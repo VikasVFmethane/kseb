@@ -1,0 +1,18 @@
+{
+  "features": {
+    "demand-projection": {
+      "enabled": true,
+      "description": "Demand projections"
+    },
+    "load-curve": {
+      "enabled": true,
+      "description": "Load curve creation"
+    }
+  },
+  "feature_groups": {
+    "basic": [
+      "demand-projection",
+      "load-curve"
+    ]
+  }
+}

@@ -1,0 +1,88 @@
+2025-05-18 16:21:56,294 - INFO - app - [app.py:33] - Application starting
+2025-05-18 16:21:58,852 - INFO - utils.features_manager - [app.py:50] - Successfully imported utility modules
+2025-05-18 16:21:58,853 - INFO - utils.features_manager - [app.py:104] - Validating application configuration
+2025-05-18 16:21:58,853 - WARNING - utils.features_manager - [app.py:125] - Configuration key 'CURRENT_PROJECT' is not set
+2025-05-18 16:21:58,854 - WARNING - utils.features_manager - [app.py:125] - Configuration key 'CURRENT_PROJECT_PATH' is not set
+2025-05-18 16:21:58,873 - INFO - werkzeug - [_internal.py:97] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-05-18 16:21:58,873 - INFO - werkzeug - [_internal.py:97] - [33mPress CTRL+C to quit[0m
+2025-05-18 16:25:45,362 - INFO - utils.features_manager - [app.py:345] - Accessing home route
+2025-05-18 16:25:45,391 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:25:45] "GET / HTTP/1.1" 200 -
+2025-05-18 16:25:45,496 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:25:45] "[36mGET /static/css/common.css HTTP/1.1[0m" 304 -
+2025-05-18 16:25:45,498 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:25:45] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-05-18 16:25:45,499 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:25:45] "[36mGET /static/css/sidebar-layout.css HTTP/1.1[0m" 304 -
+2025-05-18 16:25:45,500 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:25:45] "[36mGET /static/logos/Vasudha_Logo_PNG.png HTTP/1.1[0m" 304 -
+2025-05-18 16:25:45,909 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:25:45] "[36mGET /static/js/home.js HTTP/1.1[0m" 304 -
+2025-05-18 16:25:45,909 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:25:45] "GET /static/js/sidebar.js HTTP/1.1" 200 -
+2025-05-18 16:25:45,911 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:25:45] "[36mGET /static/js/recent-projects.js HTTP/1.1[0m" 304 -
+2025-05-18 16:25:46,115 - INFO - utils.features_manager - [app.py:1113] - Processing API request for recent_projects
+2025-05-18 16:25:46,116 - INFO - utils.features_manager - [app.py:1127] - Loaded 1 recent projects for user default_user
+2025-05-18 16:25:46,117 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:25:46] "GET /api/recent_projects HTTP/1.1" 200 -
+2025-05-18 16:25:46,256 - WARNING - utils.features_manager - [app.py:2694] - 404 error: /favicon.ico
+2025-05-18 16:25:46,264 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:25:46] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-05-18 16:25:51,788 - INFO - utils.features_manager - [app.py:971] - Processing load_project request
+2025-05-18 16:25:51,796 - INFO - utils.features_manager - [app.py:993] - Fixing missing templates for C:\Users\Admin\Desktop\drive april 2025\kerala kseb project backup 13-1-2025\new\gemini testing new version\testing project\Default_project
+2025-05-18 16:25:51,797 - INFO - utils.features_manager - [app.py:185] - Saving recent project: 'Default_project' at 'C:\Users\Admin\Desktop\drive april 2025\kerala kseb project backup 13-1-2025\new\gemini testing new version\testing project\Default_project' for user 'default_user'
+2025-05-18 16:25:51,798 - INFO - utils.features_manager - [app.py:226] - Successfully saved recent project for user default_user
+2025-05-18 16:25:51,800 - INFO - utils.features_manager - [app.py:1003] - Successfully loaded project: Default_project at C:\Users\Admin\Desktop\drive april 2025\kerala kseb project backup 13-1-2025\new\gemini testing new version\testing project\Default_project
+2025-05-18 16:25:51,801 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:25:51] "POST /load_project HTTP/1.1" 200 -
+2025-05-18 16:25:54,673 - INFO - utils.features_manager - [app.py:360] - Accessing demand_projection route
+2025-05-18 16:25:55,555 - INFO - utils.features_manager - [app.py:395] - Successfully prepared demand projection data
+2025-05-18 16:25:55,592 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:25:55] "GET /demand_projection HTTP/1.1" 200 -
+2025-05-18 16:25:55,613 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:25:55] "[36mGET /static/css/common.css HTTP/1.1[0m" 304 -
+2025-05-18 16:25:55,619 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:25:55] "[36mGET /static/css/sidebar-layout.css HTTP/1.1[0m" 304 -
+2025-05-18 16:25:55,621 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:25:55] "[36mGET /static/css/demand_projection.css HTTP/1.1[0m" 304 -
+2025-05-18 16:25:55,622 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:25:55] "[36mGET /static/logos/Vasudha_Logo_PNG.png HTTP/1.1[0m" 304 -
+2025-05-18 16:25:55,625 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:25:55] "[36mGET /static/js/sidebar.js HTTP/1.1[0m" 304 -
+2025-05-18 16:25:55,697 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:25:55] "[36mGET /static/js/demand_projection.js HTTP/1.1[0m" 304 -
+2025-05-18 16:25:55,765 - INFO - utils.features_manager - [app.py:1199] - Processing API request for independent_variables/Agriculture
+2025-05-18 16:25:55,766 - INFO - utils.features_manager - [app.py:1199] - Processing API request for independent_variables/Domestic_lt
+2025-05-18 16:25:55,769 - INFO - utils.features_manager - [app.py:1199] - Processing API request for independent_variables/railway_traction
+2025-05-18 16:25:55,772 - INFO - utils.features_manager - [app.py:1199] - Processing API request for independent_variables/ev_transport
+2025-05-18 16:25:55,775 - INFO - utils.features_manager - [app.py:1199] - Processing API request for independent_variables/Commercial_lt
+2025-05-18 16:25:57,850 - INFO - utils.features_manager - [app.py:1229] - Successfully retrieved 5 variables for sector Domestic_lt
+2025-05-18 16:25:57,859 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:25:57] "GET /api/independent_variables/Domestic_lt HTTP/1.1" 200 -
+2025-05-18 16:25:57,891 - INFO - utils.features_manager - [app.py:1229] - Successfully retrieved 5 variables for sector Agriculture
+2025-05-18 16:25:57,896 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:25:57] "GET /api/independent_variables/Agriculture HTTP/1.1" 200 -
+2025-05-18 16:25:57,999 - INFO - utils.features_manager - [app.py:1229] - Successfully retrieved 5 variables for sector Commercial_lt
+2025-05-18 16:25:58,005 - INFO - utils.features_manager - [app.py:1229] - Successfully retrieved 3 variables for sector railway_traction
+2025-05-18 16:25:58,006 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:25:58] "GET /api/independent_variables/Commercial_lt HTTP/1.1" 200 -
+2025-05-18 16:25:58,023 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:25:58] "GET /api/independent_variables/railway_traction HTTP/1.1" 200 -
+2025-05-18 16:25:58,075 - INFO - utils.features_manager - [app.py:1229] - Successfully retrieved 2 variables for sector ev_transport
+2025-05-18 16:25:58,078 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:25:58] "GET /api/independent_variables/ev_transport HTTP/1.1" 200 -
+2025-05-18 16:25:58,353 - INFO - utils.features_manager - [app.py:686] - Accessing load_profile_creation route
+2025-05-18 16:26:03,814 - INFO - utils.features_manager - [app.py:811] - Successfully prepared load profile creation data
+2025-05-18 16:26:03,856 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:26:03] "GET /load_profile_creation HTTP/1.1" 200 -
+2025-05-18 16:26:03,907 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:26:03] "[36mGET /static/css/common.css HTTP/1.1[0m" 304 -
+2025-05-18 16:26:03,923 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:26:03] "GET /static/css/load_profile.css HTTP/1.1" 200 -
+2025-05-18 16:26:03,925 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:26:03] "[36mGET /static/css/sidebar-layout.css HTTP/1.1[0m" 304 -
+2025-05-18 16:26:03,931 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:26:03] "[36mGET /static/logos/Vasudha_Logo_PNG.png HTTP/1.1[0m" 304 -
+2025-05-18 16:26:03,940 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:26:03] "[36mGET /static/js/sidebar.js HTTP/1.1[0m" 304 -
+2025-05-18 16:26:04,028 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:26:04] "GET /static/js/load_profile.js HTTP/1.1" 200 -
+2025-05-18 16:26:45,356 - INFO - utils.features_manager - [app.py:686] - Accessing load_profile_creation route
+2025-05-18 16:26:46,951 - INFO - utils.features_manager - [app.py:811] - Successfully prepared load profile creation data
+2025-05-18 16:26:46,953 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:26:46] "GET /load_profile_creation HTTP/1.1" 200 -
+2025-05-18 16:26:46,980 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:26:46] "[36mGET /static/css/common.css HTTP/1.1[0m" 304 -
+2025-05-18 16:26:46,984 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:26:46] "[36mGET /static/css/sidebar-layout.css HTTP/1.1[0m" 304 -
+2025-05-18 16:26:46,985 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:26:46] "[36mGET /static/css/load_profile.css HTTP/1.1[0m" 304 -
+2025-05-18 16:26:46,986 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:26:46] "[36mGET /static/logos/Vasudha_Logo_PNG.png HTTP/1.1[0m" 304 -
+2025-05-18 16:26:46,987 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:26:46] "[36mGET /static/js/sidebar.js HTTP/1.1[0m" 304 -
+2025-05-18 16:26:47,066 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:26:47] "GET /static/js/load_profile.js HTTP/1.1" 200 -
+2025-05-18 16:26:47,093 - INFO - utils.features_manager - [app.py:1755] - Processing request for monthly patterns for year 2017
+2025-05-18 16:26:51,917 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:26:51] "GET /api/monthly_patterns/2017 HTTP/1.1" 200 -
+2025-05-18 16:26:51,926 - INFO - utils.features_manager - [app.py:1755] - Processing request for monthly patterns for year 2017
+2025-05-18 16:26:52,156 - INFO - utils.features_manager - [app.py:1755] - Processing request for monthly patterns for year 2025
+2025-05-18 16:27:08,855 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:27:08] "GET /api/monthly_patterns/2017 HTTP/1.1" 200 -
+2025-05-18 16:27:10,131 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:27:10] "GET /api/monthly_patterns/2025 HTTP/1.1" 200 -
+2025-05-18 16:27:32,979 - INFO - utils.features_manager - [app.py:563] - API call: projected_future_metrics for base_year=2025, range=2023-2037
+2025-05-18 16:27:32,980 - INFO - utils.features_manager - [app.py:573] - Forecast scenario from request: None
+2025-05-18 16:27:37,391 - INFO - utils.create_load_curve - [create_load_curve.py:1783] - Loading annual demand from Excel due to: No scenario provided
+2025-05-18 16:27:37,461 - WARNING - utils.features_manager - [app.py:621] - Annual total demand for FY 2023 is 0 or not found. Monthly projections will be 0.
+2025-05-18 16:27:37,465 - WARNING - utils.features_manager - [app.py:621] - Annual total demand for FY 2024 is 0 or not found. Monthly projections will be 0.
+2025-05-18 16:27:37,466 - WARNING - utils.features_manager - [app.py:621] - Annual total demand for FY 2025 is 0 or not found. Monthly projections will be 0.
+2025-05-18 16:27:37,472 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:27:37] "GET /api/projected_future_metrics/2025/2023/2037 HTTP/1.1" 200 -
+2025-05-18 16:30:03,149 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:30:03] "[36mGET /static/css/common.css HTTP/1.1[0m" 304 -
+2025-05-18 16:30:03,151 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:30:03] "[36mGET /static/css/sidebar-layout.css HTTP/1.1[0m" 304 -
+2025-05-18 16:30:03,153 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:30:03] "[36mGET /static/css/load_profile.css HTTP/1.1[0m" 304 -
+2025-05-18 16:30:03,189 - WARNING - utils.features_manager - [app.py:2694] - 404 error: /.well-known/appspecific/com.chrome.devtools.json
+2025-05-18 16:30:03,191 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [18/May/2025 16:30:03] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -

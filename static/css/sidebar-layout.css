@@ -1,0 +1,165 @@
+/* static/css/sidebar-layout.css */
+
+/* Sidebar Layout - Referencing variables from common.css */
+
+.sidebar {
+  /* width, height, position, background-color, color, z-index, display, flex-direction, overflow-y
+     are primarily defined in common.css and then adjusted by .sidebar-collapsed */
+}
+
+.sidebar-header {
+  /* padding, border-bottom, display, align-items, justify-content, height
+     are in common.css */
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--text-on-primary); /* From common.css */
+  flex-grow: 1;
+  overflow: hidden; /* Helps with text hiding transition */
+}
+
+.logo-img {
+  height: 36px; /* Adjusted size */
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+}
+
+.logo-text {
+  /* font-size, font-weight, color, white-space, opacity, transition
+     are in common.css */
+}
+
+.logo-text span {
+  color: var(--accent-color);
+  font-weight: 700;
+}
+
+/* Sidebar Toggle Button is styled in common.css */
+
+/* Navigation */
+.sidebar-nav {
+  flex-grow: 1; /* Use flex-grow instead of flex: 1 for better control */
+  padding: 1rem 0; /* Adjusted padding */
+  overflow-y: auto; /* Already in common.css */
+  overflow-x: hidden; /* Prevent horizontal scroll from nav text */
+}
+
+.nav-section {
+  margin-bottom: 1.25rem; /* Increased margin */
+}
+
+.nav-section-title {
+  text-transform: uppercase;
+  font-size: 0.7rem; /* Smaller title */
+  letter-spacing: 0.075em;
+  color: rgba(255, 255, 255, 0.6); /* Slightly more visible */
+  padding: 0 1.25rem; /* Matches nav link horizontal padding */
+  margin-bottom: 0.5rem; /* Reduced margin */
+  font-weight: 600;
+  opacity: 1;
+  transition: opacity var(--transition-speed-normal) var(--transition-easing);
+}
+
+body.sidebar-collapsed .nav-section-title {
+  opacity: 0; /* Hide section titles when collapsed */
+}
+
+.nav-list {
+  /* list-style, padding, margin are in common.css */
+}
+
+.nav-item {
+  /* margin-bottom in common.css */
+}
+
+.nav-link {
+  /* display, align-items, padding, color, text-decoration, transition, border-radius, margin, min-height, font-weight
+     are in common.css */
+}
+
+.nav-link:hover,
+.nav-link.active {
+  /* background-color, color are in common.css */
+}
+
+/* Active link indicator style */
+.nav-link.active {
+  position: relative; /* For pseudo-element */
+}
+.nav-link.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 70%; /* More subtle indicator height */
+  width: 4px;
+  background-color: var(--accent-color);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.nav-link i {
+  /* width, margin-right, text-align, font-size, flex-shrink, transition
+     are in common.css */
+}
+.nav-link .nav-text {
+  /* opacity, white-space, overflow, transition, max-width
+     are in common.css */
+}
+
+
+/* Sidebar Footer */
+.sidebar-footer {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: auto; /* Pushes footer to the bottom */
+}
+
+/* Example User Profile in Footer (Uncomment in HTML to use) */
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: var(--primary-light); /* Placeholder bg */
+}
+.user-details .user-name {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--text-on-primary);
+  display: block;
+}
+.user-details .logout-link {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+.user-details .logout-link:hover {
+  color: var(--text-on-primary);
+}
+
+/* Responsive Adjustments for sidebar-layout.css are mostly handled in common.css */
+/* This file focuses on the sidebar's internal structure styling. */
+
+body.sidebar-collapsed .sidebar-footer {
+  /* How footer should look when collapsed */
+  padding: 0.5rem; /* Reduced padding */
+}
+body.sidebar-collapsed .sidebar-footer .user-profile {
+  justify-content: center;
+}
+body.sidebar-collapsed .sidebar-footer .user-details {
+  display: none; /* Hide details when collapsed */
+}
+
+/* Ensure tooltips are styled (from common.css but can be overridden here) */
+.tooltip {
+  z-index: 1080; /* Bootstrap's default, ensure it's above other elements */
+}

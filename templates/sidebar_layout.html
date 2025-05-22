@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Energy Demand Forecasting & Modeling Platform{% endblock %}</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar-layout.css') }}">
+    {% block additional_css %}{% endblock %}
+
+</head>
+
+<body class="sidebar-collapsed"> {# Start collapsed by default, JS can override #}
+    <div class="app-wrapper">
+
+        <aside class="sidebar" id="appSidebar" aria-label="Main Navigation Sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('home') }}" class="logo-container" aria-label="Homepage">
+                    <img src="{{ url_for('static', filename='logos/Vasudha_Logo_PNG.png') }}"
+                        alt="Vasudha Foundation Logo" class="logo-img">
+                    <span class="logo-text">Energy<span>Forecast</span></span>
+                </a>
+                <button class="sidebar-toggle-btn" id="sidebarToggle" aria-expanded="false" aria-controls="appSidebar"
+                    aria-label="Toggle Sidebar">
+                    <i class="fas fa-chevron-right" aria-hidden="true"></i> {# Icon changes in JS #}
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <h6 class="nav-section-title visually-hidden">General Navigation</h6>
+                    <ul class="nav-list" role="menu">
+                        <li class="nav-item" role="none">
+                            <a href="{{ url_for('home') }}"
+                                class="nav-link {% if request.endpoint == 'home' %}active{% endif %}" role="menuitem"
+                                data-bs-toggle="tooltip" data-bs-placement="right" title="Home">
+                                <i class="fas fa-home" aria-hidden="true"></i><span class="nav-text">Home</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h6 class="nav-section-title">Forecasting</h6>
+                    <ul class="nav-list" role="menu">
+                        <li class="nav-item" role="none">
+                            <a href="{{ url_for('demand_projection') }}"
+                                class="nav-link {% if request.endpoint == 'demand_projection' %}active{% endif %}"
+                                role="menuitem" data-bs-toggle="tooltip" data-bs-placement="right"
+                                title="Demand Projection">
+                                <i class="fas fa-chart-line" aria-hidden="true"></i><span class="nav-text">Demand
+                                    Projection</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" role="none">
+                            <a href="{{ url_for('demand_visualization') }}"
+                                class="nav-link {% if request.endpoint == 'demand_visualization' %}active{% endif %}"
+                                role="menuitem" data-bs-toggle="tooltip" data-bs-placement="right"
+                                title="Demand Visualization">
+                                <i class="fas fa-chart-area" aria-hidden="true"></i><span class="nav-text">Demand
+                                    Visualization</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" role="none">
+                            <a href="{{ url_for('load_profile_creation') }}"
+                                class="nav-link {% if request.endpoint == 'load_profile_creation' %}active{% endif %}"
+                                role="menuitem" data-bs-toggle="tooltip" data-bs-placement="right" title="Load Curves">
+                                <i class="fas fa-wave-square" aria-hidden="true"></i><span class="nav-text">Load
+                                    Curves</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h6 class="nav-section-title">Modeling</h6>
+                    <ul class="nav-list" role="menu">
+                        <li class="nav-item" role="none">
+                            <a href="{{ url_for('pypsa_modeling') }}"
+                                class="nav-link {% if request.endpoint == 'pypsa_modeling' %}active{% endif %}"
+                                role="menuitem" data-bs-toggle="tooltip" data-bs-placement="right"
+                                title="PyPSA Modeling">
+                                <i class="fas fa-solar-panel" aria-hidden="true"></i><span class="nav-text">PyPSA
+                                    Modeling</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" role="none">
+                            <a href="{{ url_for('pypsa_results') }}"
+                                class="nav-link {% if request.endpoint == 'pypsa_results' %}active{% endif %}"
+                                role="menuitem" data-bs-toggle="tooltip" data-bs-placement="right"
+                                title="Modeling Results">
+                                <i class="fas fa-poll" aria-hidden="true"></i><span class="nav-text">Results</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h6 class="nav-section-title">Resources</h6>
+                    <ul class="nav-list" role="menu">
+                        <li class="nav-item" role="none">
+                            <a href="{{ url_for('user_guide') }}"
+                                class="nav-link {% if request.endpoint == 'user_guide' %}active{% endif %}"
+                                role="menuitem" data-bs-toggle="tooltip" data-bs-placement="right" title="User Guide">
+                                <i class="fas fa-book" aria-hidden="true"></i>
+                                <span class="nav-text">User Guide</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" role="none">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#methodologyModal"
+                                role="menuitem" data-bs-toggle-tooltip="tooltip" data-bs-placement="right"
+                                title="Modeling Methodology">
+                                <i class="fas fa-graduation-cap" aria-hidden="true"></i>
+                                <span class="nav-text">Methodology</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" role="none">
+                            <a href="https://pypsa.org/" target="_blank" rel="noopener noreferrer" class="nav-link"
+                                role="menuitem" data-bs-toggle="tooltip" data-bs-placement="right"
+                                title="PyPSA Documentation (External Link)">
+                                <i class="fas fa-external-link-alt" aria-hidden="true"></i>
+                                <span class="nav-text">PyPSA Docs</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Add to sidebar navigation -->
+                <a href="{{ url_for('feature_management') }}" class="nav-link">
+                    <i class="fas fa-toggle-on me-2"></i>
+                    <span class="nav-text">Feature Management</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+            </div>
+        </aside>
+
+        <div class="main-content" id="mainContent" role="main">
+            <header class="top-bar">
+                <div class="page-title">
+                    <h1>{% block page_header_title %}{% endblock %}
+                        {% if current_project or self.page_header_subtitle() %}
+                        <span class="project-subtitle">
+                            {% if current_project %}{{ current_project }}{% else %}{% block page_header_subtitle %}{%
+                            endblock %}{% endif %}
+                        </span>
+                        {% endif %}
+                    </h1>
+                </div>
+                <div class="top-bar-actions">
+                    <button type="button" class="action-button" data-bs-toggle="modal" data-bs-target="#searchModal"
+                        aria-label="Search">
+                        <i class="fas fa-search" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" class="action-button" data-bs-toggle="modal"
+                        data-bs-target="#notificationsModal" aria-label="View Notifications">
+                        <i class="fas fa-bell" aria-hidden="true"></i>
+                        <span class="notification-badge" id="notificationCountBadge" style="display:none;">0</span> {#
+                        JS will update count and visibility #}
+                    </button>
+                    <button type="button" class="action-button" data-bs-toggle="modal"
+                        data-bs-target="#helpModalUniversal" aria-label="Help">
+                        <i class="fas fa-question-circle" aria-hidden="true"></i>
+                    </button>
+                    <div class="dropdown">
+                        <button class="action-button dropdown-toggle" type="button" id="userProfileDropdown"
+                            data-bs-toggle="dropdown" aria-expanded="false" aria-label="User Menu">
+                            <i class="fas fa-user-circle" aria-hidden="true"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userProfileDropdown">
+                            <li><a class="dropdown-item" href="#">Profile</a></li>
+                            <li><a class="dropdown-item" href="#">Settings</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#">Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-area">
+                {% block content %}{% endblock %}
+            </div>
+
+        </div>
+
+        <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+    </div>
+
+    <div class="modal fade" id="helpModalUniversal" tabindex="-1" aria-labelledby="helpModalUniversalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="helpModalUniversalLabel"><i
+                            class="fas fa-question-circle me-2"></i>Platform Help</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>Quick Start Guide</h6>
+                    <p>Welcome to the Energy Demand Forecasting Platform!</p>
+                    <ol>
+                        <li><strong>Create or Load a Project:</strong> Start by setting up a new project or loading an
+                            existing one from the homepage.</li>
+                        <li><strong>Input Data:</strong> Navigate to the relevant sections to input your energy data
+                            using the provided templates.</li>
+                        <li><strong>Generate Projections:</strong> Use the "Demand Projection" feature to forecast
+                            future energy needs.</li>
+                        <li><strong>Visualize Data:</strong> Explore charts and tables in "Demand Visualization" and
+                            other sections.</li>
+                        <li><strong>Model Scenarios:</strong> Utilize "PyPSA Modeling" for advanced energy system
+                            analysis.</li>
+                    </ol>
+                    <hr>
+                    <h6>Need Support?</h6>
+                    <p>If you encounter any issues or have questions:</p>
+                    <ul>
+                        <li>Consult the <a href="{{ url_for('user_guide') }}" target="_blank">Full User Guide <i
+                                    class="fas fa-external-link-alt fa-xs"></i></a>.</li>
+                        <li>Review the <a href="#" data-bs-toggle="modal" data-bs-target="#methodologyModal">Modeling
+                                Methodology</a>.</li>
+                        <li>Contact support at <a href="mailto:vikas@vasudhaindia.org">vikas@vasudhaindia.org</a> or
+                            call <a href="tel:+918369770600">+91-8369770600</a>.</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="methodologyModal" tabindex="-1" aria-labelledby="methodologyModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="methodologyModalLabel">Modeling Methodology</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>Data Processing</h6>
+                    <ul>
+                        <li>Data validation and cleaning</li>
+                        <li>Trend and seasonal pattern analysis</li>
+                        <li>Feature engineering and selection</li>
+                    </ul>
+
+                    <h6>Forecasting Methods</h6>
+                    <ul>
+                        <li>Time series analysis (ARIMA, SARIMA)</li>
+                        <li>Multiple Linear Regression (MLR)</li>
+                        <li>Simple Linear Regression (SLR)</li>
+                        <li>Weighted Average Method (WAM)</li>
+                        <li>Machine Learning models (e.g., Random Forest, Gradient Boosting - if applicable)</li>
+                    </ul>
+
+                    <h6>PyPSA Integration</h6>
+                    <p>Integration with PyPSA for comprehensive energy system modeling and optimization, including
+                        network configuration, resource optimization, cost analysis, and scenario comparison.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="searchModalLabel"><i class="fas fa-search me-2"></i>Search Platform</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="globalSearchForm" role="search">
+                        <div class="input-group mb-3">
+                            <input type="search" class="form-control" id="globalSearchInput"
+                                placeholder="Search projects, features, help..." aria-label="Search Query">
+                            <button class="btn btn-primary" type="submit" aria-label="Submit Search">
+                                <i class="fas fa-search" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </form>
+                    <div id="globalSearchResults" aria-live="polite">
+                        <p class="text-muted">Start typing to see search results.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="notificationsModal" tabindex="-1" aria-labelledby="notificationsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notificationsModalLabel"><i class="fas fa-bell me-2"></i>Notifications
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="notifications-list" id="notificationsListContainer">
+                        <p class="text-center text-muted" id="noNotificationsText">No new notifications.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary btn-sm" id="markAllNotificationsReadBtn">Mark
+                        All as Read</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;" aria-hidden="true" aria-live="assertive"
+        aria-label="Loading, please wait.">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Simple global alert function (can be expanded)
+        function showGlobalAlert(message, type = 'info', duration = 5000) {
+            const alertPlaceholder = document.createElement('div');
+            alertPlaceholder.style.position = 'fixed';
+            alertPlaceholder.style.top = '80px';
+            alertPlaceholder.style.right = '20px';
+            alertPlaceholder.style.zIndex = '1056'; // Above most Bootstrap components
+            alertPlaceholder.style.maxWidth = '400px';
+            document.body.appendChild(alertPlaceholder);
+
+            const wrapper = document.createElement('div');
+            const iconClass = type === 'success' ? 'fa-check-circle' :
+                type === 'danger' ? 'fa-exclamation-triangle' :
+                    type === 'warning' ? 'fa-exclamation-circle' : 'fa-info-circle';
+            wrapper.innerHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show d-flex align-items-start" role="alert">
+                    <i class="fas ${iconClass} alert-icon me-2"></i>
+                    <div class="alert-content">${message}</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+            alertPlaceholder.append(wrapper);
+            const alertElement = wrapper.firstChild;
+            const bsAlert = new bootstrap.Alert(alertElement);
+
+            if (duration) {
+                setTimeout(() => {
+                    bsAlert.close();
+                }, duration);
+            }
+        }
+
+        // Global Loading Overlay Control
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        function showLoading(show = true) {
+            if (loadingOverlay) {
+                loadingOverlay.style.display = show ? 'flex' : 'none';
+                loadingOverlay.setAttribute('aria-hidden', !show);
+            }
+        }
+
+        // Initialize Bootstrap Tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    </script>
+
+    <script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

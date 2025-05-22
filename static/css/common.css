@@ -1,0 +1,977 @@
+/* static/css/common.css */
+
+/* ========== Variables ========== */
+:root {
+  /* Color Palette (Ensure WCAG AA/AAA contrast for text against backgrounds) */
+  --primary-color: #1e3a8a; /* WCAG AA against white */
+  --primary-light: #2563eb; /* WCAG AA against white */
+  --primary-dark: #172e6e; /* WCAG AAA against white */
+  --secondary-color: #3b82f6;
+  --accent-color: #f97316; /* WCAG AA against white, consider darker for text */
+  --success-color: #0d7752; /* Darker green for better contrast */
+  --warning-color: #c87c0a; /* Darker yellow/orange */
+  --danger-color: #c53030;  /* Darker red */
+
+  /* Text Colors */
+  --text-primary: #1a202c; /* Darker for better readability */
+  --text-secondary: #4a5568;
+  --text-muted: #718096;
+  --text-on-primary: #ffffff; /* Text on dark primary backgrounds */
+  --text-on-accent: #ffffff;
+
+  /* Background Colors */
+  --bg-light: #f7fafc;
+  --bg-white: #ffffff;
+  --bg-sidebar: #1a2942;
+  --bg-interactive-hover: rgba(0, 0, 0, 0.04); /* Subtle hover for light elements */
+  --bg-interactive-disabled: #e2e8f0;
+
+  /* Border and Shadow */
+  --border-color: #cbd5e0; /* Slightly darker for better definition */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --focus-ring-color: rgba(37, 99, 235, 0.5); /* For focus indicators */
+
+  /* Border Radius */
+  --radius-sm: 0.25rem; /* 4px */
+  --radius-md: 0.375rem; /* 6px */
+  --radius-lg: 0.5rem; /* 8px */
+
+  /* Layout Dimensions */
+  --sidebar-width-expanded: 16rem; /* Increased for more space */
+  --sidebar-width-collapsed: 4.5rem; /* Increased for larger icons */
+  --header-height: 55px; /* Increased for larger touch targets */
+  --min-touch-target-size: 44px; /* WCAG recommendation */
+
+  /* Animation */
+  --transition-speed-fast: 0.15s;
+  --transition-speed-normal: 0.3s;
+  --transition-speed-slow: 0.5s;
+  --transition-easing: ease-in-out;
+}
+
+/* ========== Base Styles ========== */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 100%; /* Base font size, typically 16px */
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  color: var(--text-primary);
+  background-color: var(--bg-light);
+  line-height: 1.6;
+  display: flex;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary);
+  font-weight: 600; /* Slightly bolder for headings */
+  line-height: 1.2;
+  margin-bottom: 0.75rem;
+}
+
+h1 { font-size: 2rem; }
+h2 { font-size: 1.75rem; }
+h3 { font-size: 1.5rem; }
+h4 { font-size: 1.25rem; }
+h5 { font-size: 1.125rem; }
+h6 { font-size: 1rem; }
+
+p {
+  margin-bottom: 1rem;
+  max-width: 75ch; /* Improve readability for paragraphs */
+}
+
+a {
+  color: var(--primary-light);
+  text-decoration: none;
+  transition: color var(--transition-speed-normal) var(--transition-easing);
+}
+
+a:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+/* Focus styles for accessibility */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:not([tabindex="-1"]):focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--focus-ring-color);
+  border-radius: var(--radius-sm);
+}
+/* Remove default outline if custom is applied */
+*:focus {
+  outline: none;
+}
+
+
+ul, ol {
+  margin-bottom: 1rem;
+  padding-left: 1.75rem; /* Increased padding */
+}
+
+img, svg, video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ========== Layout Components ========== */
+.app-wrapper {
+    display: flex;
+    width: 100%;
+}
+
+.sidebar {
+    width: var(--sidebar-width-expanded);
+    min-width: var(--sidebar-width-expanded);
+    background-color: var(--bg-sidebar);
+    color: var(--text-on-primary);
+    transition: width var(--transition-speed-normal) var(--transition-easing),
+                min-width var(--transition-speed-normal) var(--transition-easing);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 200;
+}
+
+body.sidebar-collapsed .sidebar {
+    width: var(--sidebar-width-collapsed);
+    min-width: var(--sidebar-width-collapsed);
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    padding: 1rem; /* Consistent padding */
+    height: var(--header-height);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-header .logo-container { /* Ensure logo container in header is also flex */
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    overflow: hidden; /* To hide text smoothly */
+}
+
+.sidebar-header .logo-text {
+    color: var(--text-on-primary);
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 1;
+    transition: opacity var(--transition-speed-normal) var(--transition-easing),
+                width var(--transition-speed-normal) var(--transition-easing),
+                margin-left var(--transition-speed-normal) var(--transition-easing);
+}
+
+body.sidebar-collapsed .sidebar-header .logo-text {
+    opacity: 0;
+    width: 0;
+    margin-left: -1rem; /* Pull left to hide completely */
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar-nav li {
+    margin-bottom: 0.25rem; /* Reduced margin between nav items */
+}
+
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    padding: 0.875rem 1.25rem; /* Increased padding for touch */
+    color: rgba(255, 255, 255, 0.8);
+    transition: color var(--transition-speed-normal) var(--transition-easing),
+                background-color var(--transition-speed-normal) var(--transition-easing);
+    border-radius: var(--radius-md);
+    margin: 0 0.5rem;
+    min-height: var(--min-touch-target-size); /* Touch target size */
+    font-weight: 500;
+}
+
+.sidebar-nav a:hover,
+.sidebar-nav a:focus-visible {
+    color: var(--text-on-primary);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+.sidebar-nav a.active {
+    background-color: var(--primary-light);
+    color: var(--text-on-primary);
+    font-weight: 600;
+}
+.sidebar-nav a.active:hover,
+.sidebar-nav a.active:focus-visible {
+    background-color: var(--primary-color);
+}
+
+
+.sidebar-nav a i {
+    font-size: 1.25rem; /* Larger icons */
+    margin-right: 1rem;
+    width: 1.5rem; /* Fixed width for icon alignment */
+    text-align: center;
+    flex-shrink: 0;
+    transition: margin-right var(--transition-speed-normal) var(--transition-easing);
+}
+
+.sidebar-nav a .nav-text { /* Wrapped text in span for better control */
+    opacity: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    transition: opacity var(--transition-speed-normal) var(--transition-easing),
+                max-width var(--transition-speed-normal) var(--transition-easing);
+    max-width: 150px; /* Adjust as needed */
+}
+
+body.sidebar-collapsed .sidebar-nav a .nav-text {
+    opacity: 0;
+    max-width: 0;
+}
+
+body.sidebar-collapsed .sidebar-nav a {
+    justify-content: center; /* Center icon when collapsed */
+}
+
+body.sidebar-collapsed .sidebar-nav a i {
+    margin-right: 0;
+}
+
+.main-content {
+    flex-grow: 1;
+    margin-left: var(--sidebar-width-expanded);
+    transition: margin-left var(--transition-speed-normal) var(--transition-easing);
+    display: flex;
+    flex-direction: column; /* Ensure top-bar and content-area stack */
+    width: calc(100% - var(--sidebar-width-expanded)); /* Initial width calculation */
+}
+
+body.sidebar-collapsed .main-content {
+    margin-left: var(--sidebar-width-collapsed);
+    width: calc(100% - var(--sidebar-width-collapsed));
+}
+
+.top-bar {
+  position: sticky; /* Changed from fixed to sticky for better flow with content */
+  top: 0;
+  /* left is not needed with sticky if main-content handles margin */
+  width: 100%; /* Takes width of its container .main-content */
+  height: var(--header-height);
+  background-color: var(--bg-white);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem; /* Increased padding */
+  z-index: 100; /* Lower than sidebar */
+  box-shadow: var(--shadow-sm);
+  /* No transition needed for left/width as it's handled by main-content */
+}
+
+.page-title h1 {
+  font-size: 1.25rem; /* Adjusted size for top bar */
+  display: flex;
+  align-items: baseline; /* Align title and subtitle */
+  line-height: 1.3;
+  margin-bottom: 0;
+}
+
+.project-subtitle {
+  font-size: 0.8rem; /* Adjusted size */
+  font-weight: 500;
+  color: var(--accent-color);
+  margin-left: 0.75rem; /* Space from main title */
+  display: inline-block;
+  background-color: rgba(249, 115, 22, 0.1);
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.top-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* Reduced gap for compact layout */
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--min-touch-target-size);
+  height: var(--min-touch-target-size);
+  border-radius: 50%;
+  border: none;
+  background-color: transparent;
+  color: var(--text-secondary);
+  font-size: 1.25rem; /* Larger icons */
+  cursor: pointer;
+  transition: all var(--transition-speed-fast) var(--transition-easing);
+  position: relative;
+}
+
+.action-button:hover,
+.action-button:focus-visible {
+  background-color: var(--bg-interactive-hover);
+  color: var(--primary-color);
+}
+.action-button:disabled {
+    background-color: transparent;
+    color: var(--text-muted);
+    cursor: not-allowed;
+}
+
+
+.notification-badge {
+  position: absolute;
+  top: 4px;    /* Adjusted for larger button */
+  right: 4px;  /* Adjusted for larger button */
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: var(--danger-color);
+  color: var(--text-on-primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  border: 2px solid var(--bg-white); /* Make badge pop a bit */
+}
+.notification-badge.pulse { /* For subtle animation */
+    animation: pulseAnimation 1.5s infinite ease-in-out;
+}
+
+@keyframes pulseAnimation {
+    0% { box-shadow: 0 0 0 0 rgba(var(--danger-color), 0.7); }
+    70% { box-shadow: 0 0 0 8px rgba(var(--danger-color), 0); }
+    100% { box-shadow: 0 0 0 0 rgba(var(--danger-color), 0); }
+}
+
+.content-area {
+  padding: 1.5rem; /* Consistent padding */
+  flex-grow: 1; /* Takes remaining vertical space */
+  width: 100%;
+  overflow-y: auto; /* If content area itself needs to scroll */
+}
+
+.sidebar-toggle-btn {
+    background: none;
+    border: none;
+    color: var(--text-on-primary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--min-touch-target-size);
+    height: var(--min-touch-target-size);
+    border-radius: 50%;
+    margin-left: auto; /* Pushes toggle to the right of logo */
+    transition: transform var(--transition-speed-normal) var(--transition-easing), background-color var(--transition-speed-fast) var(--transition-easing);
+}
+.sidebar-toggle-btn:hover,
+.sidebar-toggle-btn:focus-visible {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+body.sidebar-collapsed .sidebar-toggle-btn {
+    transform: rotate(180deg);
+}
+body:not(.sidebar-collapsed) .sidebar-header .sidebar-toggle-btn {
+    /* Adjust position if needed when expanded, for now it's fine with margin-left: auto */
+}
+body.sidebar-collapsed .sidebar-header .sidebar-toggle-btn {
+    margin: 0 auto; /* Center icon in collapsed header */
+}
+
+
+/* ========== Components ========== */
+.card {
+  background-color: var(--bg-white);
+  border-radius: var(--radius-lg); /* Softer radius */
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1.5rem; /* Increased margin */
+  overflow: hidden; /* Important for child elements like headers */
+  transition: transform var(--transition-speed-normal) var(--transition-easing),
+              box-shadow var(--transition-speed-normal) var(--transition-easing);
+  display: flex; /* To help with card body growing */
+  flex-direction: column;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.card-header {
+  padding: 1rem 1.5rem; /* Increased padding */
+  background-color: var(--bg-light); /* Lighter header */
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 50px;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 1.125rem; /* Adjusted size */
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.card-body {
+  padding: 1.5rem; /* Increased padding */
+  flex-grow: 1; /* Allows card body to fill space if card is flex */
+}
+
+.card-footer {
+  padding: 1rem 1.5rem;
+  background-color: var(--bg-light);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end; /* Common pattern for actions */
+  gap: 0.75rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem 1.25rem; /* Increased padding for better touch */
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+  vertical-align: middle;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-speed-fast) var(--transition-easing);
+  min-height: var(--min-touch-target-size);
+  gap: 0.5rem; /* Space between icon and text */
+}
+.btn:disabled,
+.btn.disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+    background-color: var(--bg-interactive-disabled);
+    border-color: var(--border-color);
+    color: var(--text-muted);
+    box-shadow: none;
+}
+
+.btn-primary {
+  background-color: var(--primary-light);
+  color: var(--text-on-primary);
+  border-color: var(--primary-light);
+}
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+  color: var(--text-on-primary);
+}
+
+.btn-secondary {
+  background-color: var(--text-secondary);
+  color: var(--text-on-primary);
+  border-color: var(--text-secondary);
+}
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--text-primary);
+  border-color: var(--text-primary);
+  color: var(--text-on-primary);
+}
+
+/* ... other button styles (success, warning, danger, outline) with :not(:disabled) for hover ... */
+
+.btn-success {
+  background-color: var(--success-color);
+  color: var(--text-on-primary);
+  border-color: var(--success-color);
+}
+.btn-success:hover:not(:disabled) {
+  background-color: darken(var(--success-color), 10%);
+  border-color: darken(var(--success-color), 10%);
+}
+.btn-warning {
+  background-color: var(--warning-color);
+  color: var(--text-primary); /* Warning typically has dark text for contrast */
+  border-color: var(--warning-color);
+}
+.btn-warning:hover:not(:disabled) {
+  background-color: darken(var(--warning-color), 10%);
+  border-color: darken(var(--warning-color), 10%);
+}
+.btn-danger {
+  background-color: var(--danger-color);
+  color: var(--text-on-primary);
+  border-color: var(--danger-color);
+}
+.btn-danger:hover:not(:disabled) {
+  background-color: darken(var(--danger-color), 10%);
+  border-color: darken(var(--danger-color), 10%);
+}
+
+
+.btn-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  min-height: calc(var(--min-touch-target-size) * 0.8);
+}
+
+.btn-lg {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.125rem;
+  min-height: calc(var(--min-touch-target-size) * 1.2);
+}
+
+/* Forms */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.form-control,
+.form-select { /* Added form-select */
+  display: block;
+  width: 100%;
+  padding: 0.625rem 0.875rem; /* Increased padding */
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background-color: var(--bg-white);
+  background-clip: padding-box;
+  border: 1px solid var(--border-color);
+  appearance: none; /* For custom select arrows if added */
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-speed-fast) var(--transition-easing),
+              box-shadow var(--transition-speed-fast) var(--transition-easing);
+  min-height: var(--min-touch-target-size);
+}
+.form-control:disabled, .form-control[readonly],
+.form-select:disabled {
+    background-color: var(--bg-interactive-disabled);
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+
+.form-control:focus,
+.form-select:focus { /* Updated focus style to match global focus */
+  border-color: var(--primary-light);
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 0; /* No offset for inputs, focus ring inside */
+  box-shadow: 0 0 0 2px var(--focus-ring-color); /* Inner shadow for inputs */
+}
+
+/* Styling for Bootstrap's .is-valid and .is-invalid */
+.form-control.is-invalid, .form-select.is-invalid {
+    border-color: var(--danger-color);
+}
+.form-control.is-invalid:focus, .form-select.is-invalid:focus {
+    border-color: var(--danger-color);
+    box-shadow: 0 0 0 0.25rem rgba(var(--danger-color), 0.25);
+}
+.invalid-feedback {
+    display: none;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: .875em;
+    color: var(--danger-color);
+}
+.is-invalid ~ .invalid-feedback {
+    display: block;
+}
+
+.form-control.is-valid, .form-select.is-valid {
+    border-color: var(--success-color);
+}
+.form-control.is-valid:focus, .form-select.is-valid:focus {
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 0.25rem rgba(var(--success-color), 0.25);
+}
+.valid-feedback {
+    display: none;
+    width: 100%;
+    margin-top: .25rem;
+    font-size: .875em;
+    color: var(--success-color);
+}
+.is-valid ~ .valid-feedback {
+    display: block;
+}
+
+
+.input-group {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  width: 100%;
+}
+.input-group > .form-control,
+.input-group > .form-select {
+  position: relative;
+  flex: 1 1 auto;
+  width: 1%;
+  min-width: 0;
+}
+.input-group-text {
+  display: flex;
+  align-items: center;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  text-align: center;
+  white-space: nowrap;
+  background-color: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+.input-group > .form-control:not(:last-child),
+.input-group > .form-select:not(:last-child) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.input-group > .form-control:not(:first-child),
+.input-group > .form-select:not(:first-child) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.input-group > .input-group-text:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.input-group > .input-group-text:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+
+/* Alerts */
+.alert {
+  position: relative;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  display: flex; /* For icon alignment */
+  align-items: flex-start; /* Align icon with first line of text */
+  gap: 0.75rem;
+}
+.alert-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    margin-top: 0.125rem; /* Small adjustment for alignment */
+}
+.alert-content {
+    flex-grow: 1;
+}
+.alert h5, .alert .alert-heading { /* Bootstrap class */
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+.alert-primary {
+  color: var(--primary-dark);
+  background-color: rgba(37, 99, 235, 0.1);
+  border-color: rgba(37, 99, 235, 0.25);
+}
+.alert-success {
+  color: var(--success-color);
+  background-color: rgba(13, 119, 82, 0.1);
+  border-color: rgba(13, 119, 82, 0.25);
+}
+.alert-warning {
+  color: var(--warning-color); /* Ensure text is dark enough */
+  background-color: rgba(200, 124, 10, 0.1);
+  border-color: rgba(200, 124, 10, 0.25);
+}
+.alert-danger {
+  color: var(--danger-color);
+  background-color: rgba(197, 48, 48, 0.1);
+  border-color: rgba(197, 48, 48, 0.25);
+}
+.alert-info {
+  color: var(--secondary-color);
+  background-color: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.25);
+}
+
+.alert-dismissible {
+  padding-right: 3.5rem; /* Space for close button */
+}
+.alert-dismissible .btn-close {
+  position: absolute;
+  top: 50%;
+  right: 1.25rem;
+  transform: translateY(-50%);
+  padding: 0.5rem; /* Ensure touch target */
+  background: transparent;
+  border: 0;
+  font-size: 1.25rem;
+  color: inherit;
+  opacity: 0.7;
+}
+.alert-dismissible .btn-close:hover {
+    opacity: 1;
+}
+
+/* Modals (Bootstrap's default modal structure is generally good for accessibility) */
+.modal-content {
+  border: none;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+.modal-header {
+  padding: 1.25rem 1.5rem;
+  background-color: var(--primary-color);
+  color: var(--text-on-primary);
+  border-bottom: none;
+  border-top-left-radius: var(--radius-lg);
+  border-top-right-radius: var(--radius-lg);
+}
+.modal-title {
+  font-weight: 600;
+  color: var(--text-on-primary);
+  font-size: 1.25rem;
+}
+.modal-header .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%); /* Make close button white */
+}
+.modal-body {
+  padding: 1.5rem;
+  line-height: 1.7; /* Slightly more line height for modals */
+}
+.modal-footer {
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  display: flex; /* Ensure proper alignment */
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+/* Folder Structure (from home.css, good to keep common) */
+.folder-structure {
+  list-style: none;
+  padding-left: 0;
+}
+.folder-structure ul {
+  list-style: none;
+  padding-left: 1.75rem; /* Increased indent */
+  margin-top: 0.5rem;
+  border-left: 1px dashed var(--border-color); /* Visual cue for nesting */
+}
+.folder-structure li {
+  margin-bottom: 0.5rem;
+  position: relative; /* For pseudo-elements if needed */
+}
+.folder-structure i {
+  margin-right: 0.75rem;
+  color: var(--text-secondary);
+  font-size: 1.1em;
+}
+.folder-structure i.fa-folder { color: var(--warning-color); }
+.folder-structure i.fa-file-excel { color: var(--success-color); }
+.folder-structure strong { font-weight: 500; }
+
+
+/* Tooltips (Basic styling, Bootstrap JS handles positioning) */
+.tooltip-inner {
+    background-color: var(--text-primary); /* Dark tooltip for contrast */
+    color: var(--bg-white);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+}
+.tooltip.bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before,
+.tooltip.bs-tooltip-top .tooltip-arrow::before {
+  border-top-color: var(--text-primary);
+}
+.tooltip.bs-tooltip-auto[data-popper-placement^=right] .tooltip-arrow::before,
+.tooltip.bs-tooltip-end .tooltip-arrow::before { /* Updated class for BS5 */
+  border-right-color: var(--text-primary);
+}
+.tooltip.bs-tooltip-auto[data-popper-placement^=bottom] .tooltip-arrow::before,
+.tooltip.bs-tooltip-bottom .tooltip-arrow::before {
+  border-bottom-color: var(--text-primary);
+}
+.tooltip.bs-tooltip-auto[data-popper-placement^=left] .tooltip-arrow::before,
+.tooltip.bs-tooltip-start .tooltip-arrow::before { /* Updated class for BS5 */
+  border-left-color: var(--text-primary);
+}
+
+
+/* ========== Utilities (Spacing, Display, Flex, Text - Bootstrap based, ensure consistency) ========== */
+/* Spacing (m-*, p-*) - Using Bootstrap's scale is generally fine.
+   If more granularity is needed, add custom classes or adjust Bootstrap variables. */
+
+/* Display */
+.d-none { display: none !important; }
+/* ... other display utilities if needed, or rely on Bootstrap ... */
+
+/* Flex */
+.d-flex { display: flex !important; }
+/* ... other flex utilities, rely on Bootstrap ... */
+
+/* Text */
+.text-center { text-align: center !important; }
+/* ... other text utilities, rely on Bootstrap ... */
+
+
+/* Loading Spinner */
+.spinner-border { /* Assuming Bootstrap's spinner */
+    color: var(--primary-light);
+}
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999; /* High z-index */
+}
+.loading-overlay .spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Guided Tour / Interactive Tooltip Placeholders */
+.guided-tour-step {
+    /* Styles for individual steps of a guided tour */
+}
+.interactive-tooltip {
+    /* Styles for custom interactive tooltips */
+}
+
+
+/* ========== Responsive Breakpoints ========== */
+/* Using Bootstrap's breakpoints as a general guide:
+   sm: 576px, md: 768px, lg: 992px, xl: 1200px, xxl: 1400px
+*/
+
+@media (max-width: 991.98px) { /* lg breakpoint and down */
+    :root {
+        --sidebar-width-expanded: 15rem;
+    }
+}
+
+@media (max-width: 767.98px) { /* md breakpoint and down */
+    body {
+        /* Default to collapsed on mobile if not explicitly expanded */
+    }
+    body:not(.sidebar-expanded) .sidebar {
+        width: var(--sidebar-width-collapsed);
+        min-width: var(--sidebar-width-collapsed);
+    }
+    body:not(.sidebar-expanded) .main-content {
+        margin-left: var(--sidebar-width-collapsed);
+        width: calc(100% - var(--sidebar-width-collapsed));
+    }
+    body:not(.sidebar-expanded) .sidebar-header .logo-text,
+    body:not(.sidebar-expanded) .sidebar-nav a .nav-text {
+        opacity: 0;
+        width: 0;
+        max-width: 0;
+        overflow: hidden;
+    }
+    body:not(.sidebar-expanded) .sidebar-nav a i {
+         margin-right: 0;
+    }
+    body:not(.sidebar-expanded) .sidebar-nav a {
+        justify-content: center;
+    }
+
+    /* When sidebar is explicitly expanded on mobile */
+    body.sidebar-expanded .sidebar {
+        width: min(var(--sidebar-width-expanded), 80vw); /* Take up to 80% of viewport or expanded width */
+        min-width: min(var(--sidebar-width-expanded), 80vw);
+        box-shadow: var(--shadow-lg); /* Add shadow when it overlays */
+    }
+    body.sidebar-expanded .main-content {
+        /* Main content might be partially obscured or behavior controlled by JS overlay */
+         margin-left: 0; /* If sidebar overlays fully */
+    }
+    body.sidebar-expanded .sidebar-overlay {
+      display: block;
+    }
+
+    .top-bar {
+        padding: 0 1rem;
+    }
+    .page-title h1 {
+        font-size: 1.1rem;
+    }
+    .project-subtitle {
+        font-size: 0.7rem;
+        margin-left: 0.5rem;
+    }
+    .content-area {
+        padding: 1rem;
+    }
+    .card-header, .card-body, .card-footer {
+        padding: 1rem;
+    }
+    .btn {
+        padding: 0.5rem 1rem; /* Slightly smaller padding on mobile */
+        font-size: 0.9rem;
+    }
+}
+
+/* Overlay for mobile when sidebar is expanded */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 199; /* Below sidebar, above content */
+    cursor: pointer; /* Indicate it's clickable to close */
+}

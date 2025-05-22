@@ -1,0 +1,7 @@
+# flask geminii/requirements.txt
+Flask>=2.0
+pandas>=1.3
+python-dotenv>=0.19 # Good practice for managing config like SECRET_KEY
+# Add other core dependencies like numpy, scipy, statsmodels, etc.
+# Add plotting libraries if generating plots server-side (e.g., matplotlib, seaborn)
+# Keep existing dependencies like pypsa, openpyxl, etc.

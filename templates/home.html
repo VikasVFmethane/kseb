@@ -1,0 +1,297 @@
+{% extends "sidebar_layout.html" %}
+
+{% block title %}Homepage - Energy Demand Platform{% endblock %}
+
+{% block additional_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+{% endblock %}
+
+{% block page_header_title %}Energy Demand Forecasting Platform{% endblock %}
+
+{% block content %}
+<div class="home-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages-container mb-4" role="region" aria-label="Notifications">
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    <i class="fas {{ 'fa-check-circle' if category == 'success' else 'fa-exclamation-triangle' if category == 'danger' or category == 'warning' else 'fa-info-circle' }} alert-icon"></i>
+                    <div class="alert-content">{{ message }}</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <section id="welcomeOnboardingSection" class="mb-5" style="display:none;">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center p-4">
+                <h2 class="card-title h3">Welcome to the Platform!</h2>
+                <p class="lead mb-3">Ready to get started with your energy demand forecasting?</p>
+                <button class="btn btn-light btn-lg" id="startGuidedTourBtn"><i class="fas fa-magic me-2"></i>Start Guided Tour</button>
+                <button class="btn btn-link text-white mt-2" id="dismissWelcomeBtn">Dismiss</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="project-setup-section card mb-5" aria-labelledby="projectSetupTitle">
+        <div class="card-body">
+            <h2 class="section-title" id="projectSetupTitle">Project Setup</h2>
+            <p class="section-description">Create a new project or load an existing one to continue your work.</p>
+
+            <div class="project-mode-selection mb-4">
+                <div class="btn-group w-100" role="radiogroup" aria-label="Project Mode Selection">
+                    <input type="radio" class="btn-check" name="projectMode" id="createNewMode" value="create" checked>
+                    <label class="btn btn-outline-primary" for="createNewMode">
+                        <i class="fas fa-plus-circle me-2" aria-hidden="true"></i>Create New Project
+                    </label>
+
+                    <input type="radio" class="btn-check" name="projectMode" id="selectExistingMode" value="select">
+                    <label class="btn btn-outline-primary" for="selectExistingMode">
+                        <i class="fas fa-folder-open me-2" aria-hidden="true"></i>Load Existing Project
+                    </label>
+                </div>
+            </div>
+
+            <form id="projectForm" class="mt-4 needs-validation" novalidate>
+                <div id="createNewFields">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-5">
+                            <label for="projectName" class="form-label">Project Name</label>
+                            <div class="input-group has-validation">
+                                <span class="input-group-text"><i class="fas fa-project-diagram" aria-hidden="true"></i></span>
+                                <input type="text" class="form-control" id="projectName" placeholder="E.g., National Demand Forecast 2030" required aria-describedby="projectNameFeedback">
+                                <div id="projectNameFeedback" class="invalid-feedback">
+                                    Please provide a unique and descriptive project name.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <label for="projectLocation" class="form-label">Project Location</label>
+                            <div class="input-group has-validation">
+                                <span class="input-group-text"><i class="fas fa-folder" aria-hidden="true"></i></span>
+                                <input type="text" class="form-control" id="projectLocation" placeholder="Select or type folder path" required readonly aria-describedby="projectLocationFeedback browseBtn">
+                                <button class="btn btn-outline-secondary" type="button" id="browseBtn" aria-label="Browse for project folder">
+                                    <i class="fas fa-folder-plus" aria-hidden="true"></i> </button>
+                                <div id="projectLocationFeedback" class="invalid-feedback">
+                                    Please select a valid folder for your project.
+                                </div>
+                            </div>
+                            <small class="form-text text-muted mt-1" id="locationHelpText" style="display:none;">You can type the folder path or use browse.</small>
+                        </div>
+                        <div class="col-md-2 d-grid">
+                            <button type="submit" class="btn btn-primary" id="createProjectBtn" disabled>
+                                <i class="fas fa-plus-circle me-1" aria-hidden="true"></i>Create
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="selectExistingFields" style="display: none;">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-10">
+                            <label for="existingProjectPath" class="form-label">Existing Project Folder Path</label>
+                            <div class="input-group has-validation">
+                                <span class="input-group-text"><i class="fas fa-folder-open" aria-hidden="true"></i></span>
+                                <input type="text" class="form-control" id="existingProjectPath" placeholder="Select folder of an existing project" required aria-describedby="existingProjectPathFeedback browseExistingBtn">
+                                <button class="btn btn-outline-secondary" type="button" id="browseExistingBtn" aria-label="Browse for existing project folder">
+                                    <i class="fas fa-search-location" aria-hidden="true"></i> </button>
+                                <div id="existingProjectPathFeedback" class="invalid-feedback">
+                                    Please select a valid existing project folder.
+                                </div>
+                            </div>
+                            <small class="form-text text-muted mt-1">
+                                Select a folder that was previously set up as an energy forecasting project.
+                            </small>
+                        </div>
+                        <div class="col-md-2 d-grid">
+                            <button type="button" class="btn btn-primary" id="loadProjectBtn" disabled>
+                                <i class="fas fa-folder-open me-1" aria-hidden="true"></i>Load
+                            </button>
+                        </div>
+                    </div>
+                    <div class="project-validation-status mt-3" id="projectValidationStatus" role="status" aria-live="polite"></div>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <section id="existingProjectsDashboard" class="mb-5" aria-labelledby="existingProjectsTitle">
+        <h2 class="section-title" id="existingProjectsTitle">Recent Projects</h2>
+        <p class="section-description">Your recently accessed projects are listed below for quick access.</p>
+        
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="projectCardsContainer">
+            <!-- Project cards will be inserted here by JavaScript -->
+            <div class="col placeholder-glow">
+                <div class="card h-100 project-card-placeholder">
+                    <div class="card-body">
+                        <h5 class="card-title placeholder w-75"></h5>
+                        <p class="card-text placeholder w-100"></p>
+                        <p class="card-text placeholder w-50"></p>
+                        <a href="#" tabindex="-1" class="btn btn-primary disabled placeholder col-6"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p id="noProjectsMessage" class="text-center text-muted mt-4" style="display:none;">
+            You don't have any projects yet. Create one above to get started!
+        </p>
+    </section>
+
+    <section class="main-features-section card mb-5" aria-labelledby="mainFeaturesTitle">
+        <div class="card-body">
+            <h2 class="section-title" id="mainFeaturesTitle">Core Platform Features</h2>
+            <p class="section-description">Explore the key capabilities to streamline your energy analysis workflow.</p>
+
+            <div class="feature-grid mt-4">
+                {% macro feature_card(id, icon, title, description, url, help_modal_id) %}
+                <div class="feature-card" data-feature="{{ id }}" role="region" aria-labelledby="featureTitle{{id}}">
+                    <div class="feature-icon-wrapper">
+                        <div class="feature-icon" aria-hidden="true">
+                            <i class="fas {{ icon }}"></i>
+                        </div>
+                    </div>
+                    <div class="feature-content">
+                        <h3 id="featureTitle{{id}}">{{ title }}</h3>
+                        <p>{{ description }}</p>
+                    </div>
+                    <div class="feature-action">
+                        <a href="{{ url_for(url) }}" class="btn btn-sm btn-outline-primary feature-link">
+                            Go to {{ title }} <i class="fas fa-arrow-right ms-1" aria-hidden="true"></i>
+                        </a>
+                        <button type="button" class="help-btn action-button" data-bs-toggle="modal"
+                            data-bs-target="#{{ help_modal_id }}" aria-label="Help for {{ title }}">
+                            <i class="fas fa-question-circle" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+                {% endmacro %}
+
+                {{ feature_card("demand-projection", "fa-chart-line", "Demand Projection", "Generate sector-wise electricity demand projections.", "demand_projection", "demandProjectionHelpModal") }}
+                {{ feature_card("demand-visualization", "fa-chart-bar", "Demand Visualization", "Visualize and analyze forecast results interactively.", "demand_visualization", "demandVisualizationHelpModal") }}
+                {{ feature_card("load-curve", "fa-wave-square", "Load Curve Creation", "Generate temporal load profiles for different scenarios.", "load_profile_creation", "loadCurveHelpModal") }}
+                {{ feature_card("pypsa-modeling", "fa-cogs", "PyPSA Modeling", "Model energy systems using the PyPSA framework.", "pypsa_modeling", "pypsaModelingHelpModal") }}
+                {{ feature_card("results-analysis", "fa-poll-h", "Results Analysis", "Analyze modeling outputs and generate reports.", "pypsa_results", "resultsHelpModal") }}
+            </div>
+        </div>
+    </section>
+
+    <section class="resources-section mb-5" aria-labelledby="resourcesTitle">
+        <h2 class="section-title" id="resourcesTitle">Resources & Templates</h2>
+        <p class="section-description">Download essential resources and templates to kickstart your projects.</p>
+
+        <div class="resource-grid mt-4">
+            {% macro resource_card(icon, title, description, url, download_label="Download", external=false) %}
+            <div class="resource-card card h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="resource-icon-wrapper mb-3">
+                        <div class="resource-icon" aria-hidden="true"><i class="fas {{ icon }}"></i></div>
+                        <h4>{{ title }}</h4>
+                    </div>
+                    <p class="resource-description small flex-grow-1">{{ description }}</p>
+                    <a href="{{ url }}" class="btn btn-secondary btn-sm mt-auto"
+                       {% if download_label == "Download" %} download {% endif %}
+                       {% if external %} target="_blank" rel="noopener noreferrer" {% endif %}>
+                        <i class="fas {{ 'fa-download' if download_label == 'Download' else 'fa-external-link-alt' }} me-2" aria-hidden="true"></i>{{ download_label }}
+                    </a>
+                </div>
+            </div>
+            {% endmacro %}
+
+            {{ resource_card("fa-file-excel", "Data Input Template", "Excel template for sector-wise energy demand data.", url_for('download_template', template_type='data_input')) }}
+            {{ resource_card("fa-file-excel", "Load Curve Template", "Excel template for load curve creation parameters.", url_for('download_template', template_type='load_curve')) }}
+            {{ resource_card("fa-file-excel", "PyPSA Input Template", "Excel template for PyPSA modeling inputs.", url_for('download_template', template_type='pypsa_input')) }}
+            {{ resource_card("fa-file-pdf", "User Guide", "Comprehensive guide for using all platform features.", url_for('download_user_guide'), download_label="View Guide", external=true) }}
+            {{ resource_card("fa-file-alt", "Methodology Document", "Detailed explanation of forecasting and modeling methods.", url_for('download_methodology'), download_label="View Document", external=true) }}
+            {{ resource_card("fa-video", "Tutorial Videos", "Step-by-step video guides for key platform functionalities.", url_for('tutorials'), download_label="View Tutorials", external=true) }}
+        </div>
+    </section>
+
+    <section class="recent-activity-section" aria-labelledby="recentActivityTitle">
+        <h2 class="section-title" id="recentActivityTitle">Recent Activity</h2>
+        <p class="section-description">A quick look at your recent interactions and project updates.</p>
+
+        <div class="activity-list mt-4 card">
+            <div class="card-body">
+                {% if recent_activities %}
+                    {% for activity in recent_activities %}
+                    <div class="activity-item">
+                        <div class="activity-icon" aria-hidden="true">
+                            <i class="fas {{ activity.icon | default('fa-history') }}"></i>
+                        </div>
+                        <div class="activity-details">
+                            <div class="activity-title">{{ activity.title }}</div>
+                            <div class="activity-time small text-muted">{{ activity.time }}</div>
+                        </div>
+                        <div class="activity-actions ms-auto">
+                            <a href="{{ activity.link | default('#') }}" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-eye me-1" aria-hidden="true"></i> View
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="empty-state text-center py-5">
+                    <img src="{{ url_for('static', filename='images/no_activity_vector.svg') }}" alt="" class="empty-state-image mb-3" onerror="this.style.display='none'">
+                    <h4>No Recent Activities</h4>
+                    <p class="text-muted">Your recent activities and project updates will appear here.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Confirm Delete Project Modal -->
+<div class="modal fade" id="deleteProjectModal" tabindex="-1" aria-labelledby="deleteProjectModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteProjectModalLabel">Confirm Removal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to remove <strong id="projectToDelete">this project</strong> from your recent projects list?</p>
+                <p class="text-muted">Note: This will only remove it from your recent projects list. The project files will not be deleted.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                    <i class="fas fa-trash-alt me-2"></i>Remove from Recent Projects
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% macro help_modal(id, title, content_html) %}
+<div class="modal fade" id="{{ id }}" tabindex="-1" aria-labelledby="{{id}}Label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="{{id}}Label"><i class="fas fa-info-circle me-2"></i>{{ title }} Help</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {{ content_html | safe }}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Got it!</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{{ help_modal("demandProjectionHelpModal", "Demand Projection", "<p>The Demand Projection module allows you to generate sector-wise electricity demand forecasts using various methods including Multiple Linear Regression (MLR), Simple Linear Regression (SLR), Time Series Analysis (ARIMA/SARIMA), and Weighted Average Method (WAM).</p><ul><li>Upload your sector-wise historical data.</li><li>Select independent variables for regression models.</li><li>Configure parameters for time series models.</li><li>View results in sortable tables and interactive charts.</li><li>Export your projections and underlying data.</li></ul><p><strong>Tip:</strong> Ensure your input data is clean and complete for accurate forecasts.</p>") }}
+{{ help_modal("demandVisualizationHelpModal", "Demand Visualization", "<p>The Demand Visualization module provides interactive tools to explore and analyze your forecast results and historical data:</p><ul><li>Compare historical data with forecasted values across different models.</li><li>Drill down into sector-wise contributions to total demand.</li><li>Customize chart types, date ranges, and data series displayed.</li><li>Export visualizations as images (PNG, SVG) and data tables (CSV, Excel).</li></ul><p><strong>Tip:</strong> Use visualizations to identify trends, anomalies, and the impact of different assumptions.</p>") }}
+{{ help_modal("loadCurveHelpModal", "Load Curve Creation", "<p>The Load Curve Creation module helps you generate temporal load profiles (e.g., hourly, daily, monthly) based on your annual demand projections:</p><ul><li>Utilize standard load profiles or upload custom profiles.</li><li>Adjust profiles based on seasonal, daily, and hourly factors.</li><li>Create multiple scenarios for sensitivity analysis.</li><li>Export load curves in formats compatible with PyPSA and other modeling tools.</li></ul><p><strong>Tip:</strong> Accurate load curves are crucial for effective energy system modeling.</p>") }}
+{{ help_modal("pypsaModelingHelpModal", "PyPSA Modeling", "<p>The PyPSA Modeling module integrates with Python for Power System Analysis to model and optimize energy systems:</p><ul><li>Define network components (generators, lines, storage) and their characteristics.</li><li>Input load curves and renewable energy generation profiles.</li><li>Set optimization objectives (e.g., minimize cost, meet renewable targets).</li><li>Run simulations and analyze results like generation dispatch, capacity expansion, and system costs.</li></ul><p><strong>Tip:</strong> Refer to the PyPSA documentation for advanced modeling techniques.</p><a href='https://pypsa.org/' target='_blank' class='btn btn-sm btn-outline-info mt-2'>PyPSA Docs <i class='fas fa-external-link-alt fa-xs'></i></a>") }}
+{{ help_modal("resultsHelpModal", "Results Analysis", "<p>The Results Analysis module allows you to interpret and report on outputs from your PyPSA models and demand forecasts:</p><ul><li>View key performance indicators (KPIs) such as total system cost, renewable penetration, and curtailment levels.</li><li>Compare results across different scenarios and model runs.</li><li>Generate customizable reports with charts, tables, and summary statistics.</li><li>Export detailed results for further analysis or presentation.</li></ul><p><strong>Tip:</strong> Use this module to derive actionable insights from your modeling efforts.</p>") }}
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/recent-projects.js') }}"></script>
+{% endblock %}

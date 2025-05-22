@@ -1,0 +1,387 @@
+{% extends "sidebar_layout.html" %}
+
+{% block title %}Demand Visualization{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/demand_visualization.css') }}">
+{% endblock %}
+
+{% block page_header_title %}
+Demand Visualization
+{% endblock %}
+
+{% block page_header_subtitle %}
+{% if current_project %}{{ current_project }}{% else %}Forecast by Sector{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="demand-visualization-container">
+    <!-- Notifications with X to dismiss -->
+    <div id="notifications-area">
+        <div id="notificationContainer" class="notification-container"></div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible fade show"
+            role="alert">
+            <i
+                class="fas {% if category == 'success' %}fa-check-circle{% elif category == 'danger' %}fa-exclamation-triangle{% elif category == 'warning' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %} me-1"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Visualization Settings Horizontal Bar -->
+    <div class="visualization-settings-bar">
+        <div class="settings-group">
+            <label for="scenarioSelect" class="settings-label">Forecast Scenario:</label>
+            <select class="form-select form-select-sm" id="scenarioSelect">
+                {% for scenario in scenarios %}
+                <option value="{{ scenario }}" {% if scenario==selected_scenario %}selected{% endif %}>{{ scenario }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="settings-group">
+            <label class="settings-label">Year Range:</label>
+            <div class="d-flex align-items-center gap-1">
+                <select class="form-select form-select-sm" id="fromYear">
+                    {% for year in range(start_year, end_year + 1) %}
+                    <option value="{{ year }}" {% if year==start_year %}selected{% endif %}>{{ year }}</option>
+                    {% endfor %}
+                </select>
+                <span class="text-muted">to</span>
+                <select class="form-select form-select-sm" id="toYear">
+                    {% for year in range(start_year, end_year + 1) %}
+                    <option value="{{ year }}" {% if year==end_year %}selected{% endif %}>{{ year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="settings-group">
+            <label for="unitSelect" class="settings-label">Display Unit:</label>
+            <select class="form-select form-select-sm" id="unitSelect">
+                <option value="TWh" selected>TWh</option>
+                <option value="GWh">GWh</option>
+                <option value="MWh">MWh</option>
+                <option value="kWh">kWh</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Sector navigation -->
+    <nav class="sector-nav" aria-label="Sector selection">
+        <button class="sector-button active" data-sector="consolidated" type="button">
+            <i class="fas fa-layer-group me-1"></i>Consolidated
+        </button>
+        {% for sector in sectors %}
+        <button class="sector-button" data-sector="{{ sector }}" type="button">
+            <i class="fas fa-industry me-1"></i>{{ sector | title }}
+        </button>
+        {% endfor %}
+    </nav>
+
+    <!-- Two-column layout: Main content area and Settings sidebar -->
+    <div class="main-layout">
+        <!-- Main content column -->
+        <div class="visualization-area">
+            <!-- Consolidated section -->
+            <div id="consolidated-section" class="sector-section active">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0"><i class="fas fa-layer-group me-2"></i>Consolidated Electricity Demand</h3>
+                        <div class="card-actions">
+                            <button class="btn btn-sm btn-outline-primary" id="downloadConsolidated">
+                                <i class="fas fa-download me-1"></i>Download
+                            </button>
+                            <button class="btn btn-sm btn-primary" id="saveConsolidated">
+                                <i class="fas fa-save me-1"></i>Save
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- View toggle for consolidated -->
+                        <div class="view-toggle mb-2" role="tablist" aria-label="Consolidated data views">
+                            <button class="view-toggle-button active" data-view="table" data-sector="consolidated"
+                                type="button" role="tab" aria-selected="true" aria-controls="consolidated-table-view">
+                                <i class="fas fa-table me-1"></i>Table View
+                            </button>
+                            <button class="view-toggle-button" data-view="chart" data-sector="consolidated"
+                                type="button" role="tab" aria-selected="false" aria-controls="consolidated-chart-view">
+                                <i class="fas fa-chart-area me-1"></i>Chart View
+                            </button>
+                            <button class="view-toggle-button" data-view="comparison" data-sector="consolidated"
+                                type="button" role="tab" aria-selected="false"
+                                aria-controls="consolidated-comparison-view">
+                                <i class="fas fa-balance-scale me-1"></i>Scenario Comparison
+                            </button>
+                        </div>
+
+                        <!-- Scenario comparison dropdown (hidden by default) -->
+                        <div class="scenario-comparison-controls mb-1 hidden">
+                            <div class="d-flex align-items-center gap-2">
+                                <select class="form-select form-select-sm" id="compareScenarioConsolidated"
+                                    data-sector="consolidated">
+                                    <option value="">Select another scenario</option>
+                                    {% for scenario in scenarios %}
+                                    {% if scenario != selected_scenario %}
+                                    <option value="{{ scenario }}">{{ scenario }}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <button class="btn btn-sm btn-outline-primary" id="downloadComparisonConsolidated">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Table view for consolidated -->
+                        <div id="consolidated-table-view" class="view-content active" role="tabpanel">
+                            <h4 class="view-title">Consolidated Sectoral Demand Data <span
+                                    class="text-muted small">(<span class="model-display">WAM</span>)</span></h4>
+                            <div class="table-container">
+                                <div class="table-loading spinner-border" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <table class="table table-striped table-hover" id="consolidatedTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Year</th>
+                                            {% for sector in sectors %}
+                                            <th>{{ sector | title }}</th>
+                                            {% endfor %}
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Table data will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Chart view for consolidated -->
+                        <div id="consolidated-chart-view" class="view-content" role="tabpanel" style="display: none;">
+                            <div class="d-flex justify-content-between mb-2">
+
+                                <div class="chart-controls">
+                                    <div class="chart-type-controls">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary active"
+                                            data-chart-type="area">
+                                            <i class="fas fa-chart-area"></i> Area
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                            data-chart-type="bar">
+                                            <i class="fas fa-chart-bar"></i> Bar
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                            data-chart-type="line">
+                                            <i class="fas fa-chart-line"></i> Line
+                                        </button>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-primary mt-1" id="downloadChartConsolidated">
+                                        <i class="fas fa-download"></i> Download
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <!-- <div class="chart-loading spinner-border" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div> -->
+                                <canvas id="consolidatedChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Scenario Comparison view for consolidated -->
+                        <div id="consolidated-comparison-view" class="view-content" role="tabpanel"
+                            style="display: none;">
+                            <div class="comparison-container" id="consolidated-comparison-container">
+                                <div class="chart-container">
+                                    <!-- <div class="chart-loading spinner-border" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div> -->
+                                    <canvas id="consolidatedComparisonChart1"></canvas>
+                                </div>
+                                <div class="chart-container" id="consolidated-comparison-chart2">
+                                    <!-- <div class="chart-loading spinner-border" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div> -->
+                                    <canvas id="consolidatedComparisonChart2"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Individual sector sections -->
+            {% for sector in sectors %}
+            <div id="{{ sector }}-section" class="sector-section">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0"><i class="fas fa-industry me-2"></i>{{ sector | title }} Sector Analysis</h3>
+                        <div class="card-actions">
+                            <button class="btn btn-sm btn-outline-primary"
+                                id="download{{ sector | safe | replace('~$', '') | replace('~', '') | replace('$', '') }}">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- View toggle for this sector -->
+                        <div class="view-toggle mb-2" role="tablist" aria-label="{{ sector }} data views">
+                            <button class="view-toggle-button active" data-view="table" data-sector="{{ sector }}"
+                                type="button" role="tab" aria-selected="true" aria-controls="{{ sector }}-table-view">
+                                <i class="fas fa-table me-1"></i>Table View
+                            </button>
+                            <button class="view-toggle-button" data-view="chart" data-sector="{{ sector }}"
+                                type="button" role="tab" aria-selected="false" aria-controls="{{ sector }}-chart-view">
+                                <i class="fas fa-chart-line me-1"></i>Time Series Plot
+                            </button>
+                            <button class="view-toggle-button" data-view="comparison" data-sector="{{ sector }}"
+                                type="button" role="tab" aria-selected="false"
+                                aria-controls="{{ sector }}-comparison-view">
+                                <i class="fas fa-balance-scale me-1"></i>Scenario Comparison
+                            </button>
+                        </div>
+
+                        <!-- Scenario comparison dropdown (hidden by default) -->
+                        <div class="scenario-comparison-controls mb-1 hidden">
+                            <div class="d-flex align-items-center gap-2">
+                                <select class="form-select form-select-sm"
+                                    id="compareScenario{{ sector | safe | replace('~$', '') | replace('~', '') | replace('$', '') }}"
+                                    data-sector="{{ sector | safe | replace('~$', '') | replace('~', '') | replace('$', '') }}">
+                                    <option value="">Select another scenario</option>
+                                    {% for scenario in scenarios %}
+                                    {% if scenario != selected_scenario %}
+                                    <option value="{{ scenario }}">{{ scenario }}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <button class="btn btn-sm btn-outline-primary"
+                                    id="downloadComparison{{ sector | safe | replace('~$', '') | replace('~', '') | replace('$', '') }}">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Table view for this sector -->
+                        <div id="{{ sector }}-table-view" class="view-content active" role="tabpanel">
+                            <h4 class="view-title">{{ sector | title }} - Forecasted Demand</h4>
+                            <div class="table-container">
+                                <div class="table-loading spinner-border" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <table class="table table-striped table-hover"
+                                    id="{{ sector | safe | replace('~$', '') | replace('~', '') | replace('$', '') }}Table">
+                                    <thead>
+                                        <tr>
+                                            <th>Year</th>
+                                            <th>MLR</th>
+                                            <th>SLR</th>
+                                            <th>TimeSeries</th>
+                                            <th>WAM</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Table data will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Chart view for this sector (Time Series Plot with Model Comparison) -->
+                        <div id="{{ sector }}-chart-view" class="view-content" role="tabpanel" style="display: none;">
+                            <div class="d-flex justify-content-between mb-2">
+
+                                <button class="btn btn-sm btn-outline-primary"
+                                    id="downloadChart{{ sector | safe | replace('~$', '') | replace('~', '') | replace('$', '') }}">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                            <div class="chart-container">
+                                <!-- <div class="chart-loading spinner-border" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div> -->
+                                <canvas
+                                    id="{{ sector | safe | replace('~$', '') | replace('~', '') | replace('$', '') }}Chart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Scenario Comparison view for this sector -->
+                        <div id="{{ sector }}-comparison-view" class="view-content" role="tabpanel"
+                            style="display: none;">
+                            <div class="comparison-container"
+                                id="{{ sector | safe | replace('~$', '') | replace('~', '') | replace('$', '') }}-comparison-container">
+                                <div class="chart-container">
+                                    <!-- <div class="chart-loading spinner-border" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div> -->
+                                    <canvas
+                                        id="{{ sector | safe | replace('~$', '') | replace('~', '') | replace('$', '') }}ComparisonChart1"></canvas>
+                                </div>
+                                <div class="chart-container"
+                                    id="{{ sector | safe | replace('~$', '') | replace('~', '') | replace('$', '') }}-comparison-chart2">
+                                    <!-- <div class="chart-loading spinner-border" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div> -->
+                                    <canvas
+                                        id="{{ sector | safe | replace('~$', '') | replace('~', '') | replace('$', '') }}ComparisonChart2"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Settings sidebar -->
+        <div class="settings-sidebar">
+            <div class="card settings-card">
+                <div class="card-header">
+                    <h4 class="mb-0">Sector Models</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Sector-specific model selection -->
+                    <div class="settings-group">
+                        <p class="settings-note">Select the forecast model for each sector:</p>
+                        <div class="sector-model-table">
+                            <div class="sector-model-row sector-model-header">
+                                <div class="sector-model-cell">Sector</div>
+                                <div class="sector-model-cell">Model</div>
+                            </div>
+                            {% for sector in sectors %}
+                            <div class="sector-model-row">
+                                <div class="sector-model-cell">{{ sector | title }}</div>
+                                <div class="sector-model-cell">
+                                    <select class="form-select form-select-sm sector-model-select"
+                                        data-sector="{{ sector | safe | replace('~$', '') | replace('~', '') | replace('$', '') }}">
+                                        <option value="WAM" selected>WAM</option>
+                                        <option value="MLR">MLR</option>
+                                        <option value="SLR">SLR</option>
+                                        <option value="TimeSeries">TimeSeries</option>
+                                    </select>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    console.log('Server-provided year range: {{ start_year }} to {{ end_year }}');
+</script>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/demand_visualization.js') }}"></script>
+{% endblock %}

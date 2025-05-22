@@ -1,0 +1,25 @@
+{% extends "sidebar_layout.html" %}
+
+{% block title %}Page Not Found - Energy Demand Platform{% endblock %}
+
+{% block page_header_title %}404 - Page Not Found{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="card">
+                <div class="card-body py-5">
+                    <h1 class="display-1 text-muted">404</h1>
+                    <h2 class="mb-4">Page Not Found</h2>
+                    <p class="lead">The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>
+                    <p class="mb-4">Please check the URL or return to the homepage.</p>
+                    <a href="{{ url_for('home') }}" class="btn btn-primary">
+                        <i class="fas fa-home me-2"></i>Return to Homepage
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

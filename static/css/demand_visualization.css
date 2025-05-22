@@ -1,0 +1,577 @@
+/* static/css/demand_visualization.css */
+
+.demand-visualization-container {
+    min-height: calc(100vh - var(--header-height));
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem;
+}
+
+/* Visualization Settings Bar */
+.visualization-settings-bar {
+    display: flex;
+    gap: 1rem;
+    background: var(--bg-white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: 0.5rem;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.visualization-settings-bar .settings-group {
+    flex: 1;
+    min-width: 150px;
+}
+
+.visualization-settings-bar .settings-label {
+    font-weight: 500;
+    font-size: 0.85rem;
+    margin-bottom: 0.2rem;
+    display: block;
+}
+
+.visualization-settings-bar .form-select-sm {
+    font-size: 0.8rem;
+}
+
+/* Main layout - two columns */
+.main-layout {
+    display: flex;
+    gap: 1rem;
+    flex-grow: 1;
+}
+
+.visualization-area {
+    flex: 1;
+    min-width: 0;
+}
+
+.settings-sidebar {
+    width: 280px;
+    flex-shrink: 0;
+}
+
+/* Settings Card */
+.settings-card {
+    position: sticky;
+    top: 80px;
+}
+
+.settings-group {
+    margin-bottom: 0.75rem;
+}
+
+.settings-label {
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+    display: block;
+}
+
+.settings-note {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+/* Sector Models Table */
+.sector-model-table {
+    display: grid;
+    gap: 0.25rem;
+}
+
+.sector-model-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 0.25rem 0;
+}
+
+.sector-model-header {
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-color-light);
+    padding-bottom: 0.25rem;
+}
+
+.sector-model-cell {
+    padding: 0.25rem;
+    font-size: 0.85rem;
+}
+
+.sector-model-cell .form-select-sm {
+    width: 100%;
+}
+
+/* Notification Area */
+#notifications-area {
+    margin-bottom: 0.75rem;
+}
+
+/* Sector Navigation */
+.sector-nav {
+    background: var(--bg-white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: 0.1rem;
+    display: flex;
+    overflow-x: auto;
+    margin-bottom: 0.75rem;
+    position: sticky;
+    z-index: 90;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border-color-light);
+}
+
+.sector-nav::-webkit-scrollbar {
+    height: 4px;
+}
+
+.sector-nav::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.05);
+}
+
+.sector-nav::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 2px;
+}
+
+.sector-button {
+    padding: 0.3rem 0.5rem;
+    border: none;
+    background: none;
+    border-radius: var(--radius-md);
+    margin-right: 0.3rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all var(--transition-speed-fast) ease-in-out;
+    font-weight: 700;
+    font-size: 0.8rem;
+    border: 1px solid transparent;
+}
+
+.sector-button:last-child {
+    margin-right: 0;
+}
+
+.sector-button:hover {
+    background-color: var(--bg-interactive-hover);
+    color: var(--primary-light);
+}
+
+.sector-button.active {
+    background-color: var(--primary-light);
+    color: var(--text-on-primary);
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Cards */
+.card {
+    margin-bottom: 0.75rem;
+}
+
+.card-header {
+    padding: 0.5rem 0.75rem;
+}
+
+.card-body {
+    padding: 0.75rem;
+}
+
+.card-header h3 {
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.card-actions .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+}
+
+/* View Toggle Styling */
+.view-toggle {
+    display: flex;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    margin-bottom: 0.75rem;
+    flex-shrink: 0;
+}
+
+.view-toggle-button {
+    padding: 0.3rem 0.75rem;
+    border: none;
+    background: var(--bg-white);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all var(--transition-speed-fast) ease-in-out;
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    justify-content: center;
+    text-align: center;
+}
+
+.view-toggle-button:not(:last-child) {
+    border-right: 1px solid var(--border-color);
+}
+
+.view-toggle-button i {
+    margin-right: 0.25rem;
+    font-size: 0.9em;
+}
+
+.view-toggle-button:hover {
+    background-color: var(--bg-interactive-hover);
+    color: var(--primary-light);
+}
+
+.view-toggle-button.active {
+    background-color: var(--primary-light);
+    color: var(--text-on-primary);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Scenario Comparison Controls */
+.scenario-comparison-controls {
+    display: flex;
+    justify-content: flex-end;
+
+    transition: opacity 0.3s ease-in-out;
+}
+
+.scenario-comparison-controls.hidden {
+    display: none;
+}
+
+.scenario-comparison-controls .form-select-sm {
+    width: 300px;
+    padding-left: 5px;
+    font-size: 0.75rem;
+
+}
+
+.scenario-comparison-controls .btn {
+    padding: 0.05rem 0.05rem;
+    font-size: 0.75rem;
+}
+
+/* View Content Styling */
+.view-content {
+    display: none;
+    flex-grow: 1;
+    min-height: 0;
+    animation: fadeInChild 0.3s ease-in-out;
+}
+
+.view-content.active {
+    display: flex;
+    flex-direction: column;
+}
+
+@keyframes fadeInChild {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* View Title */
+.view-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+/* Table Container */
+.table-container {
+    flex-grow: 1;
+    min-height: 0;
+    overflow: auto;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-white);
+    position: relative;
+}
+
+.table-container table {
+    width: 100%;
+    min-width: 600px;
+    border-collapse: collapse;
+}
+
+.table-container th,
+.table-container td {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color-light);
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.table-container th {
+    position: sticky;
+    top: 0;
+    background-color: var(--bg-light);
+    font-weight: 600;
+    color: var(--text-primary);
+    z-index: 10;
+    box-shadow: 0 1px 0 var(--border-color);
+}
+
+.table-container td.numeric {
+    text-align: right;
+}
+
+.table-container tbody tr:hover {
+    background-color: var(--bg-interactive-hover);
+}
+
+.table-container tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Chart Container */
+.chart-container {
+    flex-grow: 1;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-light);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color-light);
+    padding: 0.75rem;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Comparison Container */
+.comparison-container {
+    display: flex;
+    gap: 1rem;
+    flex-grow: 1;
+}
+
+.comparison-container.split .chart-container {
+    flex: 1;
+    min-width: 0;
+}
+
+.comparison-container:not(.split) .chart-container {
+    flex: 1;
+    min-width: 0;
+}
+
+.comparison-container:not(.split) #consolidated-comparison-chart2,
+.comparison-container:not(.split) [id$="-comparison-chart2"] {
+    display: none;
+}
+
+/* Chart Controls */
+.chart-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.chart-type-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.chart-type-controls .btn {
+    width: 100px;
+    text-align: left;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.chart-type-controls .btn i {
+    margin-right: 0.25rem;
+}
+
+/* Loading Spinners */
+.table-loading,
+.chart-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+    color: var(--primary-light);
+}
+
+/* Model Display in Heading */
+.model-display {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Sector sections animation */
+.sector-section {
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.sector-section.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .main-layout {
+        flex-direction: column-reverse;
+    }
+    
+    .settings-sidebar {
+        width: 100%;
+    }
+    
+    .settings-card {
+        position: static;
+    }
+    
+    .comparison-container.split {
+        flex-direction: column;
+    }
+    
+    .comparison-container.split .chart-container {
+        flex: 1;
+    }
+
+    .chart-controls {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .chart-type-controls {
+        flex-direction: row;
+        gap: 0.5rem;
+    }
+
+    .chart-type-controls .btn {
+        width: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .demand-visualization-container {
+        padding: 0.5rem;
+    }
+    
+    .visualization-settings-bar {
+        flex-direction: column;
+    }
+    
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .card-header h3 {
+        margin-bottom: 0.5rem;
+    }
+    
+    .card-header .card-actions {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+    }
+    
+    .view-toggle {
+        flex-direction: column;
+    }
+    
+    .view-toggle-button {
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .view-toggle-button:last-child {
+        border-bottom: none;
+    }
+    
+    .sector-model-row {
+        grid-template-columns: 1fr;
+        gap: 0.25rem;
+    }
+    
+    .sector-model-header {
+        display: none;
+    }
+
+    .scenario-comparison-controls .form-select-sm {
+        width: 100%;
+        padding: 0px;
+    }
+
+    .scenario-comparison-controls {
+        justify-content: flex-start;
+    }
+}
+/* Comparison view styling */
+#consolidatedVizComparisonPane .row {
+  margin-left: -10px;
+  margin-right: -10px;
+}
+
+#consolidatedVizComparisonPane .col-md-6 {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+#consolidatedVizComparisonPane .card {
+  height: 100%;
+  margin-bottom: 15px;
+}
+
+#consolidatedVizComparisonPane .card-header {
+  padding: 0.75rem 1rem;
+  background-color: var(--primary-light);
+  color: var(--text-on-primary);
+}
+
+#consolidatedVizComparisonPane .chart-container {
+  min-height: 300px;
+}
+
+#downloadComparisonBtn {
+  margin-top: 10px;
+}
+
+.notification-container {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 1060;
+    max-width: 400px;
+}
+.notification-container .alert {
+    margin-bottom: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}

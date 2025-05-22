@@ -1,0 +1,47 @@
+{
+    "scenario": "Base_Scenario",
+    "target_year": 2037,
+    "start_year": 2025,
+    "sectors": [
+        "Agriculture",
+        "Domestic_lt",
+        "Commercial_lt",
+        "railway_traction"
+    ],
+    "sectors_with_complete_data": [],
+    "sectors_forecasted": [
+        "Agriculture",
+        "Domestic_lt",
+        "Commercial_lt",
+        "railway_traction"
+    ],
+    "sectors_with_errors": [],
+    "timestamp": "2025-05-13 12:08:23",
+    "exclude_covid": true,
+    "models_used": {
+        "Agriculture": [
+            "MLR",
+            "SLR",
+            "WAM",
+            "TimeSeries"
+        ],
+        "Domestic_lt": [
+            "MLR",
+            "SLR",
+            "WAM",
+            "TimeSeries"
+        ],
+        "Commercial_lt": [
+            "MLR",
+            "SLR",
+            "WAM",
+            "TimeSeries"
+        ],
+        "railway_traction": [
+            "MLR",
+            "SLR",
+            "WAM",
+            "TimeSeries"
+        ]
+    }
+}

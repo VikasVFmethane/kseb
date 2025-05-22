@@ -1,0 +1,620 @@
+2025-05-19 09:00:19,390 - INFO - app - [app.py:37] - Application starting
+2025-05-19 09:00:21,573 - INFO - utils.features_manager - [app.py:54] - Successfully imported utility modules
+2025-05-19 09:00:21,575 - INFO - utils.features_manager - [app.py:109] - Validating application configuration
+2025-05-19 09:00:21,576 - WARNING - utils.features_manager - [app.py:130] - Configuration key 'CURRENT_PROJECT' is not set
+2025-05-19 09:00:21,576 - WARNING - utils.features_manager - [app.py:130] - Configuration key 'CURRENT_PROJECT_PATH' is not set
+2025-05-19 09:00:21,614 - INFO - werkzeug - [_internal.py:97] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-05-19 09:00:21,615 - INFO - werkzeug - [_internal.py:97] - [33mPress CTRL+C to quit[0m
+2025-05-19 09:00:28,901 - INFO - utils.features_manager - [app.py:960] - Accessing load_profile_creation route
+2025-05-19 09:00:28,901 - WARNING - utils.features_manager - [app.py:964] - No project selected when accessing load_profile_creation
+2025-05-19 09:00:28,904 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:28] "[32mGET /load_profile_creation HTTP/1.1[0m" 302 -
+2025-05-19 09:00:28,910 - INFO - utils.features_manager - [app.py:678] - Accessing home route
+2025-05-19 09:00:28,981 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:28] "GET / HTTP/1.1" 200 -
+2025-05-19 09:00:29,040 - WARNING - utils.features_manager - [app.py:2720] - 404 error: /.well-known/appspecific/com.chrome.devtools.json
+2025-05-19 09:00:29,046 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:29] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-05-19 09:00:29,215 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:29] "[36mGET /static/css/sidebar-layout.css HTTP/1.1[0m" 304 -
+2025-05-19 09:00:29,220 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:29] "[36mGET /static/css/common.css HTTP/1.1[0m" 304 -
+2025-05-19 09:00:29,222 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:29] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-05-19 09:00:29,224 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:29] "[36mGET /static/js/sidebar.js HTTP/1.1[0m" 304 -
+2025-05-19 09:00:29,226 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:29] "[36mGET /static/logos/Vasudha_Logo_PNG.png HTTP/1.1[0m" 304 -
+2025-05-19 09:00:29,359 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:29] "[36mGET /static/js/home.js HTTP/1.1[0m" 304 -
+2025-05-19 09:00:29,361 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:29] "[36mGET /static/js/recent-projects.js HTTP/1.1[0m" 304 -
+2025-05-19 09:00:29,438 - INFO - utils.features_manager - [app.py:1872] - Processing API request for recent_projects
+2025-05-19 09:00:29,439 - INFO - utils.features_manager - [app.py:1886] - Loaded 1 recent projects for user default_user
+2025-05-19 09:00:29,440 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:29] "GET /api/recent_projects HTTP/1.1" 200 -
+2025-05-19 09:00:32,358 - INFO - utils.features_manager - [app.py:1727] - Processing load_project request
+2025-05-19 09:00:32,360 - INFO - utils.features_manager - [app.py:1749] - Fixing missing templates for C:\Users\Admin\Desktop\drive april 2025\kerala kseb project backup 13-1-2025\new\gemini testing new version\testing project\Default_project
+2025-05-19 09:00:32,361 - INFO - utils.features_manager - [app.py:193] - Saving recent project: 'Default_project' at 'C:\Users\Admin\Desktop\drive april 2025\kerala kseb project backup 13-1-2025\new\gemini testing new version\testing project\Default_project' for user 'default_user'
+2025-05-19 09:00:32,364 - INFO - utils.features_manager - [app.py:234] - Successfully saved recent project for user default_user
+2025-05-19 09:00:32,365 - INFO - utils.features_manager - [app.py:1759] - Successfully loaded project: Default_project at C:\Users\Admin\Desktop\drive april 2025\kerala kseb project backup 13-1-2025\new\gemini testing new version\testing project\Default_project
+2025-05-19 09:00:32,366 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:32] "POST /load_project HTTP/1.1" 200 -
+2025-05-19 09:00:35,401 - INFO - utils.features_manager - [app.py:693] - Accessing demand_projection route
+2025-05-19 09:00:36,345 - INFO - utils.features_manager - [app.py:728] - Successfully prepared demand projection data
+2025-05-19 09:00:36,387 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:36] "GET /demand_projection HTTP/1.1" 200 -
+2025-05-19 09:00:36,421 - WARNING - utils.features_manager - [app.py:2720] - 404 error: /.well-known/appspecific/com.chrome.devtools.json
+2025-05-19 09:00:36,422 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:36] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-05-19 09:00:36,427 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:36] "[36mGET /static/css/common.css HTTP/1.1[0m" 304 -
+2025-05-19 09:00:36,429 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:36] "[36mGET /static/css/sidebar-layout.css HTTP/1.1[0m" 304 -
+2025-05-19 09:00:36,431 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:36] "[36mGET /static/css/demand_projection.css HTTP/1.1[0m" 304 -
+2025-05-19 09:00:36,433 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:36] "[36mGET /static/logos/Vasudha_Logo_PNG.png HTTP/1.1[0m" 304 -
+2025-05-19 09:00:36,438 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:36] "[36mGET /static/js/sidebar.js HTTP/1.1[0m" 304 -
+2025-05-19 09:00:36,708 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:36] "[36mGET /static/js/demand_projection.js HTTP/1.1[0m" 304 -
+2025-05-19 09:00:37,464 - INFO - utils.features_manager - [app.py:1958] - Processing API request for independent_variables/Agriculture
+2025-05-19 09:00:37,466 - INFO - utils.features_manager - [app.py:1958] - Processing API request for independent_variables/Domestic_lt
+2025-05-19 09:00:37,468 - INFO - utils.features_manager - [app.py:1958] - Processing API request for independent_variables/Commercial_lt
+2025-05-19 09:00:37,469 - INFO - utils.features_manager - [app.py:1958] - Processing API request for independent_variables/railway_traction
+2025-05-19 09:00:37,471 - INFO - utils.features_manager - [app.py:1958] - Processing API request for independent_variables/ev_transport
+2025-05-19 09:00:38,666 - INFO - utils.features_manager - [app.py:960] - Accessing load_profile_creation route
+2025-05-19 09:00:38,733 - INFO - utils.features_manager - [app.py:1016] - Rendering load profile creation page
+2025-05-19 09:00:41,684 - INFO - utils.features_manager - [app.py:1988] - Successfully retrieved 5 variables for sector Agriculture
+2025-05-19 09:00:41,709 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:41] "GET /api/independent_variables/Agriculture HTTP/1.1" 200 -
+2025-05-19 09:00:41,777 - INFO - utils.features_manager - [app.py:1988] - Successfully retrieved 2 variables for sector ev_transport
+2025-05-19 09:00:41,790 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:41] "GET /api/independent_variables/ev_transport HTTP/1.1" 200 -
+2025-05-19 09:00:42,002 - INFO - utils.features_manager - [app.py:1988] - Successfully retrieved 5 variables for sector Domestic_lt
+2025-05-19 09:00:42,028 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:42] "GET /api/independent_variables/Domestic_lt HTTP/1.1" 200 -
+2025-05-19 09:00:42,077 - INFO - utils.features_manager - [app.py:1988] - Successfully retrieved 5 variables for sector Commercial_lt
+2025-05-19 09:00:42,083 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:42] "GET /api/independent_variables/Commercial_lt HTTP/1.1" 200 -
+2025-05-19 09:00:42,490 - INFO - utils.features_manager - [app.py:1988] - Successfully retrieved 3 variables for sector railway_traction
+2025-05-19 09:00:42,494 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:42] "GET /api/independent_variables/railway_traction HTTP/1.1" 200 -
+2025-05-19 09:00:49,454 - INFO - utils.features_manager - [app.py:1034] - Successfully prepared load profile creation data
+2025-05-19 09:00:49,504 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:49] "GET /load_profile_creation HTTP/1.1" 200 -
+2025-05-19 09:00:49,567 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:49] "[36mGET /static/css/common.css HTTP/1.1[0m" 304 -
+2025-05-19 09:00:49,588 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:49] "[36mGET /static/css/sidebar-layout.css HTTP/1.1[0m" 304 -
+2025-05-19 09:00:49,591 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:49] "[36mGET /static/css/load_profile.css HTTP/1.1[0m" 304 -
+2025-05-19 09:00:49,602 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:49] "[36mGET /static/logos/Vasudha_Logo_PNG.png HTTP/1.1[0m" 304 -
+2025-05-19 09:00:49,604 - WARNING - utils.features_manager - [app.py:2720] - 404 error: /.well-known/appspecific/com.chrome.devtools.json
+2025-05-19 09:00:49,607 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:49] "[36mGET /static/js/sidebar.js HTTP/1.1[0m" 304 -
+2025-05-19 09:00:49,610 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:49] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-05-19 09:00:50,488 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:50] "GET /static/js/load_profile.js HTTP/1.1" 200 -
+2025-05-19 09:00:51,005 - INFO - utils.features_manager - [app.py:1187] - Processing request for monthly patterns for year 2017
+2025-05-19 09:00:59,441 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:00:59] "GET /api/monthly_patterns/2017 HTTP/1.1" 200 -
+2025-05-19 09:00:59,450 - INFO - utils.features_manager - [app.py:1187] - Processing request for monthly patterns for year 2017
+2025-05-19 09:01:08,175 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:01:08] "GET /api/monthly_patterns/2017 HTTP/1.1" 200 -
+2025-05-19 09:01:10,364 - INFO - utils.features_manager - [app.py:1187] - Processing request for monthly patterns for year 2025
+2025-05-19 09:01:14,888 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:01:14] "GET /api/monthly_patterns/2025 HTTP/1.1" 200 -
+2025-05-19 09:01:25,591 - INFO - utils.features_manager - [app.py:1052] - API call: projected_future_metrics for base_year=2025, range=2023-2037
+2025-05-19 09:01:25,594 - INFO - utils.features_manager - [app.py:1075] - Forecast scenario from request: None
+2025-05-19 09:01:30,565 - INFO - utils.create_load_curve - [create_load_curve.py:1783] - Loading annual demand from Excel due to: No scenario provided
+2025-05-19 09:01:30,628 - WARNING - utils.features_manager - [app.py:1132] - Annual total demand for FY 2023 is 0. Monthly projections will be 0.
+2025-05-19 09:01:30,630 - WARNING - utils.features_manager - [app.py:1132] - Annual total demand for FY 2024 is 0. Monthly projections will be 0.
+2025-05-19 09:01:30,631 - WARNING - utils.features_manager - [app.py:1132] - Annual total demand for FY 2025 is 0. Monthly projections will be 0.
+2025-05-19 09:01:30,636 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:01:30] "GET /api/projected_future_metrics/2025/2023/2037 HTTP/1.1" 200 -
+2025-05-19 09:04:55,540 - INFO - app - [app.py:37] - Application starting
+2025-05-19 09:04:57,337 - INFO - utils.features_manager - [app.py:54] - Successfully imported utility modules
+2025-05-19 09:04:57,339 - INFO - utils.features_manager - [app.py:109] - Validating application configuration
+2025-05-19 09:04:57,339 - WARNING - utils.features_manager - [app.py:130] - Configuration key 'CURRENT_PROJECT' is not set
+2025-05-19 09:04:57,340 - WARNING - utils.features_manager - [app.py:130] - Configuration key 'CURRENT_PROJECT_PATH' is not set
+2025-05-19 09:04:57,367 - INFO - werkzeug - [_internal.py:97] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-05-19 09:04:57,368 - INFO - werkzeug - [_internal.py:97] - [33mPress CTRL+C to quit[0m
+2025-05-19 09:05:00,951 - INFO - utils.features_manager - [app.py:960] - Accessing load_profile_creation route
+2025-05-19 09:05:00,952 - WARNING - utils.features_manager - [app.py:964] - No project selected when accessing load_profile_creation
+2025-05-19 09:05:00,953 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:00] "[32mGET /load_profile_creation HTTP/1.1[0m" 302 -
+2025-05-19 09:05:00,959 - INFO - utils.features_manager - [app.py:678] - Accessing home route
+2025-05-19 09:05:01,020 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:01] "GET / HTTP/1.1" 200 -
+2025-05-19 09:05:01,249 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:01] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-05-19 09:05:01,252 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:01] "[36mGET /static/css/common.css HTTP/1.1[0m" 304 -
+2025-05-19 09:05:01,256 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:01] "[36mGET /static/js/sidebar.js HTTP/1.1[0m" 304 -
+2025-05-19 09:05:01,259 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:01] "[36mGET /static/css/sidebar-layout.css HTTP/1.1[0m" 304 -
+2025-05-19 09:05:01,261 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:01] "[36mGET /static/logos/Vasudha_Logo_PNG.png HTTP/1.1[0m" 304 -
+2025-05-19 09:05:01,328 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:01] "[36mGET /static/js/home.js HTTP/1.1[0m" 304 -
+2025-05-19 09:05:01,329 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:01] "[36mGET /static/js/recent-projects.js HTTP/1.1[0m" 304 -
+2025-05-19 09:05:01,345 - INFO - utils.features_manager - [app.py:1872] - Processing API request for recent_projects
+2025-05-19 09:05:01,346 - INFO - utils.features_manager - [app.py:1886] - Loaded 1 recent projects for user default_user
+2025-05-19 09:05:01,347 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:01] "GET /api/recent_projects HTTP/1.1" 200 -
+2025-05-19 09:05:03,753 - INFO - utils.features_manager - [app.py:1727] - Processing load_project request
+2025-05-19 09:05:03,754 - INFO - utils.features_manager - [app.py:1749] - Fixing missing templates for C:\Users\Admin\Desktop\drive april 2025\kerala kseb project backup 13-1-2025\new\gemini testing new version\testing project\Default_project
+2025-05-19 09:05:03,755 - INFO - utils.features_manager - [app.py:193] - Saving recent project: 'Default_project' at 'C:\Users\Admin\Desktop\drive april 2025\kerala kseb project backup 13-1-2025\new\gemini testing new version\testing project\Default_project' for user 'default_user'
+2025-05-19 09:05:03,758 - INFO - utils.features_manager - [app.py:234] - Successfully saved recent project for user default_user
+2025-05-19 09:05:03,763 - INFO - utils.features_manager - [app.py:1759] - Successfully loaded project: Default_project at C:\Users\Admin\Desktop\drive april 2025\kerala kseb project backup 13-1-2025\new\gemini testing new version\testing project\Default_project
+2025-05-19 09:05:03,765 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:03] "POST /load_project HTTP/1.1" 200 -
+2025-05-19 09:05:06,488 - INFO - utils.features_manager - [app.py:693] - Accessing demand_projection route
+2025-05-19 09:05:07,277 - INFO - utils.features_manager - [app.py:728] - Successfully prepared demand projection data
+2025-05-19 09:05:07,314 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:07] "GET /demand_projection HTTP/1.1" 200 -
+2025-05-19 09:05:07,353 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:07] "[36mGET /static/css/common.css HTTP/1.1[0m" 304 -
+2025-05-19 09:05:07,360 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:07] "[36mGET /static/css/sidebar-layout.css HTTP/1.1[0m" 304 -
+2025-05-19 09:05:07,363 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:07] "[36mGET /static/css/demand_projection.css HTTP/1.1[0m" 304 -
+2025-05-19 09:05:07,368 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:07] "[36mGET /static/logos/Vasudha_Logo_PNG.png HTTP/1.1[0m" 304 -
+2025-05-19 09:05:07,369 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:07] "[36mGET /static/js/sidebar.js HTTP/1.1[0m" 304 -
+2025-05-19 09:05:07,458 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:07] "[36mGET /static/js/demand_projection.js HTTP/1.1[0m" 304 -
+2025-05-19 09:05:07,547 - INFO - utils.features_manager - [app.py:1958] - Processing API request for independent_variables/Agriculture
+2025-05-19 09:05:07,549 - INFO - utils.features_manager - [app.py:1958] - Processing API request for independent_variables/Domestic_lt
+2025-05-19 09:05:07,551 - INFO - utils.features_manager - [app.py:1958] - Processing API request for independent_variables/Commercial_lt
+2025-05-19 09:05:07,552 - INFO - utils.features_manager - [app.py:1958] - Processing API request for independent_variables/railway_traction
+2025-05-19 09:05:07,555 - INFO - utils.features_manager - [app.py:1958] - Processing API request for independent_variables/ev_transport
+2025-05-19 09:05:09,358 - INFO - utils.features_manager - [app.py:960] - Accessing load_profile_creation route
+2025-05-19 09:05:09,371 - INFO - utils.features_manager - [app.py:1016] - Rendering load profile creation page
+2025-05-19 09:05:09,623 - INFO - utils.features_manager - [app.py:1988] - Successfully retrieved 5 variables for sector Domestic_lt
+2025-05-19 09:05:09,625 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:09] "GET /api/independent_variables/Domestic_lt HTTP/1.1" 200 -
+2025-05-19 09:05:10,321 - INFO - utils.features_manager - [app.py:1988] - Successfully retrieved 5 variables for sector Agriculture
+2025-05-19 09:05:10,392 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:10] "GET /api/independent_variables/Agriculture HTTP/1.1" 200 -
+2025-05-19 09:05:10,421 - INFO - utils.features_manager - [app.py:1988] - Successfully retrieved 5 variables for sector Commercial_lt
+2025-05-19 09:05:10,468 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:10] "GET /api/independent_variables/Commercial_lt HTTP/1.1" 200 -
+2025-05-19 09:05:10,485 - INFO - utils.features_manager - [app.py:1988] - Successfully retrieved 2 variables for sector ev_transport
+2025-05-19 09:05:10,514 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:10] "GET /api/independent_variables/ev_transport HTTP/1.1" 200 -
+2025-05-19 09:05:10,587 - INFO - utils.features_manager - [app.py:1988] - Successfully retrieved 3 variables for sector railway_traction
+2025-05-19 09:05:10,593 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:10] "GET /api/independent_variables/railway_traction HTTP/1.1" 200 -
+2025-05-19 09:05:18,328 - INFO - utils.features_manager - [app.py:1034] - Successfully prepared load profile creation data
+2025-05-19 09:05:18,388 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:18] "GET /load_profile_creation HTTP/1.1" 200 -
+2025-05-19 09:05:18,443 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:18] "[36mGET /static/css/common.css HTTP/1.1[0m" 304 -
+2025-05-19 09:05:18,447 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:18] "[36mGET /static/css/sidebar-layout.css HTTP/1.1[0m" 304 -
+2025-05-19 09:05:18,454 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:18] "[36mGET /static/css/load_profile.css HTTP/1.1[0m" 304 -
+2025-05-19 09:05:18,456 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:18] "[36mGET /static/logos/Vasudha_Logo_PNG.png HTTP/1.1[0m" 304 -
+2025-05-19 09:05:18,471 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:18] "[36mGET /static/js/sidebar.js HTTP/1.1[0m" 304 -
+2025-05-19 09:05:18,613 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:18] "[36mGET /static/js/load_profile.js HTTP/1.1[0m" 304 -
+2025-05-19 09:05:18,647 - INFO - utils.features_manager - [app.py:1187] - Processing request for monthly patterns for year 2017
+2025-05-19 09:05:24,815 - INFO - utils.features_manager - [app.py:1187] - Processing request for monthly patterns for year 2025
+2025-05-19 09:05:29,564 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:29] "GET /api/monthly_patterns/2017 HTTP/1.1" 200 -
+2025-05-19 09:05:29,593 - INFO - utils.features_manager - [app.py:1187] - Processing request for monthly patterns for year 2017
+2025-05-19 09:05:39,897 - INFO - utils.features_manager - [app.py:1187] - Processing request for monthly patterns for year 2020
+2025-05-19 09:05:46,096 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:46] "GET /api/monthly_patterns/2025 HTTP/1.1" 200 -
+2025-05-19 09:05:46,157 - INFO - utils.features_manager - [app.py:1187] - Processing request for monthly patterns for year 2025
+2025-05-19 09:05:51,602 - INFO - utils.features_manager - [app.py:1052] - API call: projected_future_metrics for base_year=2025, range=2023-2037
+2025-05-19 09:05:51,835 - INFO - utils.features_manager - [app.py:1075] - Forecast scenario from request: None
+2025-05-19 09:05:52,695 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:05:52] "GET /api/monthly_patterns/2017 HTTP/1.1" 200 -
+2025-05-19 09:06:05,655 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:06:05] "GET /api/monthly_patterns/2020 HTTP/1.1" 200 -
+2025-05-19 09:06:10,042 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:06:10] "GET /api/monthly_patterns/2025 HTTP/1.1" 200 -
+2025-05-19 09:06:13,211 - INFO - utils.create_load_curve - [create_load_curve.py:1783] - Loading annual demand from Excel due to: No scenario provided
+2025-05-19 09:06:13,247 - WARNING - utils.features_manager - [app.py:1132] - Annual total demand for FY 2023 is 0. Monthly projections will be 0.
+2025-05-19 09:06:13,248 - WARNING - utils.features_manager - [app.py:1132] - Annual total demand for FY 2024 is 0. Monthly projections will be 0.
+2025-05-19 09:06:13,248 - WARNING - utils.features_manager - [app.py:1132] - Annual total demand for FY 2025 is 0. Monthly projections will be 0.
+2025-05-19 09:06:13,251 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:06:13] "GET /api/projected_future_metrics/2025/2023/2037 HTTP/1.1" 200 -
+2025-05-19 09:07:06,078 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:07:06] "[36mGET /static/css/sidebar-layout.css HTTP/1.1[0m" 304 -
+2025-05-19 09:07:06,080 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:07:06] "[36mGET /static/css/common.css HTTP/1.1[0m" 304 -
+2025-05-19 09:07:06,084 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:07:06] "[36mGET /static/css/load_profile.css HTTP/1.1[0m" 304 -
+2025-05-19 09:07:06,125 - WARNING - utils.features_manager - [app.py:2720] - 404 error: /.well-known/appspecific/com.chrome.devtools.json
+2025-05-19 09:07:06,130 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:07:06] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-05-19 09:07:20,586 - INFO - utils.features_manager - [app.py:1223] - Processing API request to generate_load_profiles
+2025-05-19 09:07:20,613 - INFO - utils.create_load_curve - [create_load_curve.py:206] - create_load_curve: method=base_year, base_year=2025, scenario_name=N/A
+2025-05-19 09:07:25,482 - INFO - utils.create_load_curve - [create_load_curve.py:50] - Fallback: Loading annual demand from Excel due to: No forecast scenario provided
+2025-05-19 09:07:25,545 - INFO - utils.create_load_curve - [create_load_curve.py:73] - Loaded annual demand from Excel sheet: Total Demand
+2025-05-19 09:07:25,546 - WARNING - utils.create_load_curve - [create_load_curve.py:265] - FY 2023: Annual total is 0. Hourly profile will be 0.
+2025-05-19 09:07:25,562 - WARNING - utils.create_load_curve - [create_load_curve.py:265] - FY 2024: Annual total is 0. Hourly profile will be 0.
+2025-05-19 09:07:25,564 - WARNING - utils.create_load_curve - [create_load_curve.py:265] - FY 2025: Annual total is 0. Hourly profile will be 0.
+2025-05-19 09:07:25,572 - INFO - utils.create_load_curve - [create_load_curve.py:299] - Applying constraints...
+2025-05-19 09:07:25,646 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2026, Month 4: Capping peak from 6010028270779.38 kW to target 5930231595.71 kW.
+2025-05-19 09:07:25,675 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2027, Month 4: Capping peak from 6301204132070.22 kW to target 6138767309.53 kW.
+2025-05-19 09:07:25,705 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2028, Month 4: Capping peak from 6603660964052.17 kW to target 6396071156.61 kW.
+2025-05-19 09:07:25,750 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2029, Month 4: Capping peak from 6985618953288.52 kW to target 6657877827.86 kW.
+2025-05-19 09:07:25,795 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2030, Month 4: Capping peak from 7382777310332.19 kW to target 6972623111.67 kW.
+2025-05-19 09:07:25,837 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2031, Month 4: Capping peak from 7884573680425.12 kW to target 7352072441.85 kW.
+2025-05-19 09:07:25,880 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2032, Month 4: Capping peak from 8397661092539.76 kW to target 7791133883.76 kW.
+2025-05-19 09:07:25,922 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2033, Month 4: Capping peak from 9013077133433.22 kW to target 8235667759.97 kW.
+2025-05-19 09:07:25,966 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2034, Month 4: Capping peak from 9649287672240.38 kW to target 8737030959.29 kW.
+2025-05-19 09:07:26,010 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2035, Month 4: Capping peak from 10337469602699.61 kW to target 9252312352.15 kW.
+2025-05-19 09:07:26,052 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2036, Month 4: Capping peak from 11043962071290.67 kW to target 9825100420.36 kW.
+2025-05-19 09:07:26,095 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2037, Month 4: Capping peak from 11883306349698.29 kW to target 10418169423.25 kW.
+2025-05-19 09:07:26,139 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2026, Month 5: Capping peak from 6220402165918.69 kW to target 6106377103.49 kW.
+2025-05-19 09:07:26,183 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2027, Month 5: Capping peak from 6521770292095.89 kW to target 6325027293.10 kW.
+2025-05-19 09:07:26,228 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2028, Month 5: Capping peak from 6834814265932.88 kW to target 6593759136.59 kW.
+2025-05-19 09:07:26,270 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2029, Month 5: Capping peak from 7230142240526.19 kW to target 6868640157.95 kW.
+2025-05-19 09:07:26,314 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2030, Month 5: Capping peak from 7641202653732.33 kW to target 7197515233.84 kW.
+2025-05-19 09:07:26,358 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2031, Month 5: Capping peak from 8160563809245.07 kW to target 7594567821.09 kW.
+2025-05-19 09:07:26,400 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2032, Month 5: Capping peak from 8691611236283.14 kW to target 8052990957.17 kW.
+2025-05-19 09:07:26,444 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2033, Month 5: Capping peak from 9328569184106.30 kW to target 8518648015.17 kW.
+2025-05-19 09:07:26,487 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2034, Month 5: Capping peak from 9987049516522.96 kW to target 9042301202.42 kW.
+2025-05-19 09:07:26,528 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2035, Month 5: Capping peak from 10699320437374.99 kW to target 9582264298.64 kW.
+2025-05-19 09:07:26,574 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2036, Month 5: Capping peak from 11430542834979.31 kW to target 10181011858.02 kW.
+2025-05-19 09:07:26,618 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2037, Month 5: Capping peak from 12299267362073.94 kW to target 10802536366.05 kW.
+2025-05-19 09:07:26,660 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2026, Month 6: Capping peak from 4714782432863.31 kW to target 4690164261.56 kW.
+2025-05-19 09:07:26,706 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2027, Month 6: Capping peak from 4943205790264.57 kW to target 4861181455.82 kW.
+2025-05-19 09:07:26,750 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2028, Month 6: Capping peak from 5180478910103.50 kW to target 5070204586.58 kW.
+2025-05-19 09:07:26,794 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2029, Month 6: Capping peak from 5480119566787.10 kW to target 5285054735.69 kW.
+2025-05-19 09:07:26,839 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2030, Month 6: Capping peak from 5791684697679.82 kW to target 5540563927.07 kW.
+2025-05-19 09:07:26,880 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2031, Month 6: Capping peak from 6185336874341.20 kW to target 5847594381.00 kW.
+2025-05-19 09:07:26,917 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2032, Month 6: Capping peak from 6587846714257.09 kW to target 6201586928.36 kW.
+2025-05-19 09:07:26,955 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2033, Month 6: Capping peak from 7070631920545.40 kW to target 6562227611.62 kW.
+2025-05-19 09:07:26,998 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2034, Month 6: Capping peak from 7569730117230.17 kW to target 6966654520.69 kW.
+2025-05-19 09:07:27,040 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2035, Month 6: Capping peak from 8109599137833.36 kW to target 7385095117.71 kW.
+2025-05-19 09:07:27,086 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2036, Month 6: Capping peak from 8663832517409.70 kW to target 7847990840.51 kW.
+2025-05-19 09:07:27,129 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2037, Month 6: Capping peak from 9322286268484.54 kW to target 8329759766.45 kW.
+2025-05-19 09:07:27,172 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2026, Month 7: Capping peak from 4434940148963.83 kW to target 4609583739.67 kW.
+2025-05-19 09:07:27,216 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2027, Month 7: Capping peak from 4649805613728.17 kW to target 4779549721.92 kW.
+2025-05-19 09:07:27,258 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2028, Month 7: Capping peak from 4872995570089.43 kW to target 4983217037.48 kW.
+2025-05-19 09:07:27,304 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2029, Month 7: Capping peak from 5154851286129.53 kW to target 5196512396.62 kW.
+2025-05-19 09:07:27,345 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2030, Month 7: Capping peak from 5447923708386.39 kW to target 5445620912.05 kW.
+2025-05-19 09:07:27,388 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2031, Month 7: Capping peak from 5818210962965.45 kW to target 5749463975.58 kW.
+2025-05-19 09:07:27,435 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2032, Month 7: Capping peak from 6196830141011.36 kW to target 6095169659.71 kW.
+2025-05-19 09:07:27,479 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2033, Month 7: Capping peak from 6650960002819.95 kW to target 6451526433.95 kW.
+2025-05-19 09:07:27,524 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2034, Month 7: Capping peak from 7120434610030.72 kW to target 6846875209.63 kW.
+2025-05-19 09:07:27,564 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2035, Month 7: Capping peak from 7628260120274.00 kW to target 7259761684.10 kW.
+2025-05-19 09:07:27,607 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2036, Month 7: Capping peak from 8149597404015.06 kW to target 7712722926.42 kW.
+2025-05-19 09:07:27,651 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2037, Month 7: Capping peak from 8768969139288.16 kW to target 8187522116.57 kW.
+2025-05-19 09:07:27,694 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2026, Month 8: Capping peak from 4571393796514.53 kW to target 4659875013.84 kW.
+2025-05-19 09:07:27,738 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2027, Month 8: Capping peak from 4792870213268.08 kW to target 4831874648.96 kW.
+2025-05-19 09:07:27,782 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2028, Month 8: Capping peak from 5022927248466.76 kW to target 5033200531.06 kW.
+2025-05-19 09:07:27,825 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2029, Month 8: Capping peak from 5313455063620.91 kW to target 5248605563.37 kW.
+2025-05-19 09:07:27,874 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2030, Month 8: Capping peak from 5615544699114.07 kW to target 5495007342.47 kW.
+2025-05-19 09:07:27,917 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2031, Month 8: Capping peak from 5997224902601.51 kW to target 5801129329.73 kW.
+2025-05-19 09:07:27,960 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2032, Month 8: Capping peak from 6387493385066.79 kW to target 6143975862.74 kW.
+2025-05-19 09:07:28,001 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2033, Month 8: Capping peak from 6855595853951.03 kW to target 6502148745.97 kW.
+2025-05-19 09:07:28,048 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2034, Month 8: Capping peak from 7339515193319.31 kW to target 6894680351.21 kW.
+2025-05-19 09:07:28,092 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2035, Month 8: Capping peak from 7862965411194.37 kW to target 7308877735.70 kW.
+2025-05-19 09:07:28,135 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2036, Month 8: Capping peak from 8400343131013.75 kW to target 7759036432.89 kW.
+2025-05-19 09:07:28,179 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2037, Month 8: Capping peak from 9038771613306.89 kW to target 8234622654.18 kW.
+2025-05-19 09:07:28,224 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2026, Month 9: Capping peak from 4673315239650.15 kW to target 4668587724.43 kW.
+2025-05-19 09:07:28,267 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2027, Month 9: Capping peak from 4899729580595.05 kW to target 4844564854.64 kW.
+2025-05-19 09:07:28,309 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2028, Month 9: Capping peak from 5134915849037.38 kW to target 5046025047.01 kW.
+2025-05-19 09:07:28,352 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2029, Month 9: Capping peak from 5431921122820.05 kW to target 5265950110.20 kW.
+2025-05-19 09:07:28,396 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2030, Month 9: Capping peak from 5740745993336.99 kW to target 5512651051.18 kW.
+2025-05-19 09:07:28,438 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2031, Month 9: Capping peak from 6130935942185.98 kW to target 5823450566.32 kW.
+2025-05-19 09:07:28,482 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2032, Month 9: Capping peak from 6529905649860.42 kW to target 6166797456.88 kW.
+2025-05-19 09:07:28,525 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2033, Month 9: Capping peak from 7008444690452.92 kW to target 6529925966.58 kW.
+2025-05-19 09:07:28,570 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2034, Month 9: Capping peak from 7503153246332.64 kW to target 6923494821.13 kW.
+2025-05-19 09:07:28,614 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2035, Month 9: Capping peak from 8038274040839.31 kW to target 7342867050.27 kW.
+2025-05-19 09:07:28,657 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2036, Month 9: Capping peak from 8587632857704.99 kW to target 7794783011.00 kW.
+2025-05-19 09:07:28,699 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2037, Month 9: Capping peak from 9240295412832.50 kW to target 8275781438.30 kW.
+2025-05-19 09:07:28,744 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2026, Month 10: Capping peak from 4793049504498.55 kW to target 4753595391.73 kW.
+2025-05-19 09:07:28,787 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2027, Month 10: Capping peak from 5025264771183.31 kW to target 4934420594.08 kW.
+2025-05-19 09:07:28,830 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2028, Month 10: Capping peak from 5266476709521.72 kW to target 5136514508.35 kW.
+2025-05-19 09:07:28,873 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2029, Month 10: Capping peak from 5571091508082.58 kW to target 5362023562.78 kW.
+2025-05-19 09:07:28,922 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2030, Month 10: Capping peak from 5887828731381.66 kW to target 5609807188.93 kW.
+2025-05-19 09:07:28,965 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2031, Month 10: Capping peak from 6288015674715.49 kW to target 5927965763.68 kW.
+2025-05-19 09:07:29,008 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2032, Month 10: Capping peak from 6697207321676.17 kW to target 6274020397.06 kW.
+2025-05-19 09:07:29,054 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2033, Month 10: Capping peak from 7188006934750.59 kW to target 6644859665.01 kW.
+2025-05-19 09:07:29,101 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2034, Month 10: Capping peak from 7695390339686.05 kW to target 7042001359.19 kW.
+2025-05-19 09:07:29,149 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2035, Month 10: Capping peak from 8244221378772.79 kW to target 7469454655.29 kW.
+2025-05-19 09:07:29,196 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2036, Month 10: Capping peak from 8807655230319.91 kW to target 7925894244.52 kW.
+2025-05-19 09:07:29,241 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2037, Month 10: Capping peak from 9477039548740.70 kW to target 8415406172.60 kW.
+2025-05-19 09:07:29,287 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2026, Month 11: Capping peak from 4757003721945.78 kW to target 4724229797.31 kW.
+2025-05-19 09:07:29,331 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2027, Month 11: Capping peak from 4987472630492.47 kW to target 4907921574.67 kW.
+2025-05-19 09:07:29,377 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2028, Month 11: Capping peak from 5226870551873.55 kW to target 5108199143.58 kW.
+2025-05-19 09:07:29,423 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2029, Month 11: Capping peak from 5529194516846.95 kW to target 5336784343.20 kW.
+2025-05-19 09:07:29,468 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2030, Month 11: Capping peak from 5843549740739.03 kW to target 5582709672.76 kW.
+2025-05-19 09:07:29,516 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2031, Month 11: Capping peak from 6240727107074.68 kW to target 5903813417.41 kW.
+2025-05-19 09:07:29,562 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2032, Month 11: Capping peak from 6646841457814.05 kW to target 6247873296.45 kW.
+2025-05-19 09:07:29,607 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2033, Month 11: Capping peak from 7133950047853.30 kW to target 6621524544.17 kW.
+2025-05-19 09:07:29,651 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2034, Month 11: Capping peak from 7637517712544.88 kW to target 7016983579.34 kW.
+2025-05-19 09:07:29,695 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2035, Month 11: Capping peak from 8182221307449.25 kW to target 7447068778.90 kW.
+2025-05-19 09:07:29,738 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2036, Month 11: Capping peak from 8741417895417.80 kW to target 7902224880.12 kW.
+2025-05-19 09:07:29,781 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2037, Month 11: Capping peak from 9405768157427.65 kW to target 8394196901.11 kW.
+2025-05-19 09:07:29,821 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2026, Month 12: Capping peak from 4777881404727.39 kW to target 4612408599.16 kW.
+2025-05-19 09:07:29,863 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2027, Month 12: Capping peak from 5009361802237.49 kW to target 4795449697.47 kW.
+2025-05-19 09:07:29,908 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2028, Month 12: Capping peak from 5249810400505.39 kW to target 4989497612.50 kW.
+2025-05-19 09:07:29,953 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2029, Month 12: Capping peak from 5553461214101.77 kW to target 5216288320.21 kW.
+2025-05-19 09:07:29,996 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2030, Month 12: Capping peak from 5869196089772.33 kW to target 5454616714.29 kW.
+2025-05-19 09:07:30,039 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2031, Month 12: Capping peak from 6268116600227.07 kW to target 5770278563.19 kW.
+2025-05-19 09:07:30,083 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2032, Month 12: Capping peak from 6676013317994.80 kW to target 6103092356.23 kW.
+2025-05-19 09:07:30,126 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2033, Month 12: Capping peak from 7165259745046.05 kW to target 6469691715.81 kW.
+2025-05-19 09:07:30,167 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2034, Month 12: Capping peak from 7671037482837.64 kW to target 6852740205.59 kW.
+2025-05-19 09:07:30,233 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2035, Month 12: Capping peak from 8218131689465.09 kW to target 7273992203.52 kW.
+2025-05-19 09:07:30,285 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2036, Month 12: Capping peak from 8779782496445.98 kW to target 7715493133.27 kW.
+2025-05-19 09:07:30,332 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2037, Month 12: Capping peak from 9447048479114.65 kW to target 8196714231.70 kW.
+2025-05-19 09:07:30,371 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2026, Month 1: Capping peak from 4820347774967.38 kW to target 4630300632.83 kW.
+2025-05-19 09:07:30,408 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2027, Month 1: Capping peak from 5053885597396.88 kW to target 4816521775.84 kW.
+2025-05-19 09:07:30,449 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2028, Month 1: Capping peak from 5296471331004.22 kW to target 5008619326.35 kW.
+2025-05-19 09:07:30,501 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2029, Month 1: Capping peak from 5602821028641.78 kW to target 5238529900.75 kW.
+2025-05-19 09:07:30,550 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2030, Month 1: Capping peak from 5921362192914.36 kW to target 5474751962.51 kW.
+2025-05-19 09:07:30,595 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2031, Month 1: Capping peak from 6323828355648.48 kW to target 5793461575.70 kW.
+2025-05-19 09:07:30,638 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2032, Month 1: Capping peak from 6735350507278.86 kW to target 6124067478.86 kW.
+2025-05-19 09:07:30,682 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2033, Month 1: Capping peak from 7228945413948.96 kW to target 6493216694.63 kW.
+2025-05-19 09:07:30,726 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2034, Month 1: Capping peak from 7739218563587.94 kW to target 6874109929.17 kW.
+2025-05-19 09:07:30,768 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2035, Month 1: Capping peak from 8291175407683.08 kW to target 7297336394.51 kW.
+2025-05-19 09:07:30,813 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2036, Month 1: Capping peak from 8857818232902.68 kW to target 7736695169.36 kW.
+2025-05-19 09:07:30,857 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2037, Month 1: Capping peak from 9531014953877.35 kW to target 8219262874.69 kW.
+2025-05-19 09:07:30,902 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2026, Month 2: Capping peak from 5373943018621.71 kW to target 5331710572.95 kW.
+2025-05-19 09:07:30,944 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2027, Month 2: Capping peak from 5634301608710.69 kW to target 5550352088.48 kW.
+2025-05-19 09:07:30,986 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2028, Month 2: Capping peak from 5904747221848.06 kW to target 5769483066.15 kW.
+2025-05-19 09:07:31,031 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2029, Month 2: Capping peak from 6246279803257.58 kW to target 6038747122.54 kW.
+2025-05-19 09:07:31,075 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2030, Month 2: Capping peak from 6601403986366.51 kW to target 6308981352.13 kW.
+2025-05-19 09:07:31,117 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2031, Month 2: Capping peak from 7050091576230.53 kW to target 6681331265.65 kW.
+2025-05-19 09:07:31,161 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2032, Month 2: Capping peak from 7508875194550.94 kW to target 7061191543.98 kW.
+2025-05-19 09:07:31,204 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2033, Month 2: Capping peak from 8059157254385.30 kW to target 7491514990.89 kW.
+2025-05-19 09:07:31,248 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2034, Month 2: Capping peak from 8628032978318.12 kW to target 7929825259.36 kW.
+2025-05-19 09:07:31,293 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2035, Month 2: Capping peak from 9243379581380.51 kW to target 8422243696.61 kW.
+2025-05-19 09:07:31,340 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2036, Month 2: Capping peak from 9875098784392.07 kW to target 8928465960.73 kW.
+2025-05-19 09:07:31,392 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2037, Month 2: Capping peak from 10625609118444.75 kW to target 9489023597.98 kW.
+2025-05-19 09:07:31,458 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2026, Month 3: Capping peak from 5727597822128.46 kW to target 5558237306.10 kW.
+2025-05-19 09:07:31,511 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2027, Month 3: Capping peak from 6005090398510.22 kW to target 5783603795.75 kW.
+2025-05-19 09:07:31,560 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2028, Month 3: Capping peak from 6293333816693.52 kW to target 6006711490.30 kW.
+2025-05-19 09:07:31,607 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2029, Month 3: Capping peak from 6657342378505.33 kW to target 6283716077.98 kW.
+2025-05-19 09:07:31,653 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2030, Month 3: Capping peak from 7035836994230.06 kW to target 6559298040.87 kW.
+2025-05-19 09:07:31,696 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2031, Month 3: Capping peak from 7514052348136.13 kW to target 6944039253.89 kW.
+2025-05-19 09:07:31,744 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2032, Month 3: Capping peak from 8003028141890.29 kW to target 7333466032.09 kW.
+2025-05-19 09:07:31,793 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2033, Month 3: Capping peak from 8589523814907.69 kW to target 7777062428.48 kW.
+2025-05-19 09:07:31,857 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2034, Month 3: Capping peak from 9195836785880.54 kW to target 8226839986.48 kW.
+2025-05-19 09:07:31,914 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2035, Month 3: Capping peak from 9851678846606.04 kW to target 8733806043.62 kW.
+2025-05-19 09:07:31,963 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2036, Month 3: Capping peak from 10524970974719.04 kW to target 9253327514.47 kW.
+2025-05-19 09:07:32,001 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2037, Month 3: Capping peak from 11324871781242.20 kW to target 9830055963.71 kW.
+2025-05-19 09:07:32,003 - INFO - utils.create_load_curve - [create_load_curve.py:358] - Applied/Overrode 15 custom LFs.
+2025-05-19 09:07:32,004 - INFO - utils.create_load_curve - [create_load_curve.py:376] - Applying YoY LF improvement of 0.3% from base LF 61.3% (FY 2037).
+2025-05-19 09:07:32,040 - WARNING - utils.create_load_curve - [create_load_curve.py:403] - FY 2023: Skipping LF constraint (target_lf=0.0, avg_demand=0.0).
+2025-05-19 09:07:32,074 - WARNING - utils.create_load_curve - [create_load_curve.py:403] - FY 2024: Skipping LF constraint (target_lf=0.0, avg_demand=0.0).
+2025-05-19 09:07:32,110 - WARNING - utils.create_load_curve - [create_load_curve.py:403] - FY 2025: Skipping LF constraint (target_lf=0.0, avg_demand=0.0).
+2025-05-19 09:07:35,305 - INFO - utils.features_manager - [app.py:1285] - Successfully generated load profile: excel_annual_base_year_by2025_20250519090720 to C:\Users\Admin\Desktop\drive april 2025\kerala kseb project backup 13-1-2025\new\gemini testing new version\testing project\Default_project\results\load_profiles\excel_annual_base_year_by2025_20250519090720.csv
+2025-05-19 09:07:35,309 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:07:35] "POST /api/generate_load_profiles HTTP/1.1" 200 -
+2025-05-19 09:07:35,346 - INFO - utils.features_manager - [app.py:960] - Accessing load_profile_creation route
+2025-05-19 09:07:35,348 - INFO - utils.features_manager - [app.py:1016] - Rendering load profile creation page
+2025-05-19 09:07:38,004 - INFO - utils.features_manager - [app.py:1034] - Successfully prepared load profile creation data
+2025-05-19 09:07:38,005 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:07:38] "GET /load_profile_creation HTTP/1.1" 200 -
+2025-05-19 09:07:38,061 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:07:38] "[36mGET /static/css/common.css HTTP/1.1[0m" 304 -
+2025-05-19 09:07:38,096 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:07:38] "[36mGET /static/css/sidebar-layout.css HTTP/1.1[0m" 304 -
+2025-05-19 09:07:38,097 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:07:38] "[36mGET /static/css/load_profile.css HTTP/1.1[0m" 304 -
+2025-05-19 09:07:38,101 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:07:38] "[36mGET /static/logos/Vasudha_Logo_PNG.png HTTP/1.1[0m" 304 -
+2025-05-19 09:07:38,102 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:07:38] "[36mGET /static/js/sidebar.js HTTP/1.1[0m" 304 -
+2025-05-19 09:07:38,134 - WARNING - utils.features_manager - [app.py:2720] - 404 error: /.well-known/appspecific/com.chrome.devtools.json
+2025-05-19 09:07:38,137 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:07:38] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-05-19 09:07:39,428 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:07:39] "[36mGET /static/js/load_profile.js HTTP/1.1[0m" 304 -
+2025-05-19 09:07:40,042 - INFO - utils.features_manager - [app.py:1187] - Processing request for monthly patterns for year 2017
+2025-05-19 09:07:42,218 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:07:42] "GET /api/monthly_patterns/2017 HTTP/1.1" 200 -
+2025-05-19 09:07:42,223 - INFO - utils.features_manager - [app.py:1187] - Processing request for monthly patterns for year 2017
+2025-05-19 09:07:44,504 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:07:44] "GET /api/monthly_patterns/2017 HTTP/1.1" 200 -
+2025-05-19 09:08:50,895 - INFO - app - [app.py:37] - Application starting
+2025-05-19 09:08:52,803 - INFO - utils.features_manager - [app.py:54] - Successfully imported utility modules
+2025-05-19 09:08:52,805 - INFO - utils.features_manager - [app.py:109] - Validating application configuration
+2025-05-19 09:08:52,806 - WARNING - utils.features_manager - [app.py:130] - Configuration key 'CURRENT_PROJECT' is not set
+2025-05-19 09:08:52,806 - WARNING - utils.features_manager - [app.py:130] - Configuration key 'CURRENT_PROJECT_PATH' is not set
+2025-05-19 09:08:52,834 - INFO - werkzeug - [_internal.py:97] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-05-19 09:08:52,834 - INFO - werkzeug - [_internal.py:97] - [33mPress CTRL+C to quit[0m
+2025-05-19 09:08:57,914 - INFO - utils.features_manager - [app.py:960] - Accessing load_profile_creation route
+2025-05-19 09:08:57,915 - WARNING - utils.features_manager - [app.py:964] - No project selected when accessing load_profile_creation
+2025-05-19 09:08:57,917 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:08:57] "[32mGET /load_profile_creation HTTP/1.1[0m" 302 -
+2025-05-19 09:08:57,926 - INFO - utils.features_manager - [app.py:678] - Accessing home route
+2025-05-19 09:08:57,995 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:08:57] "GET / HTTP/1.1" 200 -
+2025-05-19 09:08:58,058 - WARNING - utils.features_manager - [app.py:2720] - 404 error: /.well-known/appspecific/com.chrome.devtools.json
+2025-05-19 09:08:58,063 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:08:58] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-05-19 09:08:58,141 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:08:58] "[36mGET /static/css/common.css HTTP/1.1[0m" 304 -
+2025-05-19 09:08:58,147 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:08:58] "[36mGET /static/css/sidebar-layout.css HTTP/1.1[0m" 304 -
+2025-05-19 09:08:58,150 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:08:58] "[36mGET /static/logos/Vasudha_Logo_PNG.png HTTP/1.1[0m" 304 -
+2025-05-19 09:08:58,151 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:08:58] "[36mGET /static/js/sidebar.js HTTP/1.1[0m" 304 -
+2025-05-19 09:08:58,154 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:08:58] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-05-19 09:08:58,330 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:08:58] "[36mGET /static/js/home.js HTTP/1.1[0m" 304 -
+2025-05-19 09:08:58,332 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:08:58] "[36mGET /static/js/recent-projects.js HTTP/1.1[0m" 304 -
+2025-05-19 09:08:58,401 - INFO - utils.features_manager - [app.py:1872] - Processing API request for recent_projects
+2025-05-19 09:08:58,401 - INFO - utils.features_manager - [app.py:1886] - Loaded 1 recent projects for user default_user
+2025-05-19 09:08:58,402 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:08:58] "GET /api/recent_projects HTTP/1.1" 200 -
+2025-05-19 09:09:00,282 - INFO - utils.features_manager - [app.py:960] - Accessing load_profile_creation route
+2025-05-19 09:09:00,283 - WARNING - utils.features_manager - [app.py:964] - No project selected when accessing load_profile_creation
+2025-05-19 09:09:00,285 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:00] "[32mGET /load_profile_creation HTTP/1.1[0m" 302 -
+2025-05-19 09:09:00,295 - INFO - utils.features_manager - [app.py:678] - Accessing home route
+2025-05-19 09:09:00,297 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:00] "GET / HTTP/1.1" 200 -
+2025-05-19 09:09:00,318 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:00] "[36mGET /static/css/common.css HTTP/1.1[0m" 304 -
+2025-05-19 09:09:00,321 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:00] "[36mGET /static/css/sidebar-layout.css HTTP/1.1[0m" 304 -
+2025-05-19 09:09:00,324 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:00] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2025-05-19 09:09:00,325 - WARNING - utils.features_manager - [app.py:2720] - 404 error: /.well-known/appspecific/com.chrome.devtools.json
+2025-05-19 09:09:00,327 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:00] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-05-19 09:09:00,332 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:00] "[36mGET /static/logos/Vasudha_Logo_PNG.png HTTP/1.1[0m" 304 -
+2025-05-19 09:09:00,336 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:00] "[36mGET /static/js/sidebar.js HTTP/1.1[0m" 304 -
+2025-05-19 09:09:00,599 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:00] "[36mGET /static/js/home.js HTTP/1.1[0m" 304 -
+2025-05-19 09:09:00,601 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:00] "[36mGET /static/js/recent-projects.js HTTP/1.1[0m" 304 -
+2025-05-19 09:09:00,679 - INFO - utils.features_manager - [app.py:1872] - Processing API request for recent_projects
+2025-05-19 09:09:00,680 - INFO - utils.features_manager - [app.py:1886] - Loaded 1 recent projects for user default_user
+2025-05-19 09:09:00,681 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:00] "GET /api/recent_projects HTTP/1.1" 200 -
+2025-05-19 09:09:03,016 - INFO - utils.features_manager - [app.py:1727] - Processing load_project request
+2025-05-19 09:09:03,019 - INFO - utils.features_manager - [app.py:1749] - Fixing missing templates for C:\Users\Admin\Desktop\drive april 2025\kerala kseb project backup 13-1-2025\new\gemini testing new version\testing project\Default_project
+2025-05-19 09:09:03,020 - INFO - utils.features_manager - [app.py:193] - Saving recent project: 'Default_project' at 'C:\Users\Admin\Desktop\drive april 2025\kerala kseb project backup 13-1-2025\new\gemini testing new version\testing project\Default_project' for user 'default_user'
+2025-05-19 09:09:03,023 - INFO - utils.features_manager - [app.py:234] - Successfully saved recent project for user default_user
+2025-05-19 09:09:03,024 - INFO - utils.features_manager - [app.py:1759] - Successfully loaded project: Default_project at C:\Users\Admin\Desktop\drive april 2025\kerala kseb project backup 13-1-2025\new\gemini testing new version\testing project\Default_project
+2025-05-19 09:09:03,025 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:03] "POST /load_project HTTP/1.1" 200 -
+2025-05-19 09:09:05,834 - INFO - utils.features_manager - [app.py:693] - Accessing demand_projection route
+2025-05-19 09:09:06,671 - INFO - utils.features_manager - [app.py:728] - Successfully prepared demand projection data
+2025-05-19 09:09:06,710 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:06] "GET /demand_projection HTTP/1.1" 200 -
+2025-05-19 09:09:06,790 - WARNING - utils.features_manager - [app.py:2720] - 404 error: /.well-known/appspecific/com.chrome.devtools.json
+2025-05-19 09:09:06,792 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:06] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-05-19 09:09:06,793 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:06] "[36mGET /static/css/common.css HTTP/1.1[0m" 304 -
+2025-05-19 09:09:06,804 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:06] "[36mGET /static/css/sidebar-layout.css HTTP/1.1[0m" 304 -
+2025-05-19 09:09:06,805 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:06] "[36mGET /static/css/demand_projection.css HTTP/1.1[0m" 304 -
+2025-05-19 09:09:06,810 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:06] "[36mGET /static/logos/Vasudha_Logo_PNG.png HTTP/1.1[0m" 304 -
+2025-05-19 09:09:06,813 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:06] "[36mGET /static/js/sidebar.js HTTP/1.1[0m" 304 -
+2025-05-19 09:09:07,085 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:07] "[36mGET /static/js/demand_projection.js HTTP/1.1[0m" 304 -
+2025-05-19 09:09:07,858 - INFO - utils.features_manager - [app.py:1958] - Processing API request for independent_variables/Agriculture
+2025-05-19 09:09:07,860 - INFO - utils.features_manager - [app.py:1958] - Processing API request for independent_variables/Domestic_lt
+2025-05-19 09:09:07,862 - INFO - utils.features_manager - [app.py:1958] - Processing API request for independent_variables/Commercial_lt
+2025-05-19 09:09:07,864 - INFO - utils.features_manager - [app.py:1958] - Processing API request for independent_variables/railway_traction
+2025-05-19 09:09:07,866 - INFO - utils.features_manager - [app.py:1958] - Processing API request for independent_variables/ev_transport
+2025-05-19 09:09:10,010 - INFO - utils.features_manager - [app.py:960] - Accessing load_profile_creation route
+2025-05-19 09:09:10,074 - INFO - utils.features_manager - [app.py:1016] - Rendering load profile creation page
+2025-05-19 09:09:11,437 - INFO - utils.features_manager - [app.py:1988] - Successfully retrieved 5 variables for sector Agriculture
+2025-05-19 09:09:11,460 - INFO - utils.features_manager - [app.py:1988] - Successfully retrieved 5 variables for sector Domestic_lt
+2025-05-19 09:09:11,467 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:11] "GET /api/independent_variables/Agriculture HTTP/1.1" 200 -
+2025-05-19 09:09:11,498 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:11] "GET /api/independent_variables/Domestic_lt HTTP/1.1" 200 -
+2025-05-19 09:09:11,720 - INFO - utils.features_manager - [app.py:1988] - Successfully retrieved 3 variables for sector railway_traction
+2025-05-19 09:09:11,728 - INFO - utils.features_manager - [app.py:1988] - Successfully retrieved 5 variables for sector Commercial_lt
+2025-05-19 09:09:11,737 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:11] "GET /api/independent_variables/railway_traction HTTP/1.1" 200 -
+2025-05-19 09:09:11,754 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:11] "GET /api/independent_variables/Commercial_lt HTTP/1.1" 200 -
+2025-05-19 09:09:12,116 - INFO - utils.features_manager - [app.py:1988] - Successfully retrieved 2 variables for sector ev_transport
+2025-05-19 09:09:12,125 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:12] "GET /api/independent_variables/ev_transport HTTP/1.1" 200 -
+2025-05-19 09:09:19,736 - INFO - utils.features_manager - [app.py:1034] - Successfully prepared load profile creation data
+2025-05-19 09:09:19,794 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:19] "GET /load_profile_creation HTTP/1.1" 200 -
+2025-05-19 09:09:19,897 - WARNING - utils.features_manager - [app.py:2720] - 404 error: /.well-known/appspecific/com.chrome.devtools.json
+2025-05-19 09:09:19,899 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:19] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-05-19 09:09:19,903 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:19] "[36mGET /static/css/common.css HTTP/1.1[0m" 304 -
+2025-05-19 09:09:19,926 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:19] "[36mGET /static/css/load_profile.css HTTP/1.1[0m" 304 -
+2025-05-19 09:09:19,928 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:19] "[36mGET /static/css/sidebar-layout.css HTTP/1.1[0m" 304 -
+2025-05-19 09:09:19,937 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:19] "[36mGET /static/logos/Vasudha_Logo_PNG.png HTTP/1.1[0m" 304 -
+2025-05-19 09:09:19,940 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:19] "[36mGET /static/js/sidebar.js HTTP/1.1[0m" 304 -
+2025-05-19 09:09:20,196 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:20] "[36mGET /static/js/load_profile.js HTTP/1.1[0m" 304 -
+2025-05-19 09:09:20,322 - INFO - utils.features_manager - [app.py:1187] - Processing request for monthly patterns for year 2017
+2025-05-19 09:09:26,356 - INFO - utils.features_manager - [app.py:1187] - Processing request for monthly patterns for year 2025
+2025-05-19 09:09:30,980 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:30] "GET /api/monthly_patterns/2017 HTTP/1.1" 200 -
+2025-05-19 09:09:31,024 - INFO - utils.features_manager - [app.py:1187] - Processing request for monthly patterns for year 2017
+2025-05-19 09:09:36,147 - INFO - utils.features_manager - [app.py:1361] - Processing API request for load_profile_metadata/excel_annual_base_year_by2025_20250519090720
+2025-05-19 09:09:37,741 - INFO - utils.features_manager - [app.py:1379] - Successfully retrieved profile metadata for excel_annual_base_year_by2025_20250519090720
+2025-05-19 09:09:37,756 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:37] "GET /api/load_profile_metadata/excel_annual_base_year_by2025_20250519090720 HTTP/1.1" 200 -
+2025-05-19 09:09:37,843 - INFO - utils.features_manager - [app.py:1392] - Processing API request for load_profile_data/excel_annual_base_year_by2025_20250519090720/2022
+2025-05-19 09:09:41,925 - INFO - utils.features_manager - [app.py:1417] - Successfully retrieved 6600 data points for profile excel_annual_base_year_by2025_20250519090720, year 2022
+2025-05-19 09:09:41,972 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:41] "GET /api/load_profile_data/excel_annual_base_year_by2025_20250519090720/2022 HTTP/1.1" 200 -
+2025-05-19 09:09:46,535 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:46] "GET /api/monthly_patterns/2025 HTTP/1.1" 200 -
+2025-05-19 09:09:48,773 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:09:48] "GET /api/monthly_patterns/2017 HTTP/1.1" 200 -
+2025-05-19 09:10:12,979 - INFO - utils.features_manager - [app.py:1187] - Processing request for monthly patterns for year 2024
+2025-05-19 09:10:15,320 - INFO - utils.features_manager - [app.py:1187] - Processing request for monthly patterns for year 2025
+2025-05-19 09:10:19,693 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:10:19] "GET /api/monthly_patterns/2024 HTTP/1.1" 200 -
+2025-05-19 09:10:20,880 - INFO - utils.features_manager - [app.py:2356] - Processing API request for scenario_details/Base_Scenario2
+2025-05-19 09:10:20,933 - INFO - utils.features_manager - [app.py:2420] - Successfully retrieved scenario details for Base_Scenario2
+2025-05-19 09:10:20,942 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:10:20] "GET /api/scenario_details/Base_Scenario2 HTTP/1.1" 200 -
+2025-05-19 09:10:26,025 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:10:26] "GET /api/monthly_patterns/2025 HTTP/1.1" 200 -
+2025-05-19 09:10:26,033 - INFO - utils.features_manager - [app.py:1187] - Processing request for monthly patterns for year 2025
+2025-05-19 09:10:28,618 - INFO - utils.features_manager - [app.py:1052] - API call: projected_future_metrics for base_year=2025, range=2023-2037
+2025-05-19 09:10:28,633 - INFO - utils.features_manager - [app.py:1075] - Forecast scenario from request: Base_Scenario2
+2025-05-19 09:10:39,814 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:10:39] "GET /api/monthly_patterns/2025 HTTP/1.1" 200 -
+2025-05-19 09:10:43,068 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:10:43] "GET /api/projected_future_metrics/2025/2023/2037?forecast_scenario=Base_Scenario2 HTTP/1.1" 200 -
+2025-05-19 09:11:24,675 - INFO - utils.features_manager - [app.py:1052] - API call: projected_future_metrics for base_year=2025, range=2026-2045
+2025-05-19 09:11:24,677 - INFO - utils.features_manager - [app.py:1075] - Forecast scenario from request: Base_Scenario2
+2025-05-19 09:11:28,697 - WARNING - utils.features_manager - [app.py:1132] - Annual total demand for FY 2041 is 0. Monthly projections will be 0.
+2025-05-19 09:11:28,699 - WARNING - utils.features_manager - [app.py:1132] - Annual total demand for FY 2042 is 0. Monthly projections will be 0.
+2025-05-19 09:11:28,700 - WARNING - utils.features_manager - [app.py:1132] - Annual total demand for FY 2043 is 0. Monthly projections will be 0.
+2025-05-19 09:11:28,701 - WARNING - utils.features_manager - [app.py:1132] - Annual total demand for FY 2044 is 0. Monthly projections will be 0.
+2025-05-19 09:11:28,702 - WARNING - utils.features_manager - [app.py:1132] - Annual total demand for FY 2045 is 0. Monthly projections will be 0.
+2025-05-19 09:11:28,708 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:11:28] "GET /api/projected_future_metrics/2025/2026/2045?forecast_scenario=Base_Scenario2 HTTP/1.1" 200 -
+2025-05-19 09:12:56,004 - INFO - utils.features_manager - [app.py:1223] - Processing API request to generate_load_profiles
+2025-05-19 09:12:56,066 - INFO - utils.create_load_curve - [create_load_curve.py:206] - create_load_curve: method=base_year, base_year=2025, scenario_name=N/A
+2025-05-19 09:13:00,159 - INFO - utils.create_load_curve - [create_load_curve.py:50] - Fallback: Loading annual demand from Excel due to: No forecast scenario provided
+2025-05-19 09:13:00,224 - INFO - utils.create_load_curve - [create_load_curve.py:73] - Loaded annual demand from Excel sheet: Total Demand
+2025-05-19 09:13:00,244 - WARNING - utils.create_load_curve - [create_load_curve.py:265] - FY 2038: Annual total is 0. Hourly profile will be 0.
+2025-05-19 09:13:00,246 - WARNING - utils.create_load_curve - [create_load_curve.py:265] - FY 2039: Annual total is 0. Hourly profile will be 0.
+2025-05-19 09:13:00,247 - WARNING - utils.create_load_curve - [create_load_curve.py:265] - FY 2040: Annual total is 0. Hourly profile will be 0.
+2025-05-19 09:13:00,248 - INFO - utils.create_load_curve - [create_load_curve.py:299] - Applying constraints...
+2025-05-19 09:13:00,327 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2026, Month 4: Capping peak from 6010028270779.38 kW to target 5930231595.71 kW.
+2025-05-19 09:13:00,369 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2027, Month 4: Capping peak from 6301204132070.22 kW to target 6138767309.53 kW.
+2025-05-19 09:13:00,412 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2028, Month 4: Capping peak from 6603660964052.17 kW to target 6396071156.61 kW.
+2025-05-19 09:13:00,455 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2029, Month 4: Capping peak from 6985618953288.52 kW to target 6657877827.86 kW.
+2025-05-19 09:13:00,502 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2030, Month 4: Capping peak from 7382777310332.19 kW to target 6972623111.67 kW.
+2025-05-19 09:13:00,544 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2031, Month 4: Capping peak from 7884573680425.12 kW to target 7352072441.85 kW.
+2025-05-19 09:13:00,588 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2032, Month 4: Capping peak from 8397661092539.76 kW to target 7791133883.76 kW.
+2025-05-19 09:13:00,628 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2033, Month 4: Capping peak from 9013077133433.22 kW to target 8235667759.97 kW.
+2025-05-19 09:13:00,659 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2034, Month 4: Capping peak from 9649287672240.38 kW to target 8737030959.29 kW.
+2025-05-19 09:13:00,703 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2035, Month 4: Capping peak from 10337469602699.61 kW to target 9252312352.15 kW.
+2025-05-19 09:13:00,748 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2036, Month 4: Capping peak from 11043962071290.67 kW to target 9825100420.36 kW.
+2025-05-19 09:13:00,792 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2037, Month 4: Capping peak from 11883306349698.29 kW to target 10418169423.25 kW.
+2025-05-19 09:13:00,836 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2026, Month 5: Capping peak from 6220402165918.69 kW to target 6106377103.49 kW.
+2025-05-19 09:13:00,878 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2027, Month 5: Capping peak from 6521770292095.89 kW to target 6325027293.10 kW.
+2025-05-19 09:13:00,922 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2028, Month 5: Capping peak from 6834814265932.88 kW to target 6593759136.59 kW.
+2025-05-19 09:13:00,965 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2029, Month 5: Capping peak from 7230142240526.19 kW to target 6868640157.95 kW.
+2025-05-19 09:13:01,011 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2030, Month 5: Capping peak from 7641202653732.33 kW to target 7197515233.84 kW.
+2025-05-19 09:13:01,049 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2031, Month 5: Capping peak from 8160563809245.07 kW to target 7594567821.09 kW.
+2025-05-19 09:13:01,088 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2032, Month 5: Capping peak from 8691611236283.14 kW to target 8052990957.17 kW.
+2025-05-19 09:13:01,128 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2033, Month 5: Capping peak from 9328569184106.30 kW to target 8518648015.17 kW.
+2025-05-19 09:13:01,170 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2034, Month 5: Capping peak from 9987049516522.96 kW to target 9042301202.42 kW.
+2025-05-19 09:13:01,211 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2035, Month 5: Capping peak from 10699320437374.99 kW to target 9582264298.64 kW.
+2025-05-19 09:13:01,255 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2036, Month 5: Capping peak from 11430542834979.31 kW to target 10181011858.02 kW.
+2025-05-19 09:13:01,298 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2037, Month 5: Capping peak from 12299267362073.94 kW to target 10802536366.05 kW.
+2025-05-19 09:13:01,342 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2026, Month 6: Capping peak from 4714782432863.31 kW to target 4690164261.56 kW.
+2025-05-19 09:13:01,384 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2027, Month 6: Capping peak from 4943205790264.57 kW to target 4861181455.82 kW.
+2025-05-19 09:13:01,430 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2028, Month 6: Capping peak from 5180478910103.50 kW to target 5070204586.58 kW.
+2025-05-19 09:13:01,476 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2029, Month 6: Capping peak from 5480119566787.10 kW to target 5285054735.69 kW.
+2025-05-19 09:13:01,522 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2030, Month 6: Capping peak from 5791684697679.82 kW to target 5540563927.07 kW.
+2025-05-19 09:13:01,569 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2031, Month 6: Capping peak from 6185336874341.20 kW to target 5847594381.00 kW.
+2025-05-19 09:13:01,613 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2032, Month 6: Capping peak from 6587846714257.09 kW to target 6201586928.36 kW.
+2025-05-19 09:13:01,658 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2033, Month 6: Capping peak from 7070631920545.40 kW to target 6562227611.62 kW.
+2025-05-19 09:13:01,703 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2034, Month 6: Capping peak from 7569730117230.17 kW to target 6966654520.69 kW.
+2025-05-19 09:13:01,746 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2035, Month 6: Capping peak from 8109599137833.36 kW to target 7385095117.71 kW.
+2025-05-19 09:13:01,791 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2036, Month 6: Capping peak from 8663832517409.70 kW to target 7847990840.51 kW.
+2025-05-19 09:13:01,834 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2037, Month 6: Capping peak from 9322286268484.54 kW to target 8329759766.45 kW.
+2025-05-19 09:13:01,877 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2026, Month 7: Capping peak from 4434940148963.83 kW to target 4609583739.67 kW.
+2025-05-19 09:13:01,921 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2027, Month 7: Capping peak from 4649805613728.17 kW to target 4779549721.92 kW.
+2025-05-19 09:13:01,964 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2028, Month 7: Capping peak from 4872995570089.43 kW to target 4983217037.48 kW.
+2025-05-19 09:13:02,008 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2029, Month 7: Capping peak from 5154851286129.53 kW to target 5196512396.62 kW.
+2025-05-19 09:13:02,050 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2030, Month 7: Capping peak from 5447923708386.39 kW to target 5445620912.05 kW.
+2025-05-19 09:13:02,092 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2031, Month 7: Capping peak from 5818210962965.45 kW to target 5749463975.58 kW.
+2025-05-19 09:13:02,131 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2032, Month 7: Capping peak from 6196830141011.36 kW to target 6095169659.71 kW.
+2025-05-19 09:13:02,187 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2033, Month 7: Capping peak from 6650960002819.95 kW to target 6451526433.95 kW.
+2025-05-19 09:13:02,243 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2034, Month 7: Capping peak from 7120434610030.72 kW to target 6846875209.63 kW.
+2025-05-19 09:13:02,297 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2035, Month 7: Capping peak from 7628260120274.00 kW to target 7259761684.10 kW.
+2025-05-19 09:13:02,344 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2036, Month 7: Capping peak from 8149597404015.06 kW to target 7712722926.42 kW.
+2025-05-19 09:13:02,387 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2037, Month 7: Capping peak from 8768969139288.16 kW to target 8187522116.57 kW.
+2025-05-19 09:13:02,435 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2026, Month 8: Capping peak from 4571393796514.53 kW to target 4659875013.84 kW.
+2025-05-19 09:13:02,474 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2027, Month 8: Capping peak from 4792870213268.08 kW to target 4831874648.96 kW.
+2025-05-19 09:13:02,516 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2028, Month 8: Capping peak from 5022927248466.76 kW to target 5033200531.06 kW.
+2025-05-19 09:13:02,554 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2029, Month 8: Capping peak from 5313455063620.91 kW to target 5248605563.37 kW.
+2025-05-19 09:13:02,597 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2030, Month 8: Capping peak from 5615544699114.07 kW to target 5495007342.47 kW.
+2025-05-19 09:13:02,639 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2031, Month 8: Capping peak from 5997224902601.51 kW to target 5801129329.73 kW.
+2025-05-19 09:13:02,681 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2032, Month 8: Capping peak from 6387493385066.79 kW to target 6143975862.74 kW.
+2025-05-19 09:13:02,724 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2033, Month 8: Capping peak from 6855595853951.03 kW to target 6502148745.97 kW.
+2025-05-19 09:13:02,767 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2034, Month 8: Capping peak from 7339515193319.31 kW to target 6894680351.21 kW.
+2025-05-19 09:13:02,809 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2035, Month 8: Capping peak from 7862965411194.37 kW to target 7308877735.70 kW.
+2025-05-19 09:13:02,852 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2036, Month 8: Capping peak from 8400343131013.75 kW to target 7759036432.89 kW.
+2025-05-19 09:13:02,894 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2037, Month 8: Capping peak from 9038771613306.89 kW to target 8234622654.18 kW.
+2025-05-19 09:13:02,930 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2026, Month 9: Capping peak from 4673315239650.15 kW to target 4668587724.43 kW.
+2025-05-19 09:13:02,970 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2027, Month 9: Capping peak from 4899729580595.05 kW to target 4844564854.64 kW.
+2025-05-19 09:13:03,009 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2028, Month 9: Capping peak from 5134915849037.38 kW to target 5046025047.01 kW.
+2025-05-19 09:13:03,051 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2029, Month 9: Capping peak from 5431921122820.05 kW to target 5265950110.20 kW.
+2025-05-19 09:13:03,096 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2030, Month 9: Capping peak from 5740745993336.99 kW to target 5512651051.18 kW.
+2025-05-19 09:13:03,142 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2031, Month 9: Capping peak from 6130935942185.98 kW to target 5823450566.32 kW.
+2025-05-19 09:13:03,186 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2032, Month 9: Capping peak from 6529905649860.42 kW to target 6166797456.88 kW.
+2025-05-19 09:13:03,231 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2033, Month 9: Capping peak from 7008444690452.92 kW to target 6529925966.58 kW.
+2025-05-19 09:13:03,274 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2034, Month 9: Capping peak from 7503153246332.64 kW to target 6923494821.13 kW.
+2025-05-19 09:13:03,317 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2035, Month 9: Capping peak from 8038274040839.31 kW to target 7342867050.27 kW.
+2025-05-19 09:13:03,359 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2036, Month 9: Capping peak from 8587632857704.99 kW to target 7794783011.00 kW.
+2025-05-19 09:13:03,402 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2037, Month 9: Capping peak from 9240295412832.50 kW to target 8275781438.30 kW.
+2025-05-19 09:13:03,445 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2026, Month 10: Capping peak from 4793049504498.55 kW to target 4753595391.73 kW.
+2025-05-19 09:13:03,488 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2027, Month 10: Capping peak from 5025264771183.31 kW to target 4934420594.08 kW.
+2025-05-19 09:13:03,531 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2028, Month 10: Capping peak from 5266476709521.72 kW to target 5136514508.35 kW.
+2025-05-19 09:13:03,577 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2029, Month 10: Capping peak from 5571091508082.58 kW to target 5362023562.78 kW.
+2025-05-19 09:13:03,621 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2030, Month 10: Capping peak from 5887828731381.66 kW to target 5609807188.93 kW.
+2025-05-19 09:13:03,666 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2031, Month 10: Capping peak from 6288015674715.49 kW to target 5927965763.68 kW.
+2025-05-19 09:13:03,709 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2032, Month 10: Capping peak from 6697207321676.17 kW to target 6274020397.06 kW.
+2025-05-19 09:13:03,753 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2033, Month 10: Capping peak from 7188006934750.59 kW to target 6644859665.01 kW.
+2025-05-19 09:13:03,798 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2034, Month 10: Capping peak from 7695390339686.05 kW to target 7042001359.19 kW.
+2025-05-19 09:13:03,839 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2035, Month 10: Capping peak from 8244221378772.79 kW to target 7469454655.29 kW.
+2025-05-19 09:13:03,884 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2036, Month 10: Capping peak from 8807655230319.91 kW to target 7925894244.52 kW.
+2025-05-19 09:13:03,925 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2037, Month 10: Capping peak from 9477039548740.70 kW to target 8415406172.60 kW.
+2025-05-19 09:13:03,969 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2026, Month 11: Capping peak from 4757003721945.78 kW to target 4724229797.31 kW.
+2025-05-19 09:13:04,011 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2027, Month 11: Capping peak from 4987472630492.47 kW to target 4907921574.67 kW.
+2025-05-19 09:13:04,054 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2028, Month 11: Capping peak from 5226870551873.55 kW to target 5108199143.58 kW.
+2025-05-19 09:13:04,103 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2029, Month 11: Capping peak from 5529194516846.95 kW to target 5336784343.20 kW.
+2025-05-19 09:13:04,146 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2030, Month 11: Capping peak from 5843549740739.03 kW to target 5582709672.76 kW.
+2025-05-19 09:13:04,191 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2031, Month 11: Capping peak from 6240727107074.68 kW to target 5903813417.41 kW.
+2025-05-19 09:13:04,234 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2032, Month 11: Capping peak from 6646841457814.05 kW to target 6247873296.45 kW.
+2025-05-19 09:13:04,277 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2033, Month 11: Capping peak from 7133950047853.30 kW to target 6621524544.17 kW.
+2025-05-19 09:13:04,320 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2034, Month 11: Capping peak from 7637517712544.88 kW to target 7016983579.34 kW.
+2025-05-19 09:13:04,364 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2035, Month 11: Capping peak from 8182221307449.25 kW to target 7447068778.90 kW.
+2025-05-19 09:13:04,410 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2036, Month 11: Capping peak from 8741417895417.80 kW to target 7902224880.12 kW.
+2025-05-19 09:13:04,456 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2037, Month 11: Capping peak from 9405768157427.65 kW to target 8394196901.11 kW.
+2025-05-19 09:13:04,501 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2026, Month 12: Capping peak from 4777881404727.39 kW to target 4612408599.16 kW.
+2025-05-19 09:13:04,544 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2027, Month 12: Capping peak from 5009361802237.49 kW to target 4795449697.47 kW.
+2025-05-19 09:13:04,587 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2028, Month 12: Capping peak from 5249810400505.39 kW to target 4989497612.50 kW.
+2025-05-19 09:13:04,630 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2029, Month 12: Capping peak from 5553461214101.77 kW to target 5216288320.21 kW.
+2025-05-19 09:13:04,674 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2030, Month 12: Capping peak from 5869196089772.33 kW to target 5454616714.29 kW.
+2025-05-19 09:13:04,719 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2031, Month 12: Capping peak from 6268116600227.07 kW to target 5770278563.19 kW.
+2025-05-19 09:13:04,761 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2032, Month 12: Capping peak from 6676013317994.80 kW to target 6103092356.23 kW.
+2025-05-19 09:13:04,806 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2033, Month 12: Capping peak from 7165259745046.05 kW to target 6469691715.81 kW.
+2025-05-19 09:13:04,850 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2034, Month 12: Capping peak from 7671037482837.64 kW to target 6852740205.59 kW.
+2025-05-19 09:13:04,893 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2035, Month 12: Capping peak from 8218131689465.09 kW to target 7273992203.52 kW.
+2025-05-19 09:13:04,936 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2036, Month 12: Capping peak from 8779782496445.98 kW to target 7715493133.27 kW.
+2025-05-19 09:13:04,980 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2037, Month 12: Capping peak from 9447048479114.65 kW to target 8196714231.70 kW.
+2025-05-19 09:13:05,022 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2026, Month 1: Capping peak from 4820347774967.38 kW to target 4630300632.83 kW.
+2025-05-19 09:13:05,068 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2027, Month 1: Capping peak from 5053885597396.88 kW to target 4816521775.84 kW.
+2025-05-19 09:13:05,113 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2028, Month 1: Capping peak from 5296471331004.22 kW to target 5008619326.35 kW.
+2025-05-19 09:13:05,156 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2029, Month 1: Capping peak from 5602821028641.78 kW to target 5238529900.75 kW.
+2025-05-19 09:13:05,197 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2030, Month 1: Capping peak from 5921362192914.36 kW to target 5474751962.51 kW.
+2025-05-19 09:13:05,250 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2031, Month 1: Capping peak from 6323828355648.48 kW to target 5793461575.70 kW.
+2025-05-19 09:13:05,285 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2032, Month 1: Capping peak from 6735350507278.86 kW to target 6124067478.86 kW.
+2025-05-19 09:13:05,320 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2033, Month 1: Capping peak from 7228945413948.96 kW to target 6493216694.63 kW.
+2025-05-19 09:13:05,362 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2034, Month 1: Capping peak from 7739218563587.94 kW to target 6874109929.17 kW.
+2025-05-19 09:13:05,404 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2035, Month 1: Capping peak from 8291175407683.08 kW to target 7297336394.51 kW.
+2025-05-19 09:13:05,449 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2036, Month 1: Capping peak from 8857818232902.68 kW to target 7736695169.36 kW.
+2025-05-19 09:13:05,492 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2037, Month 1: Capping peak from 9531014953877.35 kW to target 8219262874.69 kW.
+2025-05-19 09:13:05,535 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2026, Month 2: Capping peak from 5373943018621.71 kW to target 5331710572.95 kW.
+2025-05-19 09:13:05,578 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2027, Month 2: Capping peak from 5634301608710.69 kW to target 5550352088.48 kW.
+2025-05-19 09:13:05,622 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2028, Month 2: Capping peak from 5904747221848.06 kW to target 5769483066.15 kW.
+2025-05-19 09:13:05,666 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2029, Month 2: Capping peak from 6246279803257.58 kW to target 6038747122.54 kW.
+2025-05-19 09:13:05,707 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2030, Month 2: Capping peak from 6601403986366.51 kW to target 6308981352.13 kW.
+2025-05-19 09:13:05,751 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2031, Month 2: Capping peak from 7050091576230.53 kW to target 6681331265.65 kW.
+2025-05-19 09:13:05,797 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2032, Month 2: Capping peak from 7508875194550.94 kW to target 7061191543.98 kW.
+2025-05-19 09:13:05,843 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2033, Month 2: Capping peak from 8059157254385.30 kW to target 7491514990.89 kW.
+2025-05-19 09:13:05,885 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2034, Month 2: Capping peak from 8628032978318.12 kW to target 7929825259.36 kW.
+2025-05-19 09:13:05,927 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2035, Month 2: Capping peak from 9243379581380.51 kW to target 8422243696.61 kW.
+2025-05-19 09:13:05,972 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2036, Month 2: Capping peak from 9875098784392.07 kW to target 8928465960.73 kW.
+2025-05-19 09:13:06,016 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2037, Month 2: Capping peak from 10625609118444.75 kW to target 9489023597.98 kW.
+2025-05-19 09:13:06,059 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2026, Month 3: Capping peak from 5727597822128.46 kW to target 5558237306.10 kW.
+2025-05-19 09:13:06,097 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2027, Month 3: Capping peak from 6005090398510.22 kW to target 5783603795.75 kW.
+2025-05-19 09:13:06,138 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2028, Month 3: Capping peak from 6293333816693.52 kW to target 6006711490.30 kW.
+2025-05-19 09:13:06,164 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2029, Month 3: Capping peak from 6657342378505.33 kW to target 6283716077.98 kW.
+2025-05-19 09:13:06,210 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2030, Month 3: Capping peak from 7035836994230.06 kW to target 6559298040.87 kW.
+2025-05-19 09:13:06,251 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2031, Month 3: Capping peak from 7514052348136.13 kW to target 6944039253.89 kW.
+2025-05-19 09:13:06,291 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2032, Month 3: Capping peak from 8003028141890.29 kW to target 7333466032.09 kW.
+2025-05-19 09:13:06,328 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2033, Month 3: Capping peak from 8589523814907.69 kW to target 7777062428.48 kW.
+2025-05-19 09:13:06,364 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2034, Month 3: Capping peak from 9195836785880.54 kW to target 8226839986.48 kW.
+2025-05-19 09:13:06,399 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2035, Month 3: Capping peak from 9851678846606.04 kW to target 8733806043.62 kW.
+2025-05-19 09:13:06,426 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2036, Month 3: Capping peak from 10524970974719.04 kW to target 9253327514.47 kW.
+2025-05-19 09:13:06,459 - INFO - utils.create_load_curve - [create_load_curve.py:337] - FY 2037, Month 3: Capping peak from 11324871781242.20 kW to target 9830055963.71 kW.
+2025-05-19 09:13:06,504 - WARNING - utils.create_load_curve - [create_load_curve.py:354] - Could not use LFs from Excel 'load_factors': Worksheet named 'load_factors' not found
+2025-05-19 09:13:06,505 - INFO - utils.create_load_curve - [create_load_curve.py:358] - Applied/Overrode 20 custom LFs.
+2025-05-19 09:13:06,505 - WARNING - utils.create_load_curve - [create_load_curve.py:385] - Cannot apply YoY LF improvement: No valid base LF or improvement rate.
+2025-05-19 09:13:07,353 - WARNING - utils.create_load_curve - [create_load_curve.py:403] - FY 2038: Skipping LF constraint (target_lf=0.613, avg_demand=0.0).
+2025-05-19 09:13:07,425 - WARNING - utils.create_load_curve - [create_load_curve.py:403] - FY 2039: Skipping LF constraint (target_lf=0.613, avg_demand=0.0).
+2025-05-19 09:13:07,503 - WARNING - utils.create_load_curve - [create_load_curve.py:403] - FY 2040: Skipping LF constraint (target_lf=0.613, avg_demand=0.0).
+2025-05-19 09:13:12,143 - INFO - utils.features_manager - [app.py:1285] - Successfully generated load profile: excel_annual_base_year_by2025_20250519091256 to C:\Users\Admin\Desktop\drive april 2025\kerala kseb project backup 13-1-2025\new\gemini testing new version\testing project\Default_project\results\load_profiles\excel_annual_base_year_by2025_20250519091256.csv
+2025-05-19 09:13:12,162 - INFO - werkzeug - [_internal.py:97] - 127.0.0.1 - - [19/May/2025 09:13:12] "POST /api/generate_load_profiles HTTP/1.1" 200 -

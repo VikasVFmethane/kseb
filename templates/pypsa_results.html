@@ -1,0 +1,853 @@
+{% extends "sidebar_layout.html" %}
+
+{% block title %}PyPSA Results - Energy Demand Platform{% endblock %}
+
+{% block additional_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pypsa_results.css') }}">
+{% endblock %}
+
+{% block page_header_title %}PyPSA Modeling Results{% endblock %}
+
+{% block content %}
+<div class="pypsa-results-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages-container mb-4" role="region" aria-label="Notifications">
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    <i class="fas {{ 'fa-check-circle' if category == 'success' else 'fa-exclamation-triangle' if category == 'danger' or category == 'warning' else 'fa-info-circle' }} alert-icon"></i>
+                    <div class="alert-content">{{ message }}</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Network Selection Section -->
+    <section class="card mb-4" id="networkSelectionSection">
+        <div class="card-body">
+            <h2 class="section-title">Network Selection</h2>
+            <p class="section-description">Select a PyPSA network file to visualize or upload a new one.</p>
+
+            <div class="network-selection">
+                <!-- Scenarios Dropdown -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="scenarioSelect" class="form-label">Scenario</label>
+                        <select class="form-select" id="scenarioSelect">
+                            <option value="">Select a scenario...</option>
+                            {% for scenario in scenarios %}
+                                <option value="{{ scenario }}">{{ scenario }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-8">
+                        <label for="networkFileSelect" class="form-label">Network File</label>
+                        <select class="form-select" id="networkFileSelect" disabled>
+                            <option value="">Select a network file...</option>
+                            {% for file in nc_files %}
+                                <option value="{{ file.path }}" data-scenario="{{ file.scenario }}">{{ file.filename }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Network Information Display -->
+                <div class="network-info-container mt-3" id="networkInfoContainer" style="display: none;">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Network Information</h5>
+                            <button type="button" class="btn btn-sm btn-primary" id="loadNetworkBtn">
+                                <i class="fas fa-chart-line me-1"></i> Load Network for Analysis
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Name:</strong> <span id="networkName"></span></p>
+                                    <p><strong>Components:</strong> <span id="networkComponents"></span></p>
+                                    <p><strong>Carriers:</strong> <span id="networkCarriers"></span></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Snapshots:</strong> <span id="networkSnapshots"></span></p>
+                                    <p><strong>Period Type:</strong> <span id="networkPeriodType"></span></p>
+                                    <p><strong>Optimization Status:</strong> <span id="networkOptStatus"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- File Upload Section -->
+                <div class="network-upload-section mt-4">
+                    <h5>Upload New Network File</h5>
+                    <form id="networkUploadForm" class="mt-2">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="uploadScenarioName" class="form-label">Scenario Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-folder"></i></span>
+                                    <input type="text" class="form-control" id="uploadScenarioName" name="scenario" placeholder="Enter scenario name" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="networkFileUpload" class="form-label">Network File (.nc)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-file-upload"></i></span>
+                                    <input type="file" class="form-control" id="networkFileUpload" name="network_file" accept=".nc" required>
+                                </div>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100" id="uploadBtn">
+                                    <i class="fas fa-upload me-1"></i> Upload
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Analysis Dashboard Section (initially hidden) -->
+    <section class="analysis-dashboard" id="analysisDashboard" style="display: none;">
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Analysis Dashboard: <span id="currentNetworkName"></span></h3>
+                    <div class="analysis-controls">
+                        <!-- Network Comparison Button will be prepended here by JS -->
+                        <button class="btn btn-sm btn-outline-secondary me-2" id="backToSelectionBtn">
+                            <i class="fas fa-arrow-left me-1"></i> Back to Selection
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-3">
+                <!-- Periods control for multi-period networks -->
+                <div id="periodControlContainer" class="mb-3" style="display: none;">
+                    <div class="d-flex align-items-center">
+                        <label for="periodSelect" class="form-label me-2 mb-0">Period:</label>
+                        <select class="form-select form-select-sm" id="periodSelect" style="width: auto;"></select>
+                        <button class="btn btn-sm btn-outline-primary ms-2" id="extractPeriodBtn" title="Extract current period to a separate file">
+                            <i class="fas fa-file-export me-1"></i> Extract Period
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Date range filter -->
+                <div id="dateFilterContainer" class="mb-3" style="display: none;">
+                    <div class="row g-2">
+                        <div class="col-md-auto">
+                            <label for="startDate" class="form-label">Start Date:</label>
+                            <input type="date" class="form-control form-control-sm" id="startDate">
+                        </div>
+                        <div class="col-md-auto">
+                            <label for="endDate" class="form-label">End Date:</label>
+                            <input type="date" class="form-control form-control-sm" id="endDate">
+                        </div>
+                        <div class="col-md-auto">
+                            <label for="resolutionSelect" class="form-label">Resolution:</label>
+                            <select class="form-control form-control-sm" id="resolutionSelect">
+                                <option value="1H">Hourly (1H)</option>
+                                <option value="3H">3-Hourly (3H)</option>
+                                <option value="6H">6-Hourly (6H)</option>
+                                <option value="12H">12-Hourly (12H)</option>
+                                <option value="1D">Daily (1D)</option>
+                                <option value="1W">Weekly (1W)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-auto d-flex align-items-end">
+                            <button class="btn btn-sm btn-primary" id="applyFilterBtn">
+                                <i class="fas fa-filter me-1"></i> Apply Filter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analysis Tabs -->
+                <ul class="nav nav-tabs" id="analysisTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="dispatch-tab" data-bs-toggle="tab" data-bs-target="#dispatch" type="button" role="tab" aria-controls="dispatch" aria-selected="true">
+                            <i class="fas fa-chart-line me-1"></i> Dispatch & Load
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="capacity-tab" data-bs-toggle="tab" data-bs-target="#capacity" type="button" role="tab" aria-controls="capacity" aria-selected="false">
+                            <i class="fas fa-solar-panel me-1"></i> Capacity
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="metrics-tab" data-bs-toggle="tab" data-bs-target="#metrics" type="button" role="tab" aria-controls="metrics" aria-selected="false">
+                            <i class="fas fa-tachometer-alt me-1"></i> Metrics
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="storage-tab" data-bs-toggle="tab" data-bs-target="#storage" type="button" role="tab" aria-controls="storage" aria-selected="false">
+                            <i class="fas fa-battery-half me-1"></i> Storage
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="emissions-tab" data-bs-toggle="tab" data-bs-target="#emissions" type="button" role="tab" aria-controls="emissions" aria-selected="false">
+                            <i class="fas fa-smog me-1"></i> Emissions
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="prices-tab" data-bs-toggle="tab" data-bs-target="#prices" type="button" role="tab" aria-controls="prices" aria-selected="false">
+                            <i class="fas fa-tag me-1"></i> Prices
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="network-tab" data-bs-toggle="tab" data-bs-target="#network" type="button" role="tab" aria-controls="network" aria-selected="false">
+                            <i class="fas fa-project-diagram me-1"></i> Network Flow
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content mt-3" id="analysisTabContent">
+                    <!-- 1. Dispatch & Load Tab -->
+                    <div class="tab-pane fade show active" id="dispatch" role="tabpanel" aria-labelledby="dispatch-tab">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card mb-4">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">Generation Dispatch</h5>
+                                        <div class="chart-controls">
+                                            <button class="btn btn-sm btn-outline-secondary download-btn" data-chart="dispatchStack">
+                                                <i class="fas fa-download me-1"></i> Download
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="plot-container" id="dispatchStackPlot">
+                                            <div class="loading-indicator">
+                                                <i class="fas fa-spinner fa-spin"></i> Loading dispatch data...
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card mb-4">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">Daily Profile</h5>
+                                        <div class="chart-controls">
+                                            <button class="btn btn-sm btn-outline-secondary download-btn" data-chart="dailyProfile">
+                                                <i class="fas fa-download me-1"></i> Download
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="plot-container" id="dailyProfilePlot">
+                                            <div class="loading-indicator">
+                                                <i class="fas fa-spinner fa-spin"></i> Loading...
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-4">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">Load Duration Curve</h5>
+                                        <div class="chart-controls">
+                                            <button class="btn btn-sm btn-outline-secondary download-btn" data-chart="loadDuration">
+                                                <i class="fas fa-download me-1"></i> Download
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="plot-container" id="loadDurationPlot">
+                                            <div class="loading-indicator">
+                                                <i class="fas fa-spinner fa-spin"></i> Loading...
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Dispatch Summary Statistics</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>Generation by Technology</h6>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-hover" id="generationSummaryTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Technology</th>
+                                                        <th>Energy (MWh)</th>
+                                                        <th>Percentage (%)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- Will be populated by JavaScript -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Load Statistics</h6>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="stats-card">
+                                                    <span class="stats-label">Total Load</span>
+                                                    <span class="stats-value" id="totalLoadValue">-</span>
+                                                    <span class="stats-unit">MWh</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="stats-card">
+                                                    <span class="stats-label">Peak Load</span>
+                                                    <span class="stats-value" id="peakLoadValue">-</span>
+                                                    <span class="stats-unit">MW</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="stats-card">
+                                                    <span class="stats-label">Min Load</span>
+                                                    <span class="stats-value" id="minLoadValue">-</span>
+                                                    <span class="stats-unit">MW</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Capacity Tab -->
+                    <div class="tab-pane fade" id="capacity" role="tabpanel" aria-labelledby="capacity-tab">
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <div class="d-flex align-items-center">
+                                    <label for="capacityAttributeSelect" class="form-label me-2 mb-0">Capacity Attribute:</label>
+                                    <select class="form-select form-select-sm" id="capacityAttributeSelect" style="width: auto;">
+                                        <option value="p_nom_opt">p_nom_opt (Optimized MW)</option>
+                                        <option value="p_nom">p_nom (Initial MW)</option>
+                                        <option value="e_nom_opt">e_nom_opt (Optimized MWh)</option>
+                                        <option value="e_nom">e_nom (Initial MWh)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card mb-4">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">Installed Capacity by Carrier</h5>
+                                        <div class="chart-controls">
+                                            <button class="btn btn-sm btn-outline-secondary download-btn" data-chart="capacityByCarrier">
+                                                <i class="fas fa-download me-1"></i> Download
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="plot-container" id="capacityByCarrierPlot">
+                                            <div class="loading-indicator">
+                                                <i class="fas fa-spinner fa-spin"></i> Loading capacity data...
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Capacity by Region</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="plot-container" id="capacityByRegionPlot">
+                                    <div class="loading-indicator">
+                                        <i class="fas fa-spinner fa-spin"></i> Loading regional data...
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Capacity Data Table</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-hover" id="capacityTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Carrier</th>
+                                                <th>Capacity</th>
+                                                <th>Unit</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Metrics Tab -->
+                    <div class="tab-pane fade" id="metrics" role="tabpanel" aria-labelledby="metrics-tab">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card mb-4">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">Capacity Utilization Factors (CUF)</h5>
+                                        <div class="chart-controls">
+                                            <button class="btn btn-sm btn-outline-secondary download-btn" data-chart="cufPlot">
+                                                <i class="fas fa-download me-1"></i> Download
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="plot-container" id="cufPlot">
+                                            <div class="loading-indicator">
+                                                <i class="fas fa-spinner fa-spin"></i> Loading CUF data...
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="table-responsive mt-3">
+                                            <table class="table table-sm table-hover" id="cufTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Carrier</th>
+                                                        <th>CUF (%)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- Will be populated by JavaScript -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="card mb-4">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">Renewable Curtailment</h5>
+                                        <div class="chart-controls">
+                                            <button class="btn btn-sm btn-outline-secondary download-btn" data-chart="curtailmentPlot">
+                                                <i class="fas fa-download me-1"></i> Download
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="plot-container" id="curtailmentPlot">
+                                            <div class="loading-indicator">
+                                                <i class="fas fa-spinner fa-spin"></i> Loading curtailment data...
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="table-responsive mt-3">
+                                            <table class="table table-sm table-hover" id="curtailmentTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Carrier</th>
+                                                        <th>Curtailment (MWh)</th>
+                                                        <th>Potential (MWh)</th>
+                                                        <th>Curtailment (%)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- Will be populated by JavaScript -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Storage Tab -->
+                    <div class="tab-pane fade" id="storage" role="tabpanel" aria-labelledby="storage-tab">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card mb-4">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">State of Charge (SoC)</h5>
+                                        <div class="chart-controls">
+                                            <button class="btn btn-sm btn-outline-secondary download-btn" data-chart="socPlot">
+                                                <i class="fas fa-download me-1"></i> Download
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="plot-container" id="socPlot">
+                                            <div class="loading-indicator">
+                                                <i class="fas fa-spinner fa-spin"></i> Loading storage data...
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Storage Utilization</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="plot-container" id="storageUtilizationPlot">
+                                            <div class="loading-indicator">
+                                                <i class="fas fa-spinner fa-spin"></i> Loading utilization data...
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-hover" id="storageUtilizationTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Storage Type</th>
+                                                        <th>Charge (MWh)</th>
+                                                        <th>Discharge (MWh)</th>
+                                                        <th>Efficiency (%)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- Will be populated by JavaScript -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. Emissions Tab -->
+                    <div class="tab-pane fade" id="emissions" role="tabpanel" aria-labelledby="emissions-tab">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Total CO₂ Emissions</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="emissions-summary">
+                                            <div class="total-emissions">
+                                                <span class="emissions-value" id="totalEmissionsValue">-</span>
+                                                <span class="emissions-unit">tonnes CO₂</span>
+                                            </div>
+                                            <div class="emissions-converted mt-2">
+                                                <span class="emissions-value" id="totalEmissionsConverted">-</span>
+                                                <span class="emissions-unit">million tonnes CO₂</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="card mb-4">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">CO₂ Emissions by Carrier</h5>
+                                        <div class="chart-controls">
+                                            <button class="btn btn-sm btn-outline-secondary download-btn" data-chart="emissionsByCarrier">
+                                                <i class="fas fa-download me-1"></i> Download
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="plot-container" id="emissionsByCarrierPlot">
+                                            <div class="loading-indicator">
+                                                <i class="fas fa-spinner fa-spin"></i> Loading emissions data...
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Emissions Data Table</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-hover" id="emissionsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Carrier</th>
+                                                <th>Emissions (Tonnes CO₂)</th>
+                                                <th>Percentage (%)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 6. Prices Tab -->
+                    <div class="tab-pane fade" id="prices" role="tabpanel" aria-labelledby="prices-tab">
+                        <div class="price-data-container" id="priceDataContainer">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card mb-4">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h5 class="mb-0">Average Price by Bus</h5>
+                                            <div class="chart-controls">
+                                                <button class="btn btn-sm btn-outline-secondary download-btn" data-chart="avgPriceByBus">
+                                                    <i class="fas fa-download me-1"></i> Download
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="plot-container" id="avgPriceByBusPlot">
+                                                <div class="loading-indicator">
+                                                    <i class="fas fa-spinner fa-spin"></i> Loading price data...
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="card mb-4">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h5 class="mb-0">Price Duration Curve</h5>
+                                            <div class="chart-controls">
+                                                <button class="btn btn-sm btn-outline-secondary download-btn" data-chart="priceDuration">
+                                                    <i class="fas fa-download me-1"></i> Download
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="plot-container" id="priceDurationPlot">
+                                                <div class="loading-indicator">
+                                                    <i class="fas fa-spinner fa-spin"></i> Loading...
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card mb-4">
+                                        <div class="card-header">
+                                            <h5 class="mb-0">Price Data Table</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-sm table-hover" id="priceTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Bus</th>
+                                                            <th>Average Price</th>
+                                                            <th>Min Price</th>
+                                                            <th>Max Price</th>
+                                                            <th>Unit</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <!-- Will be populated by JavaScript -->
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="no-price-data-container text-center py-5" id="noPriceDataContainer" style="display: none;">
+                            <i class="fas fa-exclamation-circle fa-3x text-muted mb-3"></i>
+                            <h4>No Price Data Available</h4>
+                            <p class="text-muted">This network does not contain marginal price data.</p>
+                        </div>
+                    </div>
+
+                    <!-- 7. Network Flow Tab -->
+                    <div class="tab-pane fade" id="network" role="tabpanel" aria-labelledby="network-tab">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Network Losses</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="stats-card large">
+                                            <span class="stats-label">Total Losses</span>
+                                            <span class="stats-value" id="totalLossesValue">-</span>
+                                            <span class="stats-unit">MWh</span>
+                                        </div>
+                                        
+                                        <div class="mt-3">
+                                            <span class="stats-label">Losses in GWh</span>
+                                            <span class="stats-value" id="totalLossesGWh">-</span>
+                                            <span class="stats-unit">GWh</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="card mb-4">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">Line Loading</h5>
+                                        <div class="chart-controls">
+                                            <button class="btn btn-sm btn-outline-secondary download-btn" data-chart="lineLoading">
+                                                <i class="fas fa-download me-1"></i> Download
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="plot-container" id="lineLoadingPlot">
+                                            <div class="loading-indicator">
+                                                <i class="fas fa-spinner fa-spin"></i> Loading line data...
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Line Loading Data Table</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-hover" id="lineLoadingTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Line</th>
+                                                <th>Average Loading (%)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Network Comparison Section -->
+    <section class="network-comparison" id="networkComparisonSection" style="display: none;">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">Network Comparison</h3>
+                <button class="btn btn-sm btn-outline-secondary" id="backToDashboardBtn">
+                    <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+                </button>
+            </div>
+            <div class="card-body p-3">
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <h5>Select Networks to Compare</h5>
+                        <p class="text-muted small">Select multiple network files to compare their metrics.</p>
+                        
+                        <div class="network-select-container mb-3" id="networkSelectContainer">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                        
+                        <div class="d-flex align-items-center mb-3">
+                            <label for="comparisonTypeSelect" class="form-label me-2 mb-0">Comparison Type:</label>
+                            <select class="form-select form-select-sm" id="comparisonTypeSelect" style="width: auto;">
+                                <option value="capacity">Capacity</option>
+                                <option value="generation">Generation</option>
+                                <option value="metrics">Metrics (CUF & Curtailment)</option>
+                                <option value="emissions">Emissions</option>
+                            </select>
+                            
+                            <button class="btn btn-sm btn-primary ms-3" id="runComparisonBtn">
+                                <i class="fas fa-play me-1"></i> Run Comparison
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="comparison-results" id="comparisonResults" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0" id="comparisonResultsTitle">Comparison Results</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="plot-container" id="comparisonMainPlot">
+                                        <div class="loading-indicator">
+                                            <i class="fas fa-spinner fa-spin"></i> Generating comparison...
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mt-4" id="comparisonSecondaryRow" style="display: none;">
+                                <div class="col-12">
+                                    <div class="plot-container" id="comparisonSecondaryPlot">
+                                        <div class="loading-indicator">
+                                            <i class="fas fa-spinner fa-spin"></i> Loading secondary plot...
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Period Extraction Success Modal -->
+<div class="modal fade" id="periodExtractionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Period Extracted Successfully</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
+                </div>
+                <p>The period has been successfully extracted to a separate file.</p>
+                <p class="mb-0"><strong>File:</strong> <span id="extractedPeriodFilePath"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="loadExtractedPeriodBtn">
+                    <i class="fas fa-chart-line me-1"></i> Load Extracted Period
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdn.plot.ly/plotly-2.20.0.min.js"></script>
+    <script src="{{ url_for('static', filename='js/pypsa_results.js') }}"></script>
+{% endblock %}

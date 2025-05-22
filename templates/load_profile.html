@@ -1,0 +1,759 @@
+<!-- templates/load_profile.html - Optimized Version -->
+{% extends "sidebar_layout.html" %}
+
+{% block title %}Load Profile Creation{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/load_profile.css') }}">
+{% endblock %}
+
+{% block page_header_title %}Load Profile Creation{% endblock %}
+{% block page_header_subtitle %}
+    {% if current_project %}Project: {{ current_project }}{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="load-profile-container">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages-container mb-3">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ 'info' if category == 'message' else category }} alert-dismissible fade show" role="alert">
+            <i class="fas {% if category == 'success' %}fa-check-circle{% elif category == 'danger' %}fa-exclamation-triangle{% elif category == 'warning' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %} me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Navigation Tabs -->
+    <nav class="mb-4">
+        <ul class="nav nav-tabs" id="loadProfileTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="create-tab" data-bs-toggle="tab" 
+                        data-bs-target="#create-pane" type="button" role="tab" 
+                        aria-controls="create-pane" aria-selected="true">
+                    <i class="fas fa-edit me-2"></i>Create Load Profiles
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="visualize-tab" data-bs-toggle="tab" 
+                        data-bs-target="#visualize-pane" type="button" role="tab" 
+                        aria-controls="visualize-pane" aria-selected="false">
+                    <i class="fas fa-chart-line me-2"></i>Visualize Load Profiles
+                </button>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="loadProfileTabContent">
+        <!-- Create Tab -->
+        <div class="tab-pane fade show active" id="create-pane" role="tabpanel" aria-labelledby="create-tab">
+            <div class="row">
+                <!-- Main Content Column -->
+                <div class="col-lg-8">
+                    <!-- Data Source Card -->
+                    <section class="card mb-4" aria-labelledby="data-source-heading">
+                        <div class="card-header">
+                            <h2 class="h5 mb-0" id="data-source-heading">
+                                <i class="fas fa-file-upload me-2"></i>Data Source Selection
+                            </h2>
+                        </div>
+                        <div class="card-body">
+                            <!-- File Status Display -->
+                            <div class="data-source-status mb-3" role="status" aria-live="polite">
+                                {% if input_file_exists %}
+                                <div class="alert alert-success">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    <strong>Input file found:</strong> Load profile Excel file detected in inputs folder.
+                                    <small class="d-block mt-1">Last modified: {{ input_file_date }}</small>
+                                </div>
+                                {% else %}
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>No input file detected:</strong> Please upload a load profile Excel file.
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- File Upload Form -->
+                            <form method="POST" action="{{ url_for('load_profile_creation') }}" 
+                                  enctype="multipart/form-data" id="uploadForm" 
+                                  aria-label="Upload load profile file">
+                                <div class="mb-3">
+                                    <label for="profileFile" class="form-label">Select Load Profile Excel File</label>
+                                    <input class="form-control" type="file" id="profileFile" name="profile_file" 
+                                           accept=".xlsx" {% if input_file_exists %}disabled{% endif %}
+                                           data-exists="{{ 'true' if input_file_exists else 'false' }}"
+                                           aria-describedby="profileFileHelp">
+                                    <div id="profileFileHelp" class="form-text">
+                                        Required sheets: <strong>Past_Hourly_Demand</strong>, <strong>Total Demand</strong>, <strong>max_demand</strong>
+                                    </div>
+                                </div>
+                                
+                                <!-- Upload/Replace Buttons -->
+                                <div class="d-flex gap-2">
+                                    {% if input_file_exists %}
+                                    <button type="button" id="replaceFileBtn" class="btn btn-outline-primary">
+                                        <i class="fas fa-sync me-1"></i>Replace File
+                                    </button>
+                                    {% else %}
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-upload me-1"></i>Upload File
+                                    </button>
+                                    {% endif %}
+                                    <a href="{{ url_for('download_template', template_type='load_curve') }}" 
+                                       class="btn btn-outline-secondary">
+                                        <i class="fas fa-download me-1"></i>Download Template
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+
+                    <!-- Forecast Scenario Card -->
+                    <section class="card mb-4" aria-labelledby="scenario-heading">
+                        <div class="card-header">
+                            <h2 class="h5 mb-0" id="scenario-heading">
+                                <i class="fas fa-project-diagram me-2"></i>Forecast Scenario Selection
+                            </h2>
+                        </div>
+                        <div class="card-body">
+                            {% if forecast_scenarios %}
+                            <div class="mb-3">
+                                <label for="forecastScenario" class="form-label">Select Forecast Scenario</label>
+                                <select class="form-select" id="forecastScenario" name="forecast_scenario" 
+                                        aria-describedby="scenarioHelp">
+                                    <option value="" selected disabled>Choose a forecast scenario...</option>
+                                    {% for scenario in forecast_scenarios %}
+                                    <option value="{{ scenario }}">{{ scenario }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div id="scenarioHelp" class="form-text">
+                                    Annual demand values will be taken from this forecast scenario.
+                                </div>
+                            </div>
+                            
+                            <!-- Scenario Information Display -->
+                            <div id="scenarioInfo" class="alert alert-info" style="display: none;" role="status" aria-live="polite">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <strong>Sectors:</strong> <span id="scenarioSectors">--</span>
+                                    </div>
+                                    <div>
+                                        <strong>Target Year:</strong> <span id="scenarioTargetYear">--</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                No forecast scenarios found. Please run demand projections first.
+                            </div>
+                            {% endif %}
+                        </div>
+                    </section>
+
+                    <!-- Profile Generation Options Card -->
+                    <section class="card mb-4" aria-labelledby="generation-options-heading">
+                        <div class="card-header">
+                            <h2 class="h5 mb-0" id="generation-options-heading">
+                                <i class="fas fa-cogs me-2"></i>Profile Generation Options
+                            </h2>
+                        </div>
+                        <div class="card-body">
+                            <form id="profileOptions" aria-label="Load profile generation options">
+                                <!-- Generation Method Selection -->
+                                <fieldset class="mb-4">
+                                    <legend class="form-label fw-bold fs-6">Select Generation Method</legend>
+                                    <div class="method-selection">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="radio" name="method" 
+                                                   id="baseYearMethod" value="base_year" checked>
+                                            <label class="form-check-label" for="baseYearMethod">
+                                                <strong>Base Year Method</strong>
+                                                <small class="text-muted d-block">
+                                                    Uses patterns from a selected fiscal year to generate load profiles
+                                                </small>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="method" 
+                                                   id="mlMethod" value="ml_weather">
+                                            <label class="form-check-label" for="mlMethod">
+                                                <strong>Machine Learning with Weather</strong>
+                                                <small class="text-muted d-block">
+                                                    Uses ML and weather correlations for advanced profile generation
+                                                </small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </fieldset>
+
+                                <!-- Base Year Options -->
+                                <div id="baseYearOptions" class="method-options">
+                                    <div class="mb-3">
+                                        <label for="baseYear" class="form-label fw-bold">Select Base Financial Year</label>
+                                        <select class="form-select" id="baseYear" name="base_year" 
+                                                aria-describedby="baseYearHelp">
+                                            {% if available_years %}
+                                                {% for year in available_years %}
+                                                <option value="{{ year }}">FY {{ year }}-{{ year+1 }}</option>
+                                                {% endfor %}
+                                            {% else %}
+                                                <option value="" disabled>No historical data available</option>
+                                            {% endif %}
+                                        </select>
+                                        <div id="baseYearHelp" class="form-text">
+                                            Load patterns from this year will be applied to future years.
+                                        </div>
+                                    </div>
+                                    <!-- Base year patterns container will be populated by JavaScript -->
+                                </div>
+
+                                <!-- ML Method Options -->
+                                <div id="mlOptions" class="method-options" style="display: none;">
+                                    <div class="mb-3">
+                                        <label for="weatherData" class="form-label fw-bold">Weather Data Source</label>
+                                        <select class="form-select" id="weatherData" name="weather_data" 
+                                                aria-describedby="weatherDataHelp">
+                                            <option value="historical">Use Historical Weather Data</option>
+                                            <option value="forecast">Use Weather Forecast Data</option>
+                                            <option value="none">No Weather Data (Temperature Only)</option>
+                                        </select>
+                                        <div id="weatherDataHelp" class="form-text">
+                                            Weather data will be used to generate more accurate load profiles.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Constraint Options -->
+                                <fieldset class="mb-4">
+                                    <legend class="form-label fw-bold fs-6">Load Curve Constraints</legend>
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="useConstraints" 
+                                               name="use_constraints" checked>
+                                        <label class="form-check-label fw-bold" for="useConstraints">
+                                            Apply Load Curve Constraints
+                                        </label>
+                                    </div>
+                                    <div class="form-text mb-3">Recommended to ensure realistic load curves.</div>
+                                    
+                                    <div id="constraintOptions">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" 
+                                                           id="monthlyMax" name="monthly_max" checked>
+                                                    <label class="form-check-label" for="monthlyMax">
+                                                        Monthly Maximum Demand
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" 
+                                                           id="monthlyAvg" name="monthly_avg" checked>
+                                                    <label class="form-check-label" for="monthlyAvg">
+                                                        Monthly Average Demand
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" 
+                                                           id="seasonalPattern" name="seasonal_pattern" checked>
+                                                    <label class="form-check-label" for="seasonalPattern">
+                                                        Seasonal Patterns
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" 
+                                                           id="weekdayWeekend" name="weekday_weekend" checked>
+                                                    <label class="form-check-label" for="weekdayWeekend">
+                                                        Weekday/Weekend Distinction
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Load factor options will be added dynamically by JavaScript -->
+                                    </div>
+                                </fieldset>
+
+                                <!-- Advanced Options -->
+                                <details class="mb-4">
+                                    <summary class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-sliders-h me-1"></i> Advanced Options
+                                    </summary>
+                                    <div class="card card-body bg-light mt-2">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label for="outputFrequency" class="form-label">Output Frequency</label>
+                                                <select class="form-select form-select-sm" id="outputFrequency" 
+                                                        name="output_frequency">
+                                                    <option value="hourly" selected>Hourly (8760 values/year)</option>
+                                                    <option value="half_hourly">Half-hourly (17520 values/year)</option>
+                                                    <option value="15min">15-minute (35040 values/year)</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="outputUnit" class="form-label">Output Unit</label>
+                                                <select class="form-select form-select-sm" id="outputUnit" 
+                                                        name="output_unit">
+                                                    <option value="MW" selected>MW</option>
+                                                    <option value="kW">kW</option>
+                                                    <option value="GW">GW</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="startYear" class="form-label">Start Year</label>
+                                                <input type="number" class="form-control form-control-sm" 
+                                                       id="startYear" name="start_year" 
+                                                       value="2023" min="2020" max="2050">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="endYear" class="form-label">End Year</label>
+                                                <input type="number" class="form-control form-control-sm" 
+                                                       id="endYear" name="end_year" 
+                                                       value="2037" min="2023" max="2050">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </details>
+
+                                <!-- Generate Button -->
+                                <button type="button" id="generateProfilesBtn" class="btn btn-success btn-lg">
+                                    <i class="fas fa-cogs me-2"></i>Generate Load Profiles
+                                </button>
+                            </form>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Sidebar Column -->
+                <aside class="col-lg-4">
+                    <!-- Status & Information Card -->
+                    <section class="card mb-4" aria-labelledby="status-heading">
+                        <div class="card-header">
+                            <h2 class="h5 mb-0" id="status-heading">
+                                <i class="fas fa-info-circle me-2"></i>Status & Information
+                            </h2>
+                        </div>
+                        <div class="card-body">
+                            <!-- Processing Status -->
+                            <div class="mb-3">
+                                <h3 class="h6 card-subtitle mb-2 text-muted">Processing Status</h3>
+                                <div id="processingStatus" class="alert alert-secondary" role="status" aria-live="polite">
+                                    <i class="fas fa-hourglass-start me-2"></i>Waiting for input...
+                                </div>
+                            </div>
+
+                            <!-- Generated Profiles Table -->
+                            <div class="mb-3" id="generatedProfilesContainer">
+                                <h3 class="h6 card-subtitle mb-2 text-muted">Generated Load Profiles</h3>
+                                {% if generated_profiles %}
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-hover" aria-label="Generated profiles">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Profile Name</th>
+                                                <th scope="col">Date Created</th>
+                                                <th scope="col">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="generatedProfilesList">
+                                            {% for profile in generated_profiles %}
+                                            <tr>
+                                                <td>{{ profile.name }}</td>
+                                                <td>{{ profile.created }}</td>
+                                                <td>
+                                                    <div class="btn-group" role="group" aria-label="Profile actions">
+                                                        <button class="btn btn-sm btn-outline-primary" 
+                                                                onclick="loadProfileManager.viewProfileVisualization('{{ profile.id }}')"
+                                                                title="Visualize profile">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-outline-danger" 
+                                                                onclick="loadProfileManager.deleteGeneratedProfile('{{ profile.id }}')"
+                                                                title="Delete profile">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div id="noProfilesMessage" style="display: none;">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        No load profiles have been generated yet.
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div id="noProfilesMessage">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        No load profiles have been generated yet.
+                                    </div>
+                                </div>
+                                <ul id="generatedProfilesList" class="list-group" style="display: none;"></ul>
+                                {% endif %}
+                            </div>
+
+                            <!-- Help Section -->
+                            <div class="help-section">
+                                <h3 class="h6 card-subtitle mb-2 text-muted">Quick Help</h3>
+                                <div class="accordion accordion-flush" id="helpAccordion">
+                                    <div class="accordion-item">
+                                        <h4 class="accordion-header" id="headingOne">
+                                            <button class="accordion-button collapsed" type="button" 
+                                                    data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                                                What is a load profile?
+                                            </button>
+                                        </h4>
+                                        <div id="collapseOne" class="accordion-collapse collapse" 
+                                             data-bs-parent="#helpAccordion">
+                                            <div class="accordion-body small">
+                                                A load profile is a time series of electricity demand values, typically hourly. 
+                                                It shows how demand varies throughout the day, week, and year, accounting for 
+                                                patterns like peak hours, seasonality, and special days.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h4 class="accordion-header" id="headingTwo">
+                                            <button class="accordion-button collapsed" type="button" 
+                                                    data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                                                Base Year vs. ML Method
+                                            </button>
+                                        </h4>
+                                        <div id="collapseTwo" class="accordion-collapse collapse" 
+                                             data-bs-parent="#helpAccordion">
+                                            <div class="accordion-body small">
+                                                <p><strong>Base Year Method:</strong> Uses patterns from a selected historical 
+                                                year and applies them to future years, scaling to match forecasted annual demand.</p>
+                                                <p><strong>ML Method:</strong> Uses machine learning to identify complex patterns 
+                                                in historical data, including weather correlations, to generate more nuanced 
+                                                future load profiles.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h4 class="accordion-header" id="headingThree">
+                                            <button class="accordion-button collapsed" type="button" 
+                                                    data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                                                Constraints and Options
+                                            </button>
+                                        </h4>
+                                        <div id="collapseThree" class="accordion-collapse collapse" 
+                                             data-bs-parent="#helpAccordion">
+                                            <div class="accordion-body small">
+                                                <p>Constraints ensure your generated load profiles maintain realistic patterns:</p>
+                                                <ul>
+                                                    <li><strong>Monthly Maximum:</strong> Enforce expected monthly peak demand values</li>
+                                                    <li><strong>Monthly Average:</strong> Maintain expected monthly average demand</li>
+                                                    <li><strong>Seasonal Patterns:</strong> Preserve seasonal variations</li>
+                                                    <li><strong>Weekday/Weekend:</strong> Maintain distinction between weekday and weekend patterns</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h4 class="accordion-header" id="headingFour">
+                                            <button class="accordion-button collapsed" type="button" 
+                                                    data-bs-toggle="collapse" data-bs-target="#collapseFour">
+                                                Load Factors
+                                            </button>
+                                        </h4>
+                                        <div id="collapseFour" class="accordion-collapse collapse" 
+                                             data-bs-parent="#helpAccordion">
+                                            <div class="accordion-body small">
+                                                <p>Load factor is the ratio of average demand to peak demand, expressed as a percentage:</p>
+                                                <ul>
+                                                    <li>Higher load factors (closer to 100%) indicate more efficient utilization of system capacity</li>
+                                                    <li>You can specify future improvements in load factor to model efficiency gains or behavioral changes</li>
+                                                    <li>Typical load factors range from 60-80% for power systems</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </aside>
+            </div>
+        </div>
+
+        <!-- Visualize Tab -->
+        <div class="tab-pane fade" id="visualize-pane" role="tabpanel" aria-labelledby="visualize-tab">
+            <div id="visualizationSection">
+                <!-- Visualization Controls -->
+                <section class="row mb-4">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="h5 mb-0">
+                                    <i class="fas fa-chart-area me-2"></i>Load Profile Visualization
+                                </h2>
+                            </div>
+                            <div class="card-body">
+                                <!-- Control Panel -->
+                                <div class="controls-section mb-3">
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <label for="profileSelect" class="form-label">Select Profile</label>
+                                            <select class="form-select" id="profileSelect" 
+                                                    aria-describedby="profileSelectHelp">
+                                                <option value="" selected disabled>Choose profile...</option>
+                                                {% if generated_profiles %}
+                                                {% for profile in generated_profiles %}
+                                                <option value="{{ profile.id }}">{{ profile.name }}</option>
+                                                {% endfor %}
+                                                {% endif %}
+                                            </select>
+                                            <div id="profileSelectHelp" class="form-text">
+                                                Select a generated load profile to visualize.
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label for="yearSelect" class="form-label">Year</label>
+                                            <select class="form-select" id="yearSelect" disabled 
+                                                    aria-describedby="yearSelectHelp">
+                                                <option value="" selected disabled>Select year...</option>
+                                            </select>
+                                            <div id="yearSelectHelp" class="form-text">
+                                                Choose year to display.
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label for="visualizationType" class="form-label">View Type</label>
+                                            <select class="form-select" id="visualizationType" disabled>
+                                                <option value="daily">Daily</option>
+                                                <option value="weekly" selected>Weekly</option>
+                                                <option value="monthly">Monthly</option>
+                                                <option value="yearly">Yearly</option>
+                                                <option value="duration">Load Duration Curve</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2 d-flex align-items-end">
+                                            <button type="button" class="btn btn-outline-primary w-100" 
+                                                    id="downloadBtn" disabled 
+                                                    title="Download chart as image">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Chart Container -->
+                                <div class="chart-container" style="position: relative; height: 400px;">
+                                    <canvas id="loadProfileChart" role="img" 
+                                            aria-label="Load profile visualization chart"></canvas>
+                                    
+                                    <!-- Loading Indicator -->
+                                    <div id="loadingIndicator" class="loading-overlay" style="display: none;">
+                                        <div class="d-flex flex-column align-items-center justify-content-center h-100">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                            <span class="mt-2">Loading visualization...</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- No Data Message -->
+                                    <div id="noDataMessage" class="no-data-overlay">
+                                        <div class="d-flex align-items-center justify-content-center h-100">
+                                            <p class="text-muted text-center">
+                                                <i class="fas fa-chart-bar fa-3x mb-3 d-block"></i>
+                                                Select a profile to visualize load data
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Statistics Panel -->
+                    <aside class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="h5 mb-0">
+                                    <i class="fas fa-info-circle me-2"></i>Profile Statistics
+                                </h2>
+                            </div>
+                            <div class="card-body">
+                                <div id="profileStats">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-chart-bar me-2"></i>
+                                        Select a profile to view statistics
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+                </section>
+
+                <!-- Data Table -->
+                <section class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="h5 mb-0">
+                                    <i class="fas fa-table me-2"></i>Load Profile Data
+                                </h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table id="profileDataTable" class="table table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Timestamp</th>
+                                                <th scope="col">Demand (MW)</th>
+                                                <th scope="col">% of Peak</th>
+                                                <th scope="col">Category</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="4" class="text-center">Select a profile to view data</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Export and Reports -->
+                <section class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="h5 mb-0">
+                                    <i class="fas fa-file-export me-2"></i>Reports & Exports
+                                </h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card bg-light">
+                                            <div class="card-body">
+                                                <h3 class="h6 card-title">Load Profile Report</h3>
+                                                <p class="card-text small">
+                                                    Generate a comprehensive report with key statistics, charts, and analysis.
+                                                </p>
+                                                <button type="button" class="btn btn-primary" id="reportBtn" disabled>
+                                                    <i class="fas fa-file-pdf me-1"></i>Generate PDF Report
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card bg-light">
+                                            <div class="card-body">
+                                                <h3 class="h6 card-title">Export Data</h3>
+                                                <p class="card-text small">
+                                                    Download the raw load profile data in various formats for external use.
+                                                </p>
+                                                <div class="btn-group">
+                                                    <button type="button" class="btn btn-outline-primary" 
+                                                            id="exportCsvBtn" disabled>
+                                                        <i class="fas fa-file-csv me-1"></i>CSV
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-primary" 
+                                                            id="exportExcelBtn" disabled>
+                                                        <i class="fas fa-file-excel me-1"></i>Excel
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Processing Modal -->
+    <div class="modal fade" id="processingModal" tabindex="-1" aria-labelledby="processingModalLabel" 
+         aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="processingModalLabel">
+                        <i class="fas fa-cogs me-2"></i>Generating Load Profiles
+                    </h5>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <div class="mb-3">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <p id="processingMessage">Analyzing input data and generating load profiles...</p>
+                    <div class="progress mt-3">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                             id="processingProgress" role="progressbar" style="width: 0%" 
+                             aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="successModalLabel">
+                        <i class="fas fa-check-circle text-success me-2"></i>Load Profiles Generated
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-check-circle text-success" style="font-size: 48px;"></i>
+                    </div>
+                    <p id="successMessage">Load profiles have been successfully generated and saved.</p>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <span id="profileDetailMessage">Generated profiles include hourly data for years 2023-2037.</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="loadProfileManager.switchToVisualizationIfProfileExists()">
+                        <i class="fas fa-chart-line me-1"></i>Visualize Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<!-- DataTables -->
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<!-- Load Profile JavaScript -->
+<script src="{{ url_for('static', filename='js/load_profile.js') }}"></script>
+{% endblock %}

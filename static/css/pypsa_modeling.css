@@ -1,0 +1,126 @@
+/* static/css/pypsa_modeling.css */
+
+.pypsa-modeling-container {
+    padding-top: 1rem; /* Add some top padding if not already there */
+}
+
+/* Settings Accordion Styling */
+.accordion-button.collapsed {
+    background-color: var(--bs-gray-100); /* Lighter than bg-light for subtle contrast */
+}
+.accordion-button:not(.collapsed) {
+    color: var(--bs-primary);
+    background-color: var(--bs-primary-bg-subtle); /* Use Bootstrap's subtle primary background */
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,.125);
+}
+.accordion-button:focus {
+    box-shadow: 0 0 0 0.25rem var(--focus-ring-color); /* Consistent focus */
+}
+
+.settings-override-body {
+    background-color: var(--bs-tertiary-bg); /* Slightly darker than accordion body */
+    padding: 1.25rem;
+    border-top: 1px solid var(--border-color);
+}
+.settings-override-body .form-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+.settings-override-body .form-text {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+.settings-override-body hr {
+    margin-top: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+/* Log Output Area */
+.log-output-area {
+    max-height: 350px; /* Increased height */
+    overflow-y: auto;
+    background-color: #1e1e1e; /* Darker theme for logs */
+    color: #d4d4d4; /* Light grey text */
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.875rem; /* Slightly larger for readability */
+    padding: 1rem;
+    border-radius: var(--radius-sm);
+    white-space: pre-wrap;
+    border: 1px solid #333;
+    line-height: 1.5;
+}
+.log-output-area p {
+    margin-bottom: 0.3em;
+    text-indent: -1em; /* Hanging indent for better readability of multi-line logs */
+    padding-left: 1em;
+}
+.log-output-area .log-error { color: #f48771; /* Softer red */ }
+.log-output-area .log-warning { color: #ffd073; /* Softer yellow */ }
+.log-output-area .log-info { color: #8ab4f8; /* Softer blue for info */ }
+.log-output-area .log-debug { color: #b9b9b9; /* Grey for debug */ }
+
+
+/* Scenario List Styling */
+#existingScenariosList .list-group-item {
+    padding: 0.75rem 1rem;
+    transition: background-color 0.15s ease-in-out;
+}
+#existingScenariosList .list-group-item:hover {
+    background-color: var(--bs-tertiary-bg);
+}
+#existingScenariosList .scenario-actions .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+}
+#existingScenariosList .scenario-actions .btn i {
+    font-size: 0.9em; /* Slightly smaller icons in buttons */
+}
+#existingScenariosList h6 .badge {
+    font-size: 0.7em;
+    vertical-align: middle;
+    margin-left: 0.5rem;
+}
+
+/* Status indicators */
+#pypsaStatusContainer .fw-bold {
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--radius-sm);
+    color: var(--bs-white); /* Default for badges */
+}
+#pypsaJobStatus.status-queued { background-color: var(--bs-secondary-bg-subtle); color: var(--bs-secondary-text-emphasis);}
+#pypsaJobStatus.status-processing_inputs,
+#pypsaJobStatus.status-running_single-year_models,
+#pypsaJobStatus.status-running_multi-year_model,
+#pypsaJobStatus.status-optimizing,
+#pypsaJobStatus.status-exporting_results { background-color: var(--bs-info-bg-subtle); color: var(--bs-info-text-emphasis); }
+#pypsaJobStatus.status-completed { background-color: var(--bs-success-bg-subtle); color: var(--bs-success-text-emphasis); }
+#pypsaJobStatus.status-failed { background-color: var(--bs-danger-bg-subtle); color: var(--bs-danger-text-emphasis); }
+#pypsaJobStatus.status-cancelled { background-color: var(--bs-warning-bg-subtle); color: var(--bs-warning-text-emphasis); }
+
+
+/* Download Modal File List */
+#fileListForDownload .list-group-item {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+}
+#fileListForDownload .list-group-item-secondary { /* For group headers */
+    font-weight: 600;
+    background-color: var(--bs-light);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.4rem 0.75rem;
+}
+
+/* Ensure consistent focus styles from common.css are applied */
+#pypsaRunForm input:focus, #pypsaRunForm select:focus, #settingsAccordion button:focus {
+  outline: 2px solid var(--focus-ring-color) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 4px var(--focus-ring-color) !important;
+}
+
+#pypsaRunForm .form-control:focus, #pypsaRunForm .form-select:focus {
+    outline-offset: 0 !important;
+    box-shadow: 0 0 0 2px var(--focus-ring-color) !important; /* Inner shadow for inputs */
+}

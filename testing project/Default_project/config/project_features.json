@@ -1,0 +1,8 @@
+{
+    "demand-projection": {
+        "enabled": false
+    },
+    "load-curve": {
+        "enabled": true
+    }
+}

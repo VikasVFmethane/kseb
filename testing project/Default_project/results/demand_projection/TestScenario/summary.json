@@ -1,0 +1,12 @@
+{
+    "scenario": "TestScenario",
+    "target_year": 2025,
+    "start_year": 2015,
+    "sectors": ["Residential", "Commercial"],
+    "timestamp": "2023-01-01 10:00:00",
+    "exclude_covid": false,
+    "models_used": {
+        "Residential": ["Historical", "ModelA", "ModelB"],
+        "Commercial": ["Historical", "ModelX"]
+    }
+}

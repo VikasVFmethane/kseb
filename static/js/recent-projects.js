@@ -40,7 +40,7 @@ function loadRecentProjects() {
     }
     
     // Fetch recent projects
-    fetch('/api/recent_projects')
+    fetch('/project/api/recent_projects')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`Network response was not ok: ${response.status}`);
@@ -147,7 +147,7 @@ function loadProjectByPath(projectPath) {
     }
     
     // Load project via API
-    fetch('/load_project', {
+    fetch('/project/load', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -173,7 +173,7 @@ function loadProjectByPath(projectPath) {
             
             // Redirect to dashboard after short delay
             setTimeout(() => {
-                window.location.href = '/demand_projection';
+                window.location.href = '/demand/projection';
             }, 1000);
         } else {
             // Show error message
@@ -248,7 +248,7 @@ function showDeleteConfirmation(projectName, projectPath) {
 
 function deleteProject(projectPath) {
     // Call the API to delete the project from recent projects
-    fetch('/api/delete_recent_project', {
+    fetch('/project/api/delete_recent_project', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

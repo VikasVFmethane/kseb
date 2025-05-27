@@ -295,41 +295,62 @@ def api_get_pypsa_network_info_api(network_rel_path):
         n = pypsa.Network(full_path)
         snaps = pau.safe_get_snapshots(n)
         is_multi = isinstance(snaps, pd.MultiIndex) and snaps.nlevels > 1
+        
         periods = []
         if is_multi and hasattr(snaps, 'levels') and len(snaps.levels) > 0:
-             periods = sorted(snaps.levels[0].astype(str).unique().tolist())
+            periods = sorted(snaps.levels[0].astype(str).unique().tolist())
         
         components_info = {}
-        for comp_name in n.components:
-            df_comp = n.df(comp_name)
-            if not df_comp.empty:
-                components_info[comp_name] = {
-                    'count': len(df_comp),
-                    'attributes': df_comp.columns.tolist()
-                }
+        if hasattr(n, 'components'):
+            for component_name in n.components.keys():
+                try:
+                    component_list_name = n.components[component_name]["list_name"]
+                    if hasattr(n, component_list_name):
+                        component_df = getattr(n, component_list_name)
+                        components_info[component_name] = len(component_df)
+                    else:
+                        components_info[component_name] = 0
+                except (KeyError, TypeError):
+                    try:
+                        if hasattr(n, component_name): # Fallback for older PyPSA or different structure
+                            component_df = getattr(n, component_name)
+                            components_info[component_name] = len(component_df) if hasattr(component_df, '__len__') else 0
+                        else:
+                            components_info[component_name] = 0
+                    except Exception:
+                        components_info[component_name] = 0
         
-        carriers_list = list(n.carriers.index) if hasattr(n, 'carriers') and not n.carriers.empty else []
+        carriers_list = []
+        if hasattr(n, 'carriers') and not n.carriers.empty:
+            carriers_list = n.carriers.index.tolist()
         
         start_s, end_s = "N/A", "N/A"
         if not snaps.empty:
-            time_index = pau.get_time_index(snaps)
-            if time_index is not None and not time_index.empty:
-                start_s = time_index[0].strftime('%Y-%m-%d %H:%M:%S')
-                end_s = time_index[-1].strftime('%Y-%m-%d %H:%M:%S')
+            s0_raw, s_end_raw = snaps[0], snaps[-1]
+            start_s = str(pau.get_time_index(pd.Index([s0_raw]))[0]) if pau.get_time_index(pd.Index([s0_raw])) is not None else str(s0_raw)
+            end_s = str(pau.get_time_index(pd.Index([s_end_raw]))[0]) if pau.get_time_index(pd.Index([s_end_raw])) is not None else str(s_end_raw)
 
-        info = { 
-            'name': os.path.basename(network_rel_path), 
-            'components': components_info, 
-            'carriers': carriers_list, 
-            'snapshots': {'count': len(snaps), 'start': start_s, 'end': end_s, 'is_multi_period': is_multi}, 
-            'periods': periods, 
-            'optimization_status': getattr(n, 'objective_status', 'N/A')
+
+        info = {
+            'name': os.path.basename(network_rel_path),
+            'components': components_info,
+            'carriers': carriers_list,
+            'snapshots': {
+                'count': len(snaps),
+                'start': start_s,
+                'end': end_s,
+                'is_multi_period': is_multi
+            },
+            'periods': periods,
+            'optimization_status': getattr(n, 'objective_status', 'N/A') # PyPSA sometimes uses objective_status
         }
-        return jsonify({'status': 'success', 'network_info': handle_nan_values(info)})
+        return jsonify({'status': 'success', 'network_info': info})
     except Exception as e:
-        current_app.logger.error(f"Error loading PyPSA network info for {network_rel_path}: {e}", exc_info=True)
-        return make_response(jsonify({'status': 'error', 'message': f"Error processing network info: {str(e)}"}), 500)
-
+       
+        error_payload = {'status': 'error', 'message': f"Error processing network info: {str(e)}"}
+        response = make_response(jsonify(error_payload), 500)
+        response.mimetype = "application/json"
+        return response
 
 @pypsa_bp.route('/api/extract_period/<path:network_rel_path>/<period_name_req>', methods=['GET'])
 def api_extract_period_network_api(network_rel_path, period_name_req):
@@ -603,4 +624,4 @@ def download_pypsa_result_file_api(scenario_name, filename):
         return send_file(str(file_to_download_path.resolve()), as_attachment=True)
     else:
         flash(f"File not found or access denied: {filename}", "danger")
-        return redirect(url_for('pypsa.pypsa_results_route')) # Corrected redirect to results if modeling is not appropriate
+        return redirect(url_for('pypsa.pypsa_results_route')) 

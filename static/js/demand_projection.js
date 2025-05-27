@@ -617,7 +617,7 @@ function loadIndependentVariables(sector) {
     `;
 
     // Fetch data from API
-    fetch(`/api/independent_variables/${sector}`)
+    fetch(`/demand/api/independent_variables/${sector}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -885,7 +885,7 @@ function sendForecastRequest(requestData) {
     };
 
     // Send the forecast request
-    fetch('/api/run_forecast', {
+    fetch('/demand/api/run_forecast', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

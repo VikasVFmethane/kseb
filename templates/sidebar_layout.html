@@ -21,7 +21,7 @@
 
         <aside class="sidebar" id="appSidebar" aria-label="Main Navigation Sidebar">
             <div class="sidebar-header">
-                <a href="{{ url_for('home') }}" class="logo-container" aria-label="Homepage">
+                <a href="{{ url_for('core.home') }}" class="logo-container" aria-label="Homepage">
                     <img src="{{ url_for('static', filename='logos/Vasudha_Logo_PNG.png') }}"
                         alt="Vasudha Foundation Logo" class="logo-img">
                     <span class="logo-text">Energy<span>Forecast</span></span>
@@ -37,8 +37,8 @@
                     <h6 class="nav-section-title visually-hidden">General Navigation</h6>
                     <ul class="nav-list" role="menu">
                         <li class="nav-item" role="none">
-                            <a href="{{ url_for('home') }}"
-                                class="nav-link {% if request.endpoint == 'home' %}active{% endif %}" role="menuitem"
+                            <a href="{{ url_for('core.home') }}"
+                                class="nav-link {% if request.endpoint == 'core.home' %}active{% endif %}" role="menuitem"
                                 data-bs-toggle="tooltip" data-bs-placement="right" title="Home">
                                 <i class="fas fa-home" aria-hidden="true"></i><span class="nav-text">Home</span>
                             </a>
@@ -50,8 +50,8 @@
                     <h6 class="nav-section-title">Forecasting</h6>
                     <ul class="nav-list" role="menu">
                         <li class="nav-item" role="none">
-                            <a href="{{ url_for('demand_projection') }}"
-                                class="nav-link {% if request.endpoint == 'demand_projection' %}active{% endif %}"
+                            <a href="{{ url_for('demand.demand_projection_route') }}"
+                                class="nav-link {% if request.endpoint == 'demand.demand_projection_route' %}active{% endif %}"
                                 role="menuitem" data-bs-toggle="tooltip" data-bs-placement="right"
                                 title="Demand Projection">
                                 <i class="fas fa-chart-line" aria-hidden="true"></i><span class="nav-text">Demand
@@ -59,8 +59,8 @@
                             </a>
                         </li>
                         <li class="nav-item" role="none">
-                            <a href="{{ url_for('demand_visualization') }}"
-                                class="nav-link {% if request.endpoint == 'demand_visualization' %}active{% endif %}"
+                            <a href="{{ url_for('demand.demand_visualization_route') }}"
+                                class="nav-link {% if request.endpoint == 'demand.demand_visualization_route' %}active{% endif %}"
                                 role="menuitem" data-bs-toggle="tooltip" data-bs-placement="right"
                                 title="Demand Visualization">
                                 <i class="fas fa-chart-area" aria-hidden="true"></i><span class="nav-text">Demand
@@ -68,8 +68,8 @@
                             </a>
                         </li>
                         <li class="nav-item" role="none">
-                            <a href="{{ url_for('load_profile_creation') }}"
-                                class="nav-link {% if request.endpoint == 'load_profile_creation' %}active{% endif %}"
+                            <a href="{{ url_for('loadprofile.load_profile_creation_route') }}"
+                                class="nav-link {% if request.endpoint == 'loadprofile.load_profile_creation_route' %}active{% endif %}"
                                 role="menuitem" data-bs-toggle="tooltip" data-bs-placement="right" title="Load Curves">
                                 <i class="fas fa-wave-square" aria-hidden="true"></i><span class="nav-text">Load
                                     Curves</span>
@@ -82,8 +82,8 @@
                     <h6 class="nav-section-title">Modeling</h6>
                     <ul class="nav-list" role="menu">
                         <li class="nav-item" role="none">
-                            <a href="{{ url_for('pypsa_modeling') }}"
-                                class="nav-link {% if request.endpoint == 'pypsa_modeling' %}active{% endif %}"
+                            <a href="{{ url_for('pypsa.pypsa_modeling_route') }}"
+                                class="nav-link {% if request.endpoint == 'pypsa.pypsa_modeling_route' %}active{% endif %}"
                                 role="menuitem" data-bs-toggle="tooltip" data-bs-placement="right"
                                 title="PyPSA Modeling">
                                 <i class="fas fa-solar-panel" aria-hidden="true"></i><span class="nav-text">PyPSA
@@ -91,8 +91,8 @@
                             </a>
                         </li>
                         <li class="nav-item" role="none">
-                            <a href="{{ url_for('pypsa_results') }}"
-                                class="nav-link {% if request.endpoint == 'pypsa_results' %}active{% endif %}"
+                            <a href="{{ url_for('pypsa.pypsa_results_route') }}"
+                                class="nav-link {% if request.endpoint == 'pypsa.pypsa_results_route' %}active{% endif %}"
                                 role="menuitem" data-bs-toggle="tooltip" data-bs-placement="right"
                                 title="Modeling Results">
                                 <i class="fas fa-poll" aria-hidden="true"></i><span class="nav-text">Results</span>
@@ -105,8 +105,8 @@
                     <h6 class="nav-section-title">Resources</h6>
                     <ul class="nav-list" role="menu">
                         <li class="nav-item" role="none">
-                            <a href="{{ url_for('user_guide') }}"
-                                class="nav-link {% if request.endpoint == 'user_guide' %}active{% endif %}"
+                            <a href="{{ url_for('core.user_guide') }}"
+                                class="nav-link {% if request.endpoint == 'core.user_guide' %}active{% endif %}"
                                 role="menuitem" data-bs-toggle="tooltip" data-bs-placement="right" title="User Guide">
                                 <i class="fas fa-book" aria-hidden="true"></i>
                                 <span class="nav-text">User Guide</span>
@@ -131,7 +131,7 @@
                     </ul>
                 </div>
                 <!-- Add to sidebar navigation -->
-                <a href="{{ url_for('feature_management') }}" class="nav-link">
+                <a href="{{ url_for('admin.feature_management_route') }}" class="nav-link">
                     <i class="fas fa-toggle-on me-2"></i>
                     <span class="nav-text">Feature Management</span>
                 </a>
@@ -223,7 +223,7 @@
                     <h6>Need Support?</h6>
                     <p>If you encounter any issues or have questions:</p>
                     <ul>
-                        <li>Consult the <a href="{{ url_for('user_guide') }}" target="_blank">Full User Guide <i
+                        <li>Consult the <a href="{{ url_for('core.user_guide') }}" target="_blank">Full User Guide <i
                                     class="fas fa-external-link-alt fa-xs"></i></a>.</li>
                         <li>Review the <a href="#" data-bs-toggle="modal" data-bs-target="#methodologyModal">Modeling
                                 Methodology</a>.</li>

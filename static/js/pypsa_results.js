@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
         resolution: '1H',
         dispatchData: null,
         capacityData: null,
+        newCapacityAdditionsData: null,
         metricsData: null,
         storageData: null,
         emissionsData: null,
@@ -38,6 +39,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const resolutionSelectEl = document.getElementById('resolutionSelect'); 
     const applyFilterBtn = document.getElementById('applyFilterBtn');
     const backToSelectionBtn = document.getElementById('backToSelectionBtn');
+    const newCapacityMethodSelect = document.getElementById('newCapacityMethodSelect');
+    const downloadComparisonSecondaryBtn = document.getElementById('downloadComparisonSecondaryBtn');
+
 
     const initialNcFilesOptions = Array.from(document.querySelectorAll('#networkFileSelect option'));
     if (initialNcFilesOptions.length > 1) { 
@@ -83,13 +87,13 @@ document.addEventListener('DOMContentLoaded', function() {
         uploadBtn.disabled = true;
         uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Uploading...';
         
-        fetch('/api/pypsa/upload_network', { method: 'POST', body: formData })
+        fetch('/pypsa/api/upload_network', { method: 'POST', body: formData })
             .then(response => response.json())
             .then(data => {
                 uploadBtn.disabled = false;
                 uploadBtn.innerHTML = originalBtnText;
                 if (data.status === 'success') {
-                    showGlobalAlert(`Network file uploaded to scenario "${formData.get('scenario')}"!`, 'success');
+                    showGlobalAlert(`Network file '${data.file_info.filename}' uploaded to scenario '${data.file_info.scenario}'!`, 'success');
                     refreshNetworkFiles(); 
                     networkUploadForm.reset();
                 } else {
@@ -136,14 +140,16 @@ document.addEventListener('DOMContentLoaded', function() {
         this.disabled = true;
         this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Applying...';
         
-        showLoadingIndicators(['dispatchStackPlot', 'dailyProfilePlot', 'loadDurationPlot', 'avgPriceByBusPlot', 'priceDurationPlot']);
+        showLoadingIndicators(['dispatchStackPlot', 'dailyProfilePlot', 'loadDurationPlot', 'socPlot', 'avgPriceByBusPlot', 'priceDurationPlot']);
 
         Promise.all([
             fetchDispatchData(state.currentNetworkPath), 
+            fetchStorageData(state.currentNetworkPath),
             fetchPricesData(state.currentNetworkPath)    
         ])
         .then(() => {
             updateDispatchTab(); 
+            updateStorageTab();
             updatePricesTab();   
             showGlobalAlert('Filters applied successfully.', 'success');
         })
@@ -152,15 +158,15 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .finally(() => {
             this.disabled = false;
-            this.innerHTML = '<i class="fas fa-filter me-1"></i> Apply Filter';
-            hideLoadingIndicators(['dispatchStackPlot', 'dailyProfilePlot', 'loadDurationPlot', 'avgPriceByBusPlot', 'priceDurationPlot']);
+            this.innerHTML = '<i class="fas fa-filter me-1"></i> Apply Filters';
+            hideLoadingIndicators(['dispatchStackPlot', 'dailyProfilePlot', 'loadDurationPlot', 'socPlot', 'avgPriceByBusPlot', 'priceDurationPlot']);
         });
     });
     
     periodSelect.addEventListener('change', function() {
         state.currentPeriod = this.value;
         showLoadingIndicatorsForDashboard();
-        reloadAllData(state.currentNetworkPath, state.networkInfo)
+        reloadAllData(state.currentNetworkPath) // networkInfo is already in state
          .catch(error => {
             showGlobalAlert(`Error reloading data for period ${state.currentPeriod}: ${error.message}`, 'danger');
         })
@@ -173,8 +179,16 @@ document.addEventListener('DOMContentLoaded', function() {
         showLoadingIndicators(['capacityByCarrierPlot', 'capacityByRegionPlot']);
         fetchCapacityData(state.currentNetworkPath, this.value)
             .then(updateCapacityTab)
-            .catch(error => showGlobalAlert(`Error fetching capacity data: ${error.message}`, 'danger'))
+            .catch(error => showGlobalAlert(`Error fetching total capacity data: ${error.message}`, 'danger'))
             .finally(() => hideLoadingIndicators(['capacityByCarrierPlot', 'capacityByRegionPlot']));
+    });
+    
+    newCapacityMethodSelect.addEventListener('change', function() {
+        showLoadingIndicators(['newCapacityAdditionsPlot']);
+        fetchNewCapacityAdditionsData(state.currentNetworkPath, this.value)
+            .then(updateNewCapacityAdditionsVisuals)
+            .catch(error => showGlobalAlert(`Error fetching new capacity additions: ${error.message}`, 'danger'))
+            .finally(() => hideLoadingIndicators(['newCapacityAdditionsPlot']));
     });
     
     document.getElementById('loadExtractedPeriodBtn').addEventListener('click', function() {
@@ -233,6 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
             'loadDuration': 'loadDurationPlot',
             'capacityByCarrier': 'capacityByCarrierPlot',
             'capacityByRegion': 'capacityByRegionPlot',
+            'newCapacityAdditions': 'newCapacityAdditionsPlot',
             'cufPlot': 'cufPlot',
             'curtailmentPlot': 'curtailmentPlot',
             'socPlot': 'socPlot',
@@ -241,6 +256,8 @@ document.addEventListener('DOMContentLoaded', function() {
             'avgPriceByBus': 'avgPriceByBusPlot',
             'priceDuration': 'priceDurationPlot',
             'lineLoading': 'lineLoadingPlot',
+            'comparisonMain': 'comparisonMainPlot',
+            'comparisonSecondary': 'comparisonSecondaryPlot'
         };
         return map[chartId];
     }
@@ -249,7 +266,11 @@ document.addEventListener('DOMContentLoaded', function() {
         plotIds.forEach(id => {
             const plotContainer = document.getElementById(id);
             if (plotContainer) {
-                plotContainer.innerHTML = '<div class="loading-indicator" style="display: flex;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+                if (!plotContainer.querySelector('.loading-indicator')) {
+                    plotContainer.innerHTML = '<div class="loading-indicator" style="display: flex;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+                } else {
+                     plotContainer.querySelector('.loading-indicator').style.display = 'flex';
+                }
             }
         });
     }
@@ -260,18 +281,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 const loader = plotContainer.querySelector('.loading-indicator');
                 if(loader) loader.style.display = 'none';
             }
-        });
+         });
     }
     function showLoadingIndicatorsForDashboard() {
         document.querySelectorAll('.plot-container').forEach(pc => {
-            pc.innerHTML = '<div class="loading-indicator" style="display: flex;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+            if (!pc.querySelector('.loading-indicator')) {
+                pc.innerHTML = '<div class="loading-indicator" style="display: flex;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+            } else {
+                pc.querySelector('.loading-indicator').style.display = 'flex';
+            }
         });
         document.querySelectorAll('.stats-value').forEach(el => el.textContent = '-');
         document.querySelectorAll('.table-responsive tbody').forEach(el => el.innerHTML = '<tr><td colspan="100%" class="text-center">Loading...</td></tr>');
     }
     function hideLoadingIndicatorsForDashboard() {
          document.querySelectorAll('.plot-container .loading-indicator').forEach(el => {
-            if (el.parentElement.childElementCount === 1) { // Only hide if it's the only thing there
+            if (el.parentElement.childElementCount > 1 || el.style.display !== 'none') {
                  el.style.display = 'none';
             }
          });
@@ -293,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function() {
         networkInfoContainer.style.display = 'block';
         networkInfoContainer.innerHTML = `<div class="card"><div class="card-body text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i> Loading network information...</div></div>`;
         
-        fetch(`/api/pypsa/network_info/${networkPath}`)
+        fetch(`/pypsa/api/network_info/${networkPath}`)
             .then(response => {
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 return response.json();
@@ -366,7 +391,7 @@ document.addEventListener('DOMContentLoaded', function() {
         scenarioSelect.disabled = true;
         networkFileSelect.disabled = true;
         
-        fetch('/api/pypsa/scan_files')
+        fetch('/pypsa/api/scan_files')
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
@@ -391,6 +416,8 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 showGlobalAlert(`Error refreshing files: ${error.message}`, 'danger');
+                scenarioSelect.disabled = false;
+                networkFileSelect.disabled = !(!scenarioSelect.value);
             });
     }
     
@@ -429,7 +456,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setupDateFilter(networkInfoFull); 
         
         showLoadingIndicatorsForDashboard();
-        reloadAllData(networkPath, networkInfoFull)
+        reloadAllData(networkPath)
             .then(() => {
                 showGlobalAlert('Network loaded successfully.', 'success');
             })
@@ -446,7 +473,7 @@ document.addEventListener('DOMContentLoaded', function() {
         state.periods = networkInfoFull.periods || [];
         
         if (state.isMultiPeriod && state.periods.length > 0) {
-            periodControlContainer.style.display = 'flex'; // Use flex for better alignment
+            periodControlContainer.style.display = 'flex'; 
             periodSelect.innerHTML = '';
             state.periods.forEach(periodVal => { 
                 const option = document.createElement('option');
@@ -493,7 +520,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function extractPeriod(networkPath, periodToExtract) {
-        fetch(`/api/pypsa/extract_period/${networkPath}/${periodToExtract}`)
+        fetch(`/pypsa/api/extract_period/${networkPath}/${periodToExtract}`)
             .then(response => response.json())
             .then(data => {
                 extractPeriodBtn.disabled = false;
@@ -518,16 +545,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     async function reloadAllData(networkPath) { 
         try {
-            state.dispatchData = null; state.capacityData = null; state.metricsData = null;
+            state.dispatchData = null; state.capacityData = null; state.newCapacityAdditionsData = null; state.metricsData = null;
             state.storageData = null; state.emissionsData = null; state.pricesData = null;
             state.networkFlowData = null; 
-            // Color palette might be updated by individual fetches if the API returns it
-            // Or, have a separate call to fetch a "master" palette for the network if that's how it's designed.
-            // For now, let's assume individual API calls might return and merge colors.
 
             await Promise.all([
                 fetchDispatchData(networkPath),
                 fetchCapacityData(networkPath, document.getElementById('capacityAttributeSelect').value),
+                fetchNewCapacityAdditionsData(networkPath, newCapacityMethodSelect.value),
                 fetchMetricsData(networkPath),
                 fetchStorageData(networkPath),
                 fetchEmissionsData(networkPath),
@@ -546,7 +571,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateAllTabs() {
         updateDispatchTab();
-        updateCapacityTab();
+        updateCapacityTab(); // Will also trigger updateNewCapacityAdditionsVisuals
         updateMetricsTab();
         updateStorageTab();
         updateEmissionsTab();
@@ -558,13 +583,10 @@ document.addEventListener('DOMContentLoaded', function() {
         let url = basePath;
         const params = new URLSearchParams();
 
-        if (state.currentPeriod) { // For multi-period networks
+        if (state.currentPeriod) {
             params.append('period', state.currentPeriod);
         }
         
-        // Add date and resolution filters if they are relevant (e.g., for dispatch, prices)
-        // The calling function should decide which params are relevant.
-        // Example: if 'start_date' is in queryParams and state.startDate is set:
         if (queryParams.hasOwnProperty('start_date') && state.startDate) {
             params.append('start_date', state.startDate);
         }
@@ -575,11 +597,8 @@ document.addEventListener('DOMContentLoaded', function() {
             params.append('resolution', state.resolution);
         }
 
-        // Add other specific query params passed to the function
         for (const key in queryParams) {
-            // Avoid re-adding already handled params if they were just markers
             if (key === 'start_date' || key === 'end_date' || key === 'resolution') continue;
-            
             if (queryParams[key] !== null && queryParams[key] !== undefined && String(queryParams[key]).trim() !== "") {
                 params.append(key, queryParams[key]);
             }
@@ -589,7 +608,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (queryString) {
             url += `?${queryString}`;
         }
-        console.log("Built API URL:", url); 
         return url;
     }
     
@@ -619,93 +637,70 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Specific data fetching functions ---
     async function fetchDispatchData(networkPath) {
-        // Dispatch is affected by date and resolution
-        const queryParams = { 
-            start_date: state.startDate, // Pass these keys to indicate they are relevant
-            end_date: state.endDate,
-            resolution: state.resolution 
-        };
-        const url = buildApiUrl(`/api/pypsa/dispatch_data/${networkPath}`, queryParams);
+        const queryParams = { start_date: true, end_date: true, resolution: true };
+        const url = buildApiUrl(`/pypsa/api/dispatch_data/${networkPath}`, queryParams);
         return fetchData(url, (data) => {
-            state.dispatchData = data.dispatch_data_data; // API wrapper uses a nested key
+            state.dispatchData = data.dispatch_data_data; 
             if (data.colors) Object.assign(state.colorPalette, data.colors);
         });
     }
 
     async function fetchCapacityData(networkPath, attribute = 'p_nom_opt') {
-        // Capacity is typically for a period, not sliced by sub-period dates or resolution.
-        // 'period' will be added by buildApiUrl if state.currentPeriod is set.
-        const url = buildApiUrl(`/api/pypsa/capacity_data/${networkPath}`, { attribute });
+        const url = buildApiUrl(`/pypsa/api/capacity_data/${networkPath}`, { attribute });
         return fetchData(url, (data) => {
-            state.capacityData = data.carrier_capacity_data; // API wrapper uses a nested key
+            state.capacityData = data.carrier_capacity_data; 
             if (data.colors) Object.assign(state.colorPalette, data.colors);
         });
     }
 
-    async function fetchMetricsData(networkPath) {
-        // Metrics like CUF and Curtailment are usually for the selected period.
-        // Date/resolution filters from the main bar might not apply directly here,
-        // or the backend needs to know how to interpret them for these metrics.
-        // For now, assume they apply to the whole 'currentPeriod'.
-        const queryParams = { 
-            start_date: state.startDate, // Pass them, backend can decide to use or ignore
-            end_date: state.endDate,
-        };
-        const url = buildApiUrl(`/api/pypsa/metrics_data/${networkPath}`, queryParams);
+    async function fetchNewCapacityAdditionsData(networkPath, method = 'optimization_diff') {
+        const queryParams = { method: method };
+        const url = buildApiUrl(`/pypsa/api/new_capacity_additions/${networkPath}`, queryParams);
         return fetchData(url, (data) => {
-            state.metricsData = data.combined_metrics_extractor_data; // API wrapper uses a nested key
+            state.newCapacityAdditionsData = data.new_capacity_additions_data;
+        });
+    }
+
+    async function fetchMetricsData(networkPath) {
+        const queryParams = { start_date: true, end_date: true };
+        const url = buildApiUrl(`/pypsa/api/metrics_data/${networkPath}`, queryParams);
+        return fetchData(url, (data) => {
+            state.metricsData = data.combined_metrics_extractor_data; 
             if (data.colors) Object.assign(state.colorPalette, data.colors);
         });
     }
 
     async function fetchStorageData(networkPath) {
-        // Storage SoC is time-series, so date/resolution might apply.
-        const queryParams = { 
-            start_date: state.startDate,
-            end_date: state.endDate,
-            resolution: state.resolution 
-        };
-        const url = buildApiUrl(`/api/pypsa/storage_data/${networkPath}`, queryParams);
+        const queryParams = { start_date: true, end_date: true, resolution: true };
+        const url = buildApiUrl(`/pypsa/api/storage_data/${networkPath}`, queryParams);
         return fetchData(url, (data) => {
-            state.storageData = data.extract_api_storage_data_data; // API wrapper uses a nested key
+            state.storageData = data.extract_api_storage_data_data;
             if (data.colors) Object.assign(state.colorPalette, data.colors);
         });
     }
 
     async function fetchEmissionsData(networkPath) {
-        // Emissions are typically for the whole period.
-        const url = buildApiUrl(`/api/pypsa/emissions_data/${networkPath}`);
+        const queryParams = { start_date: true, end_date: true };
+        const url = buildApiUrl(`/pypsa/api/emissions_data/${networkPath}`, queryParams);
         return fetchData(url, (data) => {
-            state.emissionsData = data.emissions_data; // API wrapper uses a nested key
+            state.emissionsData = data.emissions_data;
             if (data.colors) Object.assign(state.colorPalette, data.colors);
         });
     }
 
     async function fetchPricesData(networkPath) {
-        // Prices are time-series and can be resampled. Date filters also apply.
-        const queryParams = { 
-            start_date: state.startDate,
-            end_date: state.endDate,
-            resolution: state.resolution 
-        };
-        const url = buildApiUrl(`/api/pypsa/prices_data/${networkPath}`, queryParams);
+        const queryParams = { start_date: true, end_date: true, resolution: true };
+        const url = buildApiUrl(`/pypsa/api/prices_data/${networkPath}`, queryParams);
         return fetchData(url, (data) => {
-            state.pricesData = data.extract_api_prices_data_data; // API wrapper uses a nested key
-             // Prices API does not typically return a 'colors' field specific to prices themselves
+            state.pricesData = data.extract_api_prices_data_data; 
         });
     }
 
     async function fetchNetworkFlowData(networkPath) {
-        // Network flow (losses, line loading) might be for the whole period.
-        // Or, if time-series of line flows are analyzed, then date/resolution could apply.
-        // Assuming backend provides aggregated results for the period for now.
-        const queryParams = { 
-            start_date: state.startDate, // Pass for backend to decide
-            end_date: state.endDate,
-        };
-        const url = buildApiUrl(`/api/pypsa/network_flow/${networkPath}`, queryParams);
+        const queryParams = { start_date: true, end_date: true }; 
+        const url = buildApiUrl(`/pypsa/api/network_flow/${networkPath}`, queryParams);
         return fetchData(url, (data) => {
-            state.networkFlowData = data.extract_api_network_flow_data; // API wrapper uses a nested key
+            state.networkFlowData = data.extract_api_network_flow_data;
         });
     }
 
@@ -716,7 +711,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function updateDispatchTab() {
         const plotContainer = document.getElementById('dispatchStackPlot');
-        hideLoadingIndicators(['dispatchStackPlot', 'dailyProfilePlot', 'loadDurationPlot']); // Hide before checking data
+        hideLoadingIndicators(['dispatchStackPlot', 'dailyProfilePlot', 'loadDurationPlot']); 
 
         if (!state.dispatchData || !state.dispatchData.timestamps || state.dispatchData.timestamps.length === 0) {
             plotContainer.innerHTML = '<div class="alert alert-warning m-3">No dispatch data available for selected criteria.</div>';
@@ -737,25 +732,44 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function updateCapacityTab() {
-        const plotContainer = document.getElementById('capacityByCarrierPlot');
+        const plotContainerCarrier = document.getElementById('capacityByCarrierPlot');
+        const plotContainerRegion = document.getElementById('capacityByRegionPlot');
         hideLoadingIndicators(['capacityByCarrierPlot', 'capacityByRegionPlot']);
 
-        if (!state.capacityData || (!state.capacityData.by_carrier || state.capacityData.by_carrier.length === 0)) {
-            plotContainer.innerHTML = '<div class="alert alert-warning m-3">No capacity data available.</div>';
-            clearPlot('capacityByRegionPlot');
+        let hasTotalCapacityData = state.capacityData && 
+                                   ((state.capacityData.by_carrier && state.capacityData.by_carrier.length > 0) ||
+                                    (state.capacityData.by_region && state.capacityData.by_region.length > 0));
+
+        if (!hasTotalCapacityData) {
+            plotContainerCarrier.innerHTML = '<div class="alert alert-warning m-3">No total capacity data available.</div>';
+            plotContainerRegion.innerHTML = '<div class="alert alert-warning m-3">No regional capacity data available.</div>';
             clearTable('capacityTable');
-            return;
+        } else {
+            createCapacityByCarrierPlot();
+            createCapacityByRegionPlot();
+            updateCapacityTable();
         }
         
-        createCapacityByCarrierPlot();
-        createCapacityByRegionPlot();
-        updateCapacityTable();
+        updateNewCapacityAdditionsVisuals();
     }
     
+    function updateNewCapacityAdditionsVisuals() {
+        const plotContainerNewAdditions = document.getElementById('newCapacityAdditionsPlot');
+        hideLoadingIndicators(['newCapacityAdditionsPlot']);
+
+        if (!state.newCapacityAdditionsData || !state.newCapacityAdditionsData.new_additions || state.newCapacityAdditionsData.new_additions.length === 0) {
+            plotContainerNewAdditions.innerHTML = '<div class="alert alert-info m-3">No new capacity addition data for selected criteria.</div>';
+            clearTable('newCapacityAdditionsTable');
+        } else {
+            createNewCapacityAdditionsPlot();
+            updateNewCapacityAdditionsTable();
+        }
+    }
+
     function updateMetricsTab() {
         hideLoadingIndicators(['cufPlot', 'curtailmentPlot']);
 
-        if (!state.metricsData || (!state.metricsData.cuf && !state.metricsData.curtailment) ) {
+        if (!state.metricsData || ((!state.metricsData.cuf || state.metricsData.cuf.length === 0) && (!state.metricsData.curtailment || state.metricsData.curtailment.length === 0)) ) {
             document.getElementById('cufPlot').innerHTML = '<div class="alert alert-warning m-3">No CUF data available.</div>';
             document.getElementById('curtailmentPlot').innerHTML = '<div class="alert alert-warning m-3">No curtailment data available.</div>';
             clearTable('cufTable');
@@ -772,7 +786,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateStorageTab() {
         hideLoadingIndicators(['socPlot', 'storageUtilizationPlot']);
 
-        if (!state.storageData || (!state.storageData.soc && !state.storageData.stats)) {
+        if (!state.storageData || ((!state.storageData.soc || state.storageData.soc.length === 0) && (!state.storageData.stats || state.storageData.stats.length === 0))) {
             document.getElementById('socPlot').innerHTML = '<div class="alert alert-warning m-3">No storage SoC data available.</div>';
             document.getElementById('storageUtilizationPlot').innerHTML = '<div class="alert alert-warning m-3">No storage utilization data.</div>';
             clearTable('storageUtilizationTable');
@@ -789,7 +803,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const totalValEl =  document.getElementById('totalEmissionsValue');
         const totalConvEl = document.getElementById('totalEmissionsConverted');
 
-        if (!state.emissionsData || (!state.emissionsData.total && !state.emissionsData.by_carrier)) {
+        if (!state.emissionsData || ((!state.emissionsData.total || state.emissionsData.total.length === 0) && (!state.emissionsData.by_carrier || state.emissionsData.by_carrier.length === 0))) {
             totalValEl.textContent = '-';
             totalConvEl.textContent = '-';
             document.getElementById('emissionsByCarrierPlot').innerHTML = '<div class="alert alert-warning m-3">No emissions data available.</div>';
@@ -810,6 +824,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!state.pricesData || !state.pricesData.available) {
             priceDataContainer.style.display = 'none';
             noPriceDataContainer.style.display = 'block';
+            clearTable('priceTable');
             return;
         }
         priceDataContainer.style.display = 'block';
@@ -822,7 +837,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function updateNetworkFlowTab() {
         hideLoadingIndicators(['lineLoadingPlot']);
-        if (!state.networkFlowData || (!state.networkFlowData.losses && !state.networkFlowData.line_loading)) {
+        if (!state.networkFlowData || ((!state.networkFlowData.losses || state.networkFlowData.losses.length === 0) && (!state.networkFlowData.line_loading || state.networkFlowData.line_loading.length === 0))) {
             document.getElementById('totalLossesValue').textContent = '-';
             document.getElementById('totalLossesGWh').textContent = '-';
             document.getElementById('lineLoadingPlot').innerHTML = '<div class="alert alert-warning m-3">No network flow data available.</div>';
@@ -838,7 +853,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function clearPlot(plotId) {
         const plotContainer = document.getElementById(plotId);
         if (plotContainer) {
-            // Keep the loading indicator structure but hide it if no data will be plotted
             plotContainer.innerHTML = `<div class="loading-indicator" style="display: none;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>`;
         }
     }
@@ -870,62 +884,77 @@ document.addEventListener('DOMContentLoaded', function() {
         const xValues = timestamps.map(ts => new Date(ts)); 
     
         if (generation && generation.length > 0) {
-            const carriers = Object.keys(generation[0]).filter(key => key !== 'index' && key !== 'timestamp'); // index is from reset_index
+            const firstGenRecord = generation[0];
+            const carriers = Object.keys(firstGenRecord).filter(key => key !== 'index' && key !== 'timestamp' && key !== 'level_0' && !key.startsWith('level_') && key !== 'Snapshot'); 
+            
             carriers.forEach(carrier => {
                 const yValues = generation.map(item => item[carrier] || 0);
                 if (yValues.some(v => Math.abs(v) > 1e-6)) { 
                     traces.push({
-                        x: xValues, y: yValues, name: carrier, stackgroup: 'positive',
+                        x: xValues, y: yValues, name: carrier, stackgroup: 'positive_generation',
                         fillcolor: state.colorPalette[carrier] || getRandomColor(),
-                        line: { width: 0 }, hovertemplate: `%{x|%Y-%m-%d %H:%M}<br>${carrier}: %{y:,.1f} MW<extra></extra>`
+                        line: { width: 0 }, fill: 'tonexty',
+                        hovertemplate: `%{x|%Y-%m-%d %H:%M}<br>${carrier}: %{y:,.1f} MW<extra></extra>`
                     });
                 }
             });
         }
     
-        [storage, store].forEach(sourceData => {
-            if (sourceData && sourceData.length > 0) {
-                const componentKeys = Object.keys(sourceData[0]).filter(key => key !== 'index' && key !== 'timestamp');
-                const dischargeCols = componentKeys.filter(key => key.includes('Discharge'));
-                const chargeCols = componentKeys.filter(key => key.includes('Charge'));
+        const combinedStorageData = [];
+        if (storage && storage.length > 0) {
+            storage.forEach(s => combinedStorageData.push({...s, _source: 'storage'}));
+        }
+        if (store && store.length > 0) {
+            store.forEach(s => combinedStorageData.push({...s, _source: 'store'}));
+        }
 
-                dischargeCols.forEach(col => {
-                    const yValues = sourceData.map(item => item[col] || 0);
-                    if (yValues.some(v => v > 1e-6)) {
-                        traces.push({
-                            x: xValues, y: yValues, name: col, stackgroup: 'positive',
-                            fillcolor: state.colorPalette[col.split(' ')[0]] || state.colorPalette[col] || getRandomColor(), // Try base carrier color first
-                            line: { width: 0 }, hovertemplate: `%{x|%Y-%m-%d %H:%M}<br>${col}: %{y:,.1f} MW<extra></extra>`
-                        });
-                    }
-                });
-                 chargeCols.forEach(col => {
-                    const yValues = sourceData.map(item => (item[col] || 0) * -1); // Negative for stacking below
-                    if (yValues.some(v => v < -1e-6)) { 
-                        traces.push({
-                            x: xValues, y: yValues, name: col, stackgroup: 'negative',
-                            fillcolor: state.colorPalette[col.split(' ')[0]] || state.colorPalette[col] || getRandomColor(),
-                            line: { width: 0 }, hovertemplate: `%{x|%Y-%m-%d %H:%M}<br>${col}: %{y:,.1f} MW<extra></extra>`
-                        });
-                    }
-                });
-            }
-        });
+        if (combinedStorageData.length > 0) {
+            const firstStorageRecord = combinedStorageData[0];
+            const componentKeys = Object.keys(firstStorageRecord).filter(key => key !== 'index' && key !== 'timestamp' && key !== 'level_0' && !key.startsWith('level_') && key !== '_source' && key !== 'Snapshot');
+            const dischargeCols = componentKeys.filter(key => key.includes('Discharge'));
+            const chargeCols = componentKeys.filter(key => key.includes('Charge'));
+
+            dischargeCols.forEach(col => {
+                const yValues = combinedStorageData.map(item => item[col] || 0);
+                 if (yValues.some(v => v > 1e-6)) {
+                    traces.push({
+                        x: xValues, y: yValues, name: col, stackgroup: 'positive_storage', 
+                        fillcolor: state.colorPalette[col.replace(' Discharge', '')] || state.colorPalette[col] || getRandomColor(),
+                        line: { width: 0 }, fill: 'tonexty',
+                        hovertemplate: `%{x|%Y-%m-%d %H:%M}<br>${col}: %{y:,.1f} MW<extra></extra>`
+                    });
+                }
+            });
+            chargeCols.forEach(col => {
+                const yValues = combinedStorageData.map(item => item[col] || 0); 
+                 if (yValues.some(v => v < -1e-6)) { 
+                    traces.push({
+                        x: xValues, y: yValues, name: col, stackgroup: 'negative_storage', 
+                        fillcolor: state.colorPalette[col.replace(' Charge', '')] || state.colorPalette[col] || getRandomColor(),
+                        line: { width: 0 }, fill: 'tonexty', 
+                        hovertemplate: `%{x|%Y-%m-%d %H:%M}<br>${col}: %{y:,.1f} MW<extra></extra>`
+                    });
+                }
+            });
+        }
     
         if (load && load.length > 0) {
             const loadValues = load.map(item => item.load);
             traces.push({
                 x: xValues, y: loadValues, name: 'Load', mode: 'lines',
-                line: { color: state.colorPalette['Load'] || 'black', width: 2 },
+                line: { color: state.colorPalette['Load'] || 'black', width: 2.5 },
                 hovertemplate: `%{x|%Y-%m-%d %H:%M}<br>Load: %{y:,.1f} MW<extra></extra>`
             });
         }
     
         const layout = {
             title: `Generation Dispatch${state.resolution ? ` (${state.resolution} resolution)` : ''}`,
-            xaxis: { title: 'Time', automargin: true }, yaxis: { title: 'Power (MW)', zeroline: true, zerolinecolor: 'black', zerolinewidth: 1},
-            hovermode: 'x unified', legend: { orientation: 'h', y: -0.3, yanchor: 'bottom' },
-            height: 600, margin: { l: 70, r: 30, t: 50, b: 150 },
+            xaxis: { title: 'Time', automargin: true }, 
+            yaxis: { title: 'Power (MW)', zeroline: true, zerolinecolor: 'grey', zerolinewidth: 1},
+            hovermode: 'x unified', 
+            legend: { orientation: 'h', y: -0.3, yanchor: 'bottom', x:0.5, xanchor:'center', traceorder: 'reversed' },
+            height: 600, 
+            margin: { l: 70, r: 30, t: 50, b: 150 },
         };
         if (typeof Plotly !== 'undefined') Plotly.newPlot(plotContainerId, traces, layout, { responsive: true });
     }
@@ -941,39 +970,34 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     
         const { generation, load, storage, store, timestamps } = state.dispatchData;
-        const allComponentsData = {}; // Store summed data by hour for each component
-        const hoursData = Array.from({ length: 24 }, () => ({ count: 0 })); // [ {comp1: sum, comp2: sum, count: N}, ... for 24 hours ]
+        const hourlyAverages = Array.from({ length: 24 }, () => ({ counts: 0 })); 
     
-        // Initialize sums for each component in hoursData
         const allComponentNames = new Set();
-        if (generation && generation.length > 0) Object.keys(generation[0]).filter(k => k !=='timestamp' && k !=='index').forEach(k => allComponentNames.add(k));
+        if (generation && generation.length > 0) Object.keys(generation[0]).filter(k => k !=='timestamp' && k !=='index' && k !== 'level_0' && !k.startsWith('level_') && k !== 'Snapshot').forEach(k => allComponentNames.add(k));
         if (load && load.length > 0) allComponentNames.add('Load');
-        [storage, store].forEach(s => {
-            if (s && s.length > 0) Object.keys(s[0]).filter(k => k !=='timestamp' && k !=='index').forEach(k => allComponentNames.add(k));
+        [storage, store].forEach(s_data => {
+            if (s_data && s_data.length > 0) Object.keys(s_data[0]).filter(k => k !=='timestamp' && k !=='index' && k !== 'level_0' && !k.startsWith('level_') && k !== 'Snapshot').forEach(k => allComponentNames.add(k));
         });
-        allComponentNames.forEach(name => hoursData.forEach(h => h[name] = 0));
+    
+        allComponentNames.forEach(name => hourlyAverages.forEach(h => h[name] = 0));
 
         timestamps.forEach((ts, i) => {
             const date = new Date(ts);
             const hour = date.getHours();
-            hoursData[hour].count++;
+            hourlyAverages[hour].counts++;
 
             if (generation && generation[i]) {
-                Object.keys(generation[i]).filter(k => k !=='timestamp' && k !=='index').forEach(carrier => {
-                    hoursData[hour][carrier] += (generation[i][carrier] || 0);
+                Object.keys(generation[i]).filter(k => k !=='timestamp' && k !=='index' && k !== 'level_0' && !k.startsWith('level_') && k !== 'Snapshot').forEach(carrier => {
+                    hourlyAverages[hour][carrier] += (generation[i][carrier] || 0);
                 });
             }
             if (load && load[i]) {
-                hoursData[hour]['Load'] += (load[i].load || 0);
+                hourlyAverages[hour]['Load'] += (load[i].load || 0);
             }
             [storage, store].forEach(sourceData => {
                 if (sourceData && sourceData[i]) {
-                    Object.keys(sourceData[i]).filter(k => k !=='timestamp' && k !=='index').forEach(key => {
-                         if (key.includes('Discharge')) {
-                            hoursData[hour][key] += (sourceData[i][key] || 0);
-                        } else if (key.includes('Charge')) {
-                            hoursData[hour][key] -= (sourceData[i][key] || 0); // Negative for charge visualization
-                        }
+                    Object.keys(sourceData[i]).filter(k => k !=='timestamp' && k !=='index' && k !== 'level_0' && !k.startsWith('level_') && k !== 'Snapshot').forEach(key => {
+                        hourlyAverages[hour][key] += (sourceData[i][key] || 0); 
                     });
                 }
             });
@@ -983,23 +1007,24 @@ document.addEventListener('DOMContentLoaded', function() {
         const xHours = Array.from({ length: 24 }, (_, i) => i);
     
         allComponentNames.forEach(compName => {
-            const yValues = xHours.map(hour => hoursData[hour][compName] / (hoursData[hour].count || 1));
+            const yValues = xHours.map(hour => hourlyAverages[hour][compName] / (hourlyAverages[hour].counts || 1));
             const isLoad = compName === 'Load';
             const isCharge = compName.includes('Charge');
 
-            if (yValues.some(v => Math.abs(v) > 1e-3)) { // Only plot if significant values
+            if (yValues.some(v => Math.abs(v) > 1e-3)) {
                 if (isLoad) {
                      traces.push({
                         x: xHours, y: yValues, name: 'Load', mode: 'lines',
-                        line: { color: state.colorPalette['Load'] || 'black', width: 2 },
-                        hovertemplate: `Hour %{x}<br>Load: %{y:,.1f} MW<extra></extra>`
+                        line: { color: state.colorPalette['Load'] || 'black', width: 2.5 },
+                        hovertemplate: `Hour %{x}<br>Avg Load: %{y:,.1f} MW<extra></extra>`
                     });
                 } else {
                     traces.push({
                         x: xHours, y: yValues, name: compName, 
-                        stackgroup: isCharge ? 'negative' : 'positive',
-                        fillcolor: state.colorPalette[compName.split(' ')[0]] || state.colorPalette[compName] || getRandomColor(),
-                        line: { width: 0 }, hovertemplate: `Hour %{x}<br>${compName}: %{y:,.1f} MW<extra></extra>`
+                        stackgroup: isCharge ? 'negative_components_daily' : 'positive_components_daily', 
+                        fillcolor: state.colorPalette[compName.replace(' Charge','').replace(' Discharge','')] || state.colorPalette[compName] || getRandomColor(),
+                        line: { width: 0 }, fill: 'tonexty',
+                        hovertemplate: `Hour %{x}<br>Avg ${compName}: %{y:,.1f} MW<extra></extra>`
                     });
                 }
             }
@@ -1008,8 +1033,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const layout = {
             title: 'Average Daily Profile',
             xaxis: { title: 'Hour of Day', tickmode: 'linear', tick0: 0, dtick: 2, automargin: true },
-            yaxis: { title: 'Average Power (MW)', zeroline: true, zerolinecolor: 'black', zerolinewidth: 1 },
-            hovermode: 'x unified', legend: { orientation: 'h', y: -0.3, yanchor: 'bottom' },
+            yaxis: { title: 'Average Power (MW)', zeroline: true, zerolinecolor: 'grey', zerolinewidth: 1 },
+            hovermode: 'x unified', legend: { orientation: 'h', y: -0.3, yanchor: 'bottom', x:0.5, xanchor:'center', traceorder: 'reversed' },
             height: 450, margin: { l: 70, r: 30, t: 50, b: 150 }
         };
         if (typeof Plotly !== 'undefined') Plotly.newPlot(plotContainerId, traces, layout, { responsive: true });
@@ -1030,8 +1055,8 @@ document.addEventListener('DOMContentLoaded', function() {
             plotContainer.innerHTML = '<div class="alert alert-warning m-3">Load data is empty or invalid.</div>';
             return;
         }
-        loadValues.sort((a, b) => b - a); // Sort descending
-        const xValues = loadValues.map((_, i) => (i / (loadValues.length -1 + 1e-9)) * 100); // Avoid div by zero for single point
+        loadValues.sort((a, b) => b - a); 
+        const xValues = loadValues.map((_, i) => (i / (loadValues.length -1 + 1e-9)) * 100); 
     
         const trace = {
             x: xValues, y: loadValues, type: 'scatter', fill: 'tozeroy',
@@ -1055,29 +1080,30 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
     
-        const generationByCarrier = {};
-        const generationData = state.dispatchData.generation; // This is an array of objects
-        const carriers = Object.keys(generationData[0]).filter(key => key !== 'index' && key !== 'timestamp');
-        const numSnapshots = state.dispatchData.timestamps.length; // Assuming timestamps match generation data length
-
-        // Assuming generation data is power (MW) and timestamps represent intervals (e.g., 1 hour)
-        // For energy, multiply by interval duration (assuming 1 hour for simplicity here, adjust if resolution implies otherwise)
-        const intervalHours = state.resolution.includes('H') ? parseFloat(state.resolution.replace('H','')) : (state.resolution === '1D' ? 24 : (state.resolution === '1W' ? 24*7 : 1));
-
+        const generationEnergyByCarrier = {};
+        const generationData = state.dispatchData.generation; 
+        const firstGenRecord = generationData[0];
+        const carriers = Object.keys(firstGenRecord).filter(key => key !== 'index' && key !== 'timestamp' && key !== 'level_0' && !key.startsWith('level_') && key !== 'Snapshot');
+        
+        let intervalHours = 1; 
+        if (state.resolution) {
+            if (state.resolution.includes('H')) intervalHours = parseFloat(state.resolution.replace('H',''));
+            else if (state.resolution === '1D') intervalHours = 24;
+            else if (state.resolution === '1W') intervalHours = 24 * 7;
+        }
 
         carriers.forEach(carrier => {
-            // Sum of (power * interval_duration) for each snapshot
-            generationByCarrier[carrier] = generationData.reduce((sum, item) => sum + (item[carrier] || 0), 0) * intervalHours;
+            generationEnergyByCarrier[carrier] = generationData.reduce((sum, item) => sum + (item[carrier] || 0), 0) * intervalHours;
         });
     
-        const sortedCarriers = Object.entries(generationByCarrier)
-            .filter(([_, energy]) => energy > 1e-3) 
+        const sortedCarriers = Object.entries(generationEnergyByCarrier)
+            .filter(([_, energy]) => Math.abs(energy) > 1e-3) // Include negative generation if any (e.g. some storage models)
             .sort(([, a], [, b]) => b - a);
     
-        const totalGeneration = sortedCarriers.reduce((sum, [, energy]) => sum + energy, 0);
+        const totalGenerationEnergy = sortedCarriers.reduce((sum, [, energy]) => sum + energy, 0);
     
         sortedCarriers.forEach(([carrier, energy]) => {
-            const percentage = totalGeneration > 0 ? (energy / totalGeneration) * 100 : 0;
+            const percentage = totalGenerationEnergy !== 0 ? (energy / totalGenerationEnergy) * 100 : 0;
             const row = tbody.insertRow();
             row.insertCell().textContent = carrier;
             row.insertCell().textContent = energy.toLocaleString(undefined, { maximumFractionDigits: 1 });
@@ -1086,11 +1112,11 @@ document.addEventListener('DOMContentLoaded', function() {
             row.cells[2].className = 'text-end';
         });
     
-        if (totalGeneration > 0) {
+        if (Math.abs(totalGenerationEnergy) > 1e-3) {
             const totalRow = tbody.insertRow();
             totalRow.classList.add('table-active', 'fw-bold');
             totalRow.insertCell().textContent = 'Total';
-            totalRow.insertCell().textContent = totalGeneration.toLocaleString(undefined, { maximumFractionDigits: 1 });
+            totalRow.insertCell().textContent = totalGenerationEnergy.toLocaleString(undefined, { maximumFractionDigits: 1 });
             totalRow.cells[1].className = 'text-end';
             totalRow.insertCell().textContent = '100.0%';
             totalRow.cells[2].className = 'text-end';
@@ -1104,12 +1130,17 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('minLoadValue').textContent = '-';
             return;
         }
-        const loadValues = state.dispatchData.load.map(item => item.load); // These are power values (MW)
-        const intervalHours = state.resolution.includes('H') ? parseFloat(state.resolution.replace('H','')) : (state.resolution === '1D' ? 24 : (state.resolution === '1W' ? 24*7 : 1));
+        const loadPowerValues = state.dispatchData.load.map(item => item.load); 
+        let intervalHours = 1;
+        if (state.resolution) {
+            if (state.resolution.includes('H')) intervalHours = parseFloat(state.resolution.replace('H',''));
+            else if (state.resolution === '1D') intervalHours = 24;
+            else if (state.resolution === '1W') intervalHours = 24 * 7;
+        }
 
-        const totalLoadEnergy = loadValues.reduce((sum, loadP) => sum + (loadP * intervalHours), 0); // MWh
-        const peakLoadPower = Math.max(...loadValues); // MW
-        const minLoadPower = Math.min(...loadValues); // MW
+        const totalLoadEnergy = loadPowerValues.reduce((sum, loadP) => sum + (loadP * intervalHours), 0); 
+        const peakLoadPower = Math.max(...loadPowerValues); 
+        const minLoadPower = Math.min(...loadPowerValues); 
     
         document.getElementById('totalLoadValue').textContent = totalLoadEnergy.toLocaleString(undefined, { maximumFractionDigits: 1 });
         document.getElementById('peakLoadValue').textContent = peakLoadPower.toLocaleString(undefined, { maximumFractionDigits: 1 });
@@ -1141,7 +1172,8 @@ document.addEventListener('DOMContentLoaded', function() {
             title: `Installed Capacity by Carrier (${attribute})`,
             xaxis: { title: 'Carrier', automargin: true },
             yaxis: { title: `Capacity (${unit})` },
-            height: 400, margin: { l: 70, r: 30, t: 50, b: 100 }
+            height: 400, margin: { l: 70, r: 30, t: 50, b: 100 },
+            legend: {traceorder: 'reversed'}
         };
         if (typeof Plotly !== 'undefined') Plotly.newPlot(plotContainerId, [trace], layout, { responsive: true });
     }
@@ -1181,7 +1213,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const tbody = document.getElementById('capacityTable').querySelector('tbody');
         tbody.innerHTML = '';
         const attribute = document.getElementById('capacityAttributeSelect').value;
-        // Default unit based on attribute, but prefer unit from data if available
         let defaultUnit = attribute.startsWith('e_nom') ? 'MWh' : 'MW';
 
         if (!state.capacityData || !state.capacityData.by_carrier || state.capacityData.by_carrier.length === 0) {
@@ -1192,7 +1223,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let totalCapacity = 0;
     
         capacityData.forEach(item => {
-            const unit = item.Unit || defaultUnit; // Use item's unit if present
+            const unit = item.Unit || defaultUnit; 
             const row = tbody.insertRow();
             row.insertCell().textContent = item.Carrier;
             row.insertCell().textContent = item.Capacity.toLocaleString(undefined, { maximumFractionDigits: 1 });
@@ -1202,7 +1233,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     
         if (totalCapacity > 0 && capacityData.length > 0) {
-            const overallUnit = capacityData[0].Unit || defaultUnit; // Use unit of first item for total, or default
+            const overallUnit = capacityData[0].Unit || defaultUnit; 
             const totalRow = tbody.insertRow();
             totalRow.classList.add('table-active', 'fw-bold');
             totalRow.insertCell().textContent = 'Total';
@@ -1211,6 +1242,71 @@ document.addEventListener('DOMContentLoaded', function() {
             totalRow.insertCell().textContent = overallUnit;
         }
     }
+
+    function createNewCapacityAdditionsPlot() {
+        const plotContainerId = 'newCapacityAdditionsPlot';
+        const plotContainer = document.getElementById(plotContainerId);
+        plotContainer.innerHTML = '';
+    
+        if (!state.newCapacityAdditionsData || !state.newCapacityAdditionsData.new_additions || state.newCapacityAdditionsData.new_additions.length === 0) {
+            plotContainer.innerHTML = '<div class="alert alert-info m-3">No new capacity addition data to plot.</div>';
+            return;
+        }
+    
+        const additionsData = [...state.newCapacityAdditionsData.new_additions].sort((a, b) => b.New_Capacity - a.New_Capacity);
+        const method = newCapacityMethodSelect.options[newCapacityMethodSelect.selectedIndex].text; // Get text of selected option
+        const unit = additionsData.length > 0 && additionsData[0].Unit ? additionsData[0].Unit : 'MW/MWh';
+
+        const trace = {
+            x: additionsData.map(item => item.Carrier),
+            y: additionsData.map(item => item.New_Capacity),
+            type: 'bar',
+            marker: { color: additionsData.map(item => state.colorPalette[item.Carrier] || getRandomColor()) },
+            hovertemplate: `%{x}<br>New Capacity: %{y:,.1f} ${unit}<extra></extra>`
+        };
+        const layout = {
+            title: `New Capacity Additions by Carrier <br><span style="font-size:0.8em; color:grey;">(Method: ${method})</span>`,
+            xaxis: { title: 'Carrier', automargin: true },
+            yaxis: { title: `New Capacity (${unit})` },
+            height: 400, margin: { l: 70, r: 30, t: 60, b: 100 }, // Increased top margin for subtitle
+            legend: {traceorder: 'reversed'}
+        };
+        if (typeof Plotly !== 'undefined') Plotly.newPlot(plotContainerId, [trace], layout, { responsive: true });
+    }
+
+    function updateNewCapacityAdditionsTable() {
+        const tbody = document.getElementById('newCapacityAdditionsTable').querySelector('tbody');
+        tbody.innerHTML = '';
+        
+        if (!state.newCapacityAdditionsData || !state.newCapacityAdditionsData.new_additions || state.newCapacityAdditionsData.new_additions.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center">No new capacity addition data.</td></tr>';
+            return;
+        }
+        const additionsData = [...state.newCapacityAdditionsData.new_additions].sort((a, b) => b.New_Capacity - a.New_Capacity);
+        let totalNewCapacity = 0;
+        const defaultUnit = 'MW/MWh';
+    
+        additionsData.forEach(item => {
+            const unit = item.Unit || defaultUnit;
+            const row = tbody.insertRow();
+            row.insertCell().textContent = item.Carrier;
+            row.insertCell().textContent = item.New_Capacity.toLocaleString(undefined, { maximumFractionDigits: 1 });
+            row.cells[1].className = 'text-end';
+            row.insertCell().textContent = unit;
+            totalNewCapacity += item.New_Capacity;
+        });
+    
+        if (totalNewCapacity > 0 && additionsData.length > 0) {
+            const overallUnit = additionsData[0].Unit || defaultUnit;
+            const totalRow = tbody.insertRow();
+            totalRow.classList.add('table-active', 'fw-bold');
+            totalRow.insertCell().textContent = 'Total New Additions';
+            totalRow.insertCell().textContent = totalNewCapacity.toLocaleString(undefined, { maximumFractionDigits: 1 });
+            totalRow.cells[1].className = 'text-end';
+            totalRow.insertCell().textContent = overallUnit;
+        }
+    }
+
 
     function createCUFPlot() {
         const plotContainerId = 'cufPlot';
@@ -1300,30 +1396,32 @@ document.addEventListener('DOMContentLoaded', function() {
         const plotContainerId = 'socPlot';
         const plotContainer = document.getElementById(plotContainerId);
         plotContainer.innerHTML = '';
-        if (!state.storageData || !state.storageData.soc || state.storageData.soc.length === 0) {
+        if (!state.storageData || !state.storageData.soc || state.storageData.soc.length === 0 || !state.storageData.timestamps || state.storageData.timestamps.length === 0) {
             plotContainer.innerHTML = '<div class="alert alert-warning m-3">No SoC data.</div>';
             return;
         }
         const socDataRecords = state.storageData.soc; 
         const timestamps = state.storageData.timestamps.map(ts => new Date(ts));
-        const storageTypes = state.storageData.storage_types; // These are the column headers from the soc data (excluding 'index' or 'timestamp')
+        const storageTypes = state.storageData.storage_types || []; 
         const traces = [];
 
         storageTypes.forEach(type => {
             const yValues = socDataRecords.map(item => item[type] || 0);
             if (yValues.some(v => Math.abs(v) > 1e-3)) {
+                // Attempt to get a base carrier name for color (e.g., "Battery" from "Battery (StorageUnit)")
+                const baseColorKey = type.includes('(') ? type.substring(0, type.indexOf('(')).trim() : type;
                 traces.push({
                     x: timestamps, y: yValues, name: type, mode: 'lines',
-                    line: { color: state.colorPalette[type.split(' ')[0]] || state.colorPalette[type] || getRandomColor(), width: 2 },
+                    line: { color: state.colorPalette[baseColorKey] || state.colorPalette[type] || getRandomColor(), width: 2 },
                     hovertemplate: `%{x|%Y-%m-%d %H:%M}<br>${type} SoC: %{y:,.1f} MWh<extra></extra>`
                 });
             }
         });
 
         const layout = {
-            title: 'Storage State of Charge (SoC)',
+            title: `Storage State of Charge (SoC)${state.resolution ? ` (${state.resolution} resolution)` : ''}`,
             xaxis: { title: 'Time', automargin: true }, yaxis: { title: 'Energy (MWh)' },
-            hovermode: 'x unified', legend: { orientation: 'h', y: -0.3, yanchor: 'bottom' },
+            hovermode: 'x unified', legend: { orientation: 'h', y: -0.3, yanchor: 'bottom', x:0.5, xanchor:'center', traceorder: 'reversed' },
             height: 400, margin: { l: 70, r: 30, t: 50, b: 150 }
         };
         if (typeof Plotly !== 'undefined') Plotly.newPlot(plotContainerId, traces, layout, { responsive: true });
@@ -1341,18 +1439,20 @@ document.addEventListener('DOMContentLoaded', function() {
         const trace1 = {
             x: storageStats.map(item => item.Storage_Type),
             y: storageStats.map(item => item.Charge_MWh),
-            name: 'Charge (MWh)', type: 'bar', marker: { color: state.colorPalette['Storage Charge'] || 'rgba(255,165,0,0.8)' }
+            name: 'Charge (MWh)', type: 'bar', 
+            marker: { color: state.colorPalette['Storage Charge'] || state.colorPalette['Store Charge'] || 'rgba(255,165,0,0.8)' }
         };
         const trace2 = {
             x: storageStats.map(item => item.Storage_Type),
             y: storageStats.map(item => item.Discharge_MWh),
-            name: 'Discharge (MWh)', type: 'bar', marker: { color: state.colorPalette['Storage Discharge'] || 'rgba(50,205,50,0.8)' }
+            name: 'Discharge (MWh)', type: 'bar', 
+            marker: { color: state.colorPalette['Storage Discharge'] || state.colorPalette['Store Discharge'] || 'rgba(50,205,50,0.8)' }
         };
         const layout = {
             title: 'Storage Energy Throughput',
-            xaxis: { title: 'Storage Type', automargin: true }, yaxis: { title: 'Energy (MWh)' },
+            xaxis: { title: 'Storage Type', automargin: true, tickangle: -30 }, yaxis: { title: 'Energy (MWh)' },
             barmode: 'group', bargap: 0.15, bargroupgap: 0.1,
-            height: 350, margin: { l: 70, r: 30, t: 50, b: 100 }
+            height: 350, margin: { l: 70, r: 30, t: 50, b: 120 }
         };
         if (typeof Plotly !== 'undefined') Plotly.newPlot(plotContainerId, [trace1, trace2], layout, { responsive: true });
     }
@@ -1385,8 +1485,7 @@ document.addEventListener('DOMContentLoaded', function() {
             totalConvEl.textContent = '-';
             return;
         }
-        // Assuming 'total' is an array, take the first item if multiple periods were aggregated, or the only item.
-        const totalEmissionsItem = state.emissionsData.total[0];
+        const totalEmissionsItem = state.emissionsData.total.find(item => item.Period === state.currentPeriod || item.Period === 'Overall') || state.emissionsData.total[0];
         const totalEmissions = totalEmissionsItem ? totalEmissionsItem['Total CO2 Emissions (Tonnes)'] : 0;
 
         totalValEl.textContent = totalEmissions.toLocaleString(undefined, { maximumFractionDigits: 0 });
@@ -1401,7 +1500,8 @@ document.addEventListener('DOMContentLoaded', function() {
             plotContainer.innerHTML = '<div class="alert alert-warning m-3">No emissions by carrier data.</div>';
             return;
         }
-        const emissionsData = [...state.emissionsData.by_carrier]
+        const emissionsDataPeriod = state.emissionsData.by_carrier.filter(item => item.Period === state.currentPeriod || item.Period === 'Overall');
+        const emissionsData = [...emissionsDataPeriod]
             .filter(item => item['Emissions (Tonnes)'] > 1)
             .sort((a, b) => b['Emissions (Tonnes)'] - a['Emissions (Tonnes)']);
 
@@ -1415,7 +1515,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const layout = {
             title: 'CO₂ Emissions by Carrier',
             xaxis: { title: 'Carrier', automargin: true }, yaxis: { title: 'Emissions (Tonnes CO₂)' },
-            height: 350, margin: { l: 70, r: 30, t: 50, b: 100 }
+            height: 350, margin: { l: 70, r: 30, t: 50, b: 100 },
+            legend: {traceorder: 'reversed'}
         };
         if (typeof Plotly !== 'undefined') Plotly.newPlot(plotContainerId, [trace], layout, { responsive: true });
     }
@@ -1427,7 +1528,8 @@ document.addEventListener('DOMContentLoaded', function() {
             tbody.innerHTML = '<tr><td colspan="3" class="text-center">No emissions data.</td></tr>';
             return;
         }
-        const emissionsData = [...state.emissionsData.by_carrier]
+        const emissionsDataPeriod = state.emissionsData.by_carrier.filter(item => item.Period === state.currentPeriod || item.Period === 'Overall');
+        const emissionsData = [...emissionsDataPeriod]
             .filter(item => item['Emissions (Tonnes)'] > 1)
             .sort((a, b) => b['Emissions (Tonnes)'] - a['Emissions (Tonnes)']);
         const totalEmissions = emissionsData.reduce((sum, item) => sum + item['Emissions (Tonnes)'], 0);
@@ -1461,14 +1563,14 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         const priceData = [...state.pricesData.avg_by_bus].sort((a, b) => b.price - a.price);
-        const unit = state.pricesData.unit || '$/MWh';
+        const unit = state.pricesData.unit || 'currency/MWh';
         const trace = {
             x: priceData.map(item => item.bus), y: priceData.map(item => item.price),
             type: 'bar', marker: { color: 'rgba(158,202,225,0.8)', line: { color: 'rgb(8,48,107)', width: 1.5 } },
             hovertemplate: `%{x}<br>Price: %{y:,.2f} ${unit}<extra></extra>`
         };
         const layout = {
-            title: 'Average Marginal Price by Bus',
+            title: `Average Marginal Price by Bus${state.resolution ? ` (${state.resolution} resolution)` : ''}`,
             xaxis: { title: 'Bus', tickangle: -45, automargin: true }, yaxis: { title: `Price (${unit})` },
             height: 350, margin: { l: 70, r: 30, t: 50, b: 120 }
         };
@@ -1484,7 +1586,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         const durationCurve = state.pricesData.duration_curve; 
-        const unit = state.pricesData.unit || '$/MWh';
+        const unit = state.pricesData.unit || 'currency/MWh';
         const xValues = durationCurve.map((_, i) => (i / (durationCurve.length -1 + 1e-9)) * 100);
         const trace = {
             x: xValues, y: durationCurve, type: 'scatter', fill: 'tozeroy',
@@ -1492,7 +1594,7 @@ document.addEventListener('DOMContentLoaded', function() {
             hovertemplate: `Duration: %{x:.1f}%<br>Price: %{y:,.2f} ${unit}<extra></extra>`
         };
         const layout = {
-            title: 'Price Duration Curve',
+            title: `Price Duration Curve${state.resolution ? ` (${state.resolution} resolution)` : ''}`,
             xaxis: { title: 'Duration (%)', range: [0, 100], automargin: true }, yaxis: { title: `Price (${unit})` },
             height: 350, margin: { l: 70, r: 30, t: 50, b: 60 }
         };
@@ -1507,7 +1609,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         const priceData = [...state.pricesData.avg_by_bus].sort((a, b) => b.price - a.price); 
-        const unit = state.pricesData.unit || '$/MWh';
+        const unit = state.pricesData.unit || 'currency/MWh';
 
         priceData.forEach(item => {
             const row = tbody.insertRow();
@@ -1530,8 +1632,7 @@ document.addEventListener('DOMContentLoaded', function() {
             totalGwhEl.textContent = '-';
             return;
         }
-        // Assuming losses is an array of objects, take the first for "Overall" or the relevant period's sum
-        const totalLossesItem = state.networkFlowData.losses[0];
+        const totalLossesItem = state.networkFlowData.losses.find(item => item.Period === state.currentPeriod || item.Period === 'Overall') || state.networkFlowData.losses[0];
         const totalLossesMWh = totalLossesItem ? (totalLossesItem['Losses (MWh)'] || 0) : 0;
 
         totalValEl.textContent = totalLossesMWh.toLocaleString(undefined, { maximumFractionDigits: 1 });
@@ -1600,7 +1701,7 @@ document.addEventListener('DOMContentLoaded', function() {
         comparisonBtn.id = 'networkComparisonToggleBtn';
         comparisonBtn.addEventListener('click', function() {
             analysisDashboard.style.display = 'none';
-            document.getElementById('networkSelectionSection').style.display = 'none'; // Hide selection too
+            document.getElementById('networkSelectionSection').style.display = 'none'; 
             document.getElementById('networkComparisonSection').style.display = 'block';
             loadNetworksForComparison();
         });
@@ -1612,7 +1713,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         document.getElementById('backToDashboardBtn').addEventListener('click', function() {
             document.getElementById('networkComparisonSection').style.display = 'none';
-            // Only show analysis dashboard if a network was previously loaded
             if (state.currentNetworkPath) {
                  analysisDashboard.style.display = 'block';
             } else {
@@ -1634,8 +1734,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         state.allNcFiles.forEach((network, index) => {
             const div = document.createElement('div');
-            div.className = 'network-checkbox form-check';
-            const isChecked = network.path === state.currentNetworkPath && state.currentNetworkPath !== null; // Auto-check current if it's part of analysis
+            div.className = 'network-checkbox form-check mb-2'; 
+            const isChecked = network.path === state.currentNetworkPath && state.currentNetworkPath !== null; 
             if (isChecked) div.classList.add('selected');
 
             div.innerHTML = `
@@ -1644,10 +1744,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     <strong>${network.scenario}</strong> / ${network.filename}
                 </label>
             `;
-            // Event listener to toggle 'selected' class on the div itself for styling
             div.addEventListener('click', function(e) {
                 const checkbox = this.querySelector('input[type="checkbox"]');
-                if (e.target !== checkbox) { // If label or div is clicked, toggle checkbox
+                if (e.target !== checkbox) { 
                     checkbox.checked = !checkbox.checked;
                 }
                 this.classList.toggle('selected', checkbox.checked);
@@ -1660,7 +1759,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedCheckboxes = Array.from(document.querySelectorAll('#networkSelectContainer .network-checkbox-input:checked'));
         const selectedNetworkPaths = selectedCheckboxes.map(cb => cb.value);
         
-        if (selectedNetworkPaths.length < 1) { // Allow single "comparison" for consistency, though 2+ is typical
+        if (selectedNetworkPaths.length < 1) { 
             showGlobalAlert('Please select at least one network for comparison.', 'warning');
             return;
         }
@@ -1680,15 +1779,18 @@ document.addEventListener('DOMContentLoaded', function() {
         mainPlotContainer.innerHTML = '<div class="loading-indicator" style="display: flex;"><i class="fas fa-spinner fa-spin"></i> Generating comparison...</div>';
         secondaryPlotContainer.innerHTML = '';
         secondaryRow.style.display = 'none';
+        downloadComparisonSecondaryBtn.style.display = 'none';
 
-        fetch('/api/pypsa/compare_networks', {
+
+        fetch('/pypsa/api/compare_networks', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 file_paths: selectedNetworkPaths,
                 labels: labels, 
                 comparison_type: comparisonType,
-                attribute: comparisonType === 'capacity' ? document.getElementById('capacityAttributeSelect').value : undefined // Pass capacity attribute if relevant
+                attribute: comparisonType === 'capacity' ? document.getElementById('capacityAttributeSelect').value : undefined,
+                new_capacity_method: comparisonType === 'new_capacity_additions' ? document.getElementById('newCapacityMethodSelect').value : undefined
             })
         })
         .then(response => response.json())
@@ -1704,115 +1806,274 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+
     function renderComparisonPlot(comparisonResult, mainPlotContainer, secondaryPlotContainer, secondaryRow) {
         mainPlotContainer.innerHTML = ''; 
         secondaryPlotContainer.innerHTML = '';
         secondaryRow.style.display = 'none';
+        downloadComparisonSecondaryBtn.style.display = 'none';
 
         const { type, data, colors, unit, label_name } = comparisonResult;
-        document.getElementById('comparisonResultsTitle').textContent = `Comparison: ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+        const methodForTitle = comparisonResult.method || (type === 'new_capacity_additions' ? newCapacityMethodSelect.options[newCapacityMethodSelect.selectedIndex].text : '');
+        document.getElementById('comparisonResultsTitle').textContent = `Comparison: ${type.charAt(0).toUpperCase() + type.slice(1).replace(/_/g, ' ')}`;
 
-        if (type === 'capacity' || type === 'generation') {
-            const plotData = [];
+        const effectiveColors = colors || state.colorPalette || {};
+
+        if (type === 'capacity' || type === 'generation' || type === 'new_capacity_additions') {
+            const plotDataForChart = []; // [{label_name: 'NetA', Carrier: 'Solar', Value: 100}, ...]
+            const uniqueCarriers = new Set();
+            const uniqueNetworkLabels = new Set();
+
             Object.entries(data).forEach(([networkLabel, items]) => {
-                if(items.error) { // Skip errored networks in plot
+                if (items.error) {
                     console.warn(`Skipping errored network ${networkLabel} in comparison plot: ${items.error}`);
                     return;
                 }
-                items.forEach(item => {
-                    plotData.push({
-                        [label_name]: networkLabel, 
-                        Carrier: item.Carrier || item.index, 
-                        Value: item.Capacity || item.Generation 
+                uniqueNetworkLabels.add(networkLabel);
+                if (Array.isArray(items)) {
+                    items.forEach(item => {
+                        const carrier = item.Carrier || item.index;
+                        uniqueCarriers.add(carrier);
+                        plotDataForChart.push({
+                            [label_name]: networkLabel,
+                            Carrier: carrier,
+                            Value: item.Capacity || item.Generation || item.New_Capacity
+                        });
                     });
+                }
+            });
+
+            if (plotDataForChart.length === 0) {
+                mainPlotContainer.innerHTML = '<div class="alert alert-info m-3">No data to display for this comparison.</div>';
+                return;
+            }
+
+            const traces = [];
+            Array.from(uniqueCarriers).forEach(carrier => {
+                const xValues = [];
+                const yValues = [];
+                Array.from(uniqueNetworkLabels).forEach(netLabel => {
+                    const item = plotDataForChart.find(d => d[label_name] === netLabel && d.Carrier === carrier);
+                    xValues.push(netLabel); // Keep pushing label even if no data, for consistent x-axis
+                    yValues.push(item ? item.Value : 0); // Use 0 if no data for this carrier in this network
+                });
+
+                traces.push({
+                    x: xValues,
+                    y: yValues,
+                    name: carrier,
+                    type: 'bar',
+                    marker: {
+                        color: effectiveColors[carrier] || getRandomColor()
+                    }
                 });
             });
-            if (plotData.length === 0) {
-                 mainPlotContainer.innerHTML = '<div class="alert alert-info m-3">No data to display for this comparison. One or more networks might have had processing errors.</div>';
-                 return;
+            
+            let yAxisTitle = '';
+            let plotTitle = '';
+            if (type === 'capacity') {
+                yAxisTitle = `Capacity (${unit || 'MW/MWh'})`;
+                plotTitle = `Installed Capacity Comparison`;
+            } else if (type === 'generation') {
+                yAxisTitle = `Generation (${unit || 'MWh'})`;
+                plotTitle = `Total Generation Comparison`;
+            } else if (type === 'new_capacity_additions') {
+                yAxisTitle = `New Capacity (${unit || 'MW/MWh'})`;
+                plotTitle = `New Capacity Additions Comparison <br><span style="font-size:0.8em; color:grey;">(Method: ${methodForTitle})</span>`;
             }
-            const yAxisTitle = type === 'capacity' ? `Capacity (${unit})` : `Generation (${unit || 'MWh'})`;
-            const fig = Plotly.graphObjectToFigure(px.bar(plotData, {
-                x: label_name, y: 'Value', color: 'Carrier', barmode: 'stack',
-                title: `${type.charAt(0).toUpperCase() + type.slice(1)} Comparison`,
-                labels: { 'Value': yAxisTitle }, color_discrete_map: colors || state.colorPalette
-            }));
-            if (typeof Plotly !== 'undefined') Plotly.newPlot(mainPlotContainer, fig.data, fig.layout, {responsive: true});
+
+            const layout = {
+                title: plotTitle,
+                xaxis: { title: label_name, automargin: true },
+                yaxis: { title: yAxisTitle },
+                barmode: 'stack', // or 'group' if preferred
+                legend: { traceorder: 'reversed', orientation: 'h', y: -0.3, yanchor: 'bottom', x:0.5, xanchor:'center'},
+                height: 500,
+                margin: { b: 150 }
+            };
+            if (typeof Plotly !== 'undefined') Plotly.newPlot(mainPlotContainer, traces, layout, { responsive: true });
 
         } else if (type === 'metrics') {
+            // CUF Plot
             const cufPlotData = [];
+            const cufUniqueCarriers = new Set();
+            const cufUniqueNetworkLabels = new Set();
             if (data.cuf) {
-                 Object.entries(data.cuf).forEach(([networkLabel, items]) => {
-                    if(items.error) return;
-                    items.forEach(item => cufPlotData.push({ [label_name]: networkLabel, Carrier: item.Carrier, Value: item.CUF * 100 }));
+                Object.entries(data.cuf).forEach(([networkLabel, items]) => {
+                    if (items.error) return;
+                    cufUniqueNetworkLabels.add(networkLabel);
+                    if (Array.isArray(items)) {
+                        items.forEach(item => {
+                            cufUniqueCarriers.add(item.Carrier);
+                            cufPlotData.push({ [label_name]: networkLabel, Carrier: item.Carrier, Value: item.CUF * 100 });
+                        });
+                    }
                 });
             }
+
             if (cufPlotData.length > 0) {
-                const figCuf = Plotly.graphObjectToFigure(px.bar(cufPlotData, {
-                    x: label_name, y: 'Value', color: 'Carrier', barmode: 'group',
+                const cufTraces = [];
+                Array.from(cufUniqueCarriers).forEach(carrier => {
+                    const xValues = [];
+                    const yValues = [];
+                    Array.from(cufUniqueNetworkLabels).forEach(netLabel => {
+                         const item = cufPlotData.find(d => d[label_name] === netLabel && d.Carrier === carrier);
+                         xValues.push(netLabel);
+                         yValues.push(item ? item.Value : 0);
+                    });
+                    cufTraces.push({
+                        x: xValues,
+                        y: yValues,
+                        name: carrier,
+                        type: 'bar',
+                        marker: { color: effectiveColors[carrier] || getRandomColor() }
+                    });
+                });
+                const cufLayout = {
                     title: 'Capacity Utilization Factor (CUF) Comparison',
-                    labels: { 'Value': 'CUF (%)' }, color_discrete_map: colors || state.colorPalette
-                }));
-                if (typeof Plotly !== 'undefined') Plotly.newPlot(mainPlotContainer, figCuf.data, figCuf.layout, {responsive: true});
+                    xaxis: { title: label_name, automargin: true },
+                    yaxis: { title: 'CUF (%)' },
+                    barmode: 'group',
+                    legend: { traceorder: 'reversed', orientation: 'h', y: -0.3, yanchor: 'bottom', x:0.5, xanchor:'center' },
+                    height: 450, margin: { b: 150 }
+                };
+                if (typeof Plotly !== 'undefined') Plotly.newPlot(mainPlotContainer, cufTraces, cufLayout, { responsive: true });
             } else {
                 mainPlotContainer.innerHTML = '<div class="alert alert-info m-3">No CUF data to compare.</div>';
             }
 
+            // Curtailment Plot
             const curtPlotData = [];
+            const curtUniqueCarriers = new Set();
+            const curtUniqueNetworkLabels = new Set();
             if (data.curtailment) {
                 Object.entries(data.curtailment).forEach(([networkLabel, items]) => {
-                     if(items.error) return;
-                    items.forEach(item => curtPlotData.push({ [label_name]: networkLabel, Carrier: item.Carrier, Value: item['Curtailment (%)'] }));
+                    if (items.error) return;
+                    curtUniqueNetworkLabels.add(networkLabel);
+                    if (Array.isArray(items)) {
+                        items.forEach(item => {
+                            curtUniqueCarriers.add(item.Carrier);
+                            curtPlotData.push({ [label_name]: networkLabel, Carrier: item.Carrier, Value: item['Curtailment (%)'] });
+                        });
+                    }
                 });
             }
+
             if (curtPlotData.length > 0) {
                 secondaryRow.style.display = 'flex';
-                const figCurt = Plotly.graphObjectToFigure(px.bar(curtPlotData, {
-                    x: label_name, y: 'Value', color: 'Carrier', barmode: 'group',
+                downloadComparisonSecondaryBtn.style.display = 'inline-block';
+                const curtTraces = [];
+                 Array.from(curtUniqueCarriers).forEach(carrier => {
+                    const xValues = [];
+                    const yValues = [];
+                    Array.from(curtUniqueNetworkLabels).forEach(netLabel => {
+                         const item = curtPlotData.find(d => d[label_name] === netLabel && d.Carrier === carrier);
+                         xValues.push(netLabel);
+                         yValues.push(item ? item.Value : 0);
+                    });
+                    curtTraces.push({
+                        x: xValues,
+                        y: yValues,
+                        name: carrier,
+                        type: 'bar',
+                        marker: { color: effectiveColors[carrier] || getRandomColor() }
+                    });
+                });
+                const curtLayout = {
                     title: 'Curtailment (%) Comparison',
-                    labels: { 'Value': 'Curtailment (%)' }, color_discrete_map: colors || state.colorPalette
-                }));
-                if (typeof Plotly !== 'undefined') Plotly.newPlot(secondaryPlotContainer, figCurt.data, figCurt.layout, {responsive: true});
+                    xaxis: { title: label_name, automargin: true },
+                    yaxis: { title: 'Curtailment (%)' },
+                    barmode: 'group',
+                    legend: { traceorder: 'reversed', orientation: 'h', y: -0.3, yanchor: 'bottom', x:0.5, xanchor:'center' },
+                    height: 450, margin: { b: 150 }
+                };
+                if (typeof Plotly !== 'undefined') Plotly.newPlot(secondaryPlotContainer, curtTraces, curtLayout, { responsive: true });
             } else {
                 secondaryPlotContainer.innerHTML = '<div class="alert alert-info m-3">No curtailment data to compare.</div>';
-                secondaryRow.style.display = 'flex'; // Still show it to display message
+                secondaryRow.style.display = 'flex';
             }
         } else if (type === 'emissions') {
+            // Total Emissions Plot
             const totalEmissionsPlotData = [];
             if (data.total) {
                 Object.entries(data.total).forEach(([networkLabel, items]) => {
-                    if(items.error) return;
-                    if (items && items.length > 0) {
-                        totalEmissionsPlotData.push({ [label_name]: networkLabel, Value: items[0]['Total CO2 Emissions (Tonnes)'] });
+                    if (items.error) return;
+                    if (items && Array.isArray(items) && items.length > 0) {
+                        // Assuming items is an array of records like [{'Period': 'Overall', 'Total CO2 Emissions (Tonnes)': VAL}]
+                        const overallItem = items.find(it => it.Period === 'Overall') || items[0];
+                        if(overallItem) {
+                            totalEmissionsPlotData.push({ [label_name]: networkLabel, Value: overallItem['Total CO2 Emissions (Tonnes)'] });
+                        }
                     }
                 });
             }
             if (totalEmissionsPlotData.length > 0) {
-                 const figTotalEm = Plotly.graphObjectToFigure(px.bar(totalEmissionsPlotData, {
-                    x: label_name, y: 'Value',
+                const totalEmTraces = [{
+                    x: totalEmissionsPlotData.map(d => d[label_name]),
+                    y: totalEmissionsPlotData.map(d => d.Value),
+                    type: 'bar',
+                    marker: { color: 'rgba(75, 192, 192, 0.8)'} // Example color
+                }];
+                const totalEmLayout = {
                     title: 'Total CO₂ Emissions Comparison',
-                    labels: { 'Value': `Total CO₂ Emissions (${unit || 'Tonnes'})` }
-                }));
-                 if (typeof Plotly !== 'undefined') Plotly.newPlot(mainPlotContainer, figTotalEm.data, figTotalEm.layout, {responsive: true});
+                    xaxis: { title: label_name, automargin: true },
+                    yaxis: { title: `Total CO₂ Emissions (${unit || 'Tonnes'})` },
+                    height: 450, margin: { b: 100 }
+                };
+                if (typeof Plotly !== 'undefined') Plotly.newPlot(mainPlotContainer, totalEmTraces, totalEmLayout, { responsive: true });
             } else {
-                 mainPlotContainer.innerHTML = '<div class="alert alert-info m-3">No total emissions data to compare.</div>';
+                mainPlotContainer.innerHTML = '<div class="alert alert-info m-3">No total emissions data to compare.</div>';
             }
-            
+
+            // Emissions by Carrier Plot
             const byCarrierPlotData = [];
+            const byCarrierUniqueCarriers = new Set();
+            const byCarrierUniqueNetworkLabels = new Set();
+
             if (data.by_carrier) {
                 Object.entries(data.by_carrier).forEach(([networkLabel, items]) => {
-                    if(items.error) return;
-                    items.forEach(item => byCarrierPlotData.push({ [label_name]: networkLabel, Carrier: item.Carrier, Value: item['Emissions (Tonnes)'] }));
+                    if (items.error) return;
+                    byCarrierUniqueNetworkLabels.add(networkLabel);
+                    if (Array.isArray(items)) {
+                        // Assuming items is like [{'Period':'Overall', 'Carrier':'Coal', 'Emissions (Tonnes)': VAL}, ...]
+                        const periodItems = items.filter(it => it.Period === 'Overall' || items.every(i => i.Period !== 'Overall')); // Prefer 'Overall'
+                        periodItems.forEach(item => {
+                            byCarrierUniqueCarriers.add(item.Carrier);
+                            byCarrierPlotData.push({ [label_name]: networkLabel, Carrier: item.Carrier, Value: item['Emissions (Tonnes)'] });
+                        });
+                    }
                 });
             }
+
             if (byCarrierPlotData.length > 0) {
                 secondaryRow.style.display = 'flex';
-                const figCarrierEm = Plotly.graphObjectToFigure(px.bar(byCarrierPlotData, {
-                    x: label_name, y: 'Value', color: 'Carrier', barmode: 'stack',
+                downloadComparisonSecondaryBtn.style.display = 'inline-block';
+                const byCarrierTraces = [];
+                Array.from(byCarrierUniqueCarriers).forEach(carrier => {
+                    const xValues = [];
+                    const yValues = [];
+                     Array.from(byCarrierUniqueNetworkLabels).forEach(netLabel => {
+                         const item = byCarrierPlotData.find(d => d[label_name] === netLabel && d.Carrier === carrier);
+                         xValues.push(netLabel);
+                         yValues.push(item ? item.Value : 0);
+                    });
+                    byCarrierTraces.push({
+                        x: xValues,
+                        y: yValues,
+                        name: carrier,
+                        type: 'bar',
+                        marker: { color: effectiveColors[carrier] || getRandomColor() }
+                    });
+                });
+                const byCarrierLayout = {
                     title: 'CO₂ Emissions by Carrier Comparison',
-                    labels: { 'Value': `Emissions (${unit || 'Tonnes'})` }, color_discrete_map: colors || state.colorPalette
-                }));
-                 if (typeof Plotly !== 'undefined') Plotly.newPlot(secondaryPlotContainer, figCarrierEm.data, figCarrierEm.layout, {responsive: true});
+                    xaxis: { title: label_name, automargin: true },
+                    yaxis: { title: `Emissions (${unit || 'Tonnes'})` },
+                    barmode: 'stack',
+                    legend: { traceorder: 'reversed', orientation: 'h', y: -0.3, yanchor: 'bottom', x:0.5, xanchor:'center' },
+                    height: 450, margin: { b: 150 }
+                };
+                if (typeof Plotly !== 'undefined') Plotly.newPlot(secondaryPlotContainer, byCarrierTraces, byCarrierLayout, { responsive: true });
             } else {
                 secondaryPlotContainer.innerHTML = '<div class="alert alert-info m-3">No emissions by carrier data to compare.</div>';
                 secondaryRow.style.display = 'flex';
@@ -1821,7 +2082,6 @@ document.addEventListener('DOMContentLoaded', function() {
             mainPlotContainer.innerHTML = `<div class="alert alert-info">Comparison type "${type}" is not yet fully implemented for plotting.</div>`;
         }
     }
-
 
     // General utility functions
     function showGlobalAlert(message, category = 'info', duration = 5000) {
@@ -1851,7 +2111,7 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
                 const bsAlert = bootstrap.Alert.getInstance(alertDiv);
                 if (bsAlert) bsAlert.close();
-                else if (alertDiv.parentElement) alertDiv.remove(); // Fallback removal
+                else if (alertDiv.parentElement) alertDiv.remove(); 
             }, duration);
         }
     }
@@ -1869,3 +2129,4 @@ document.addEventListener('DOMContentLoaded', function() {
     refreshNetworkFiles(); 
 
 });
+

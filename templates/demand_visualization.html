@@ -40,7 +40,7 @@ Demand Visualization
             <label for="scenarioSelect" class="settings-label">Forecast Scenario:</label>
             <select class="form-select form-select-sm" id="scenarioSelect">
                 {% for scenario in scenarios %}
-                <option value="{{ scenario }}" {% if scenario==selected_scenario %}selected{% endif %}>{{ scenario }}
+                <option value="{{ scenario }}" {% if scenario=selected_scenario %}selected{% endif %}>{{ scenario }}
                 </option>
                 {% endfor %}
             </select>
@@ -50,13 +50,13 @@ Demand Visualization
             <div class="d-flex align-items-center gap-1">
                 <select class="form-select form-select-sm" id="fromYear">
                     {% for year in range(start_year, end_year + 1) %}
-                    <option value="{{ year }}" {% if year==start_year %}selected{% endif %}>{{ year }}</option>
+                    <option value="{{ year }}" {% if year=start_year %}selected{% endif %}>{{ year }}</option>
                     {% endfor %}
                 </select>
                 <span class="text-muted">to</span>
                 <select class="form-select form-select-sm" id="toYear">
                     {% for year in range(start_year, end_year + 1) %}
-                    <option value="{{ year }}" {% if year==end_year %}selected{% endif %}>{{ year }}</option>
+                    <option value="{{ year }}" {% if year=end_year %}selected{% endif %}>{{ year }}</option>
                     {% endfor %}
                 </select>
             </div>

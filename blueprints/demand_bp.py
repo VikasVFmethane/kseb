@@ -426,7 +426,7 @@ def get_chart_data_api(sector): # Renamed
 
 @demand_bp.route('/api/forecast_data/<scenario>')
 def get_forecast_data_api(scenario): # Renamed
-    # ... (Logic from app.py, using current_app.logger, current_app.config)
+
     current_app.logger.info(f"Processing API request for forecast_data/{scenario} via demand_bp")
     if current_app.config.get('CURRENT_PROJECT_PATH') is None:
         return jsonify({'status': 'error', 'message': 'No project selected'})

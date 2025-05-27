@@ -16,12 +16,12 @@ class LoadProfileManager {
         // Configuration
         this.config = {
             apiEndpoints: {
-                monthlyPatterns: '/api/monthly_patterns',
-                projectedMetrics: '/api/projected_future_metrics',
-                scenarioDetails: '/api/scenario_details',
-                generateProfiles: '/api/generate_load_profiles',
-                profileMetadata: '/api/load_profile_metadata',
-                profileData: '/api/load_profile_data'
+                monthlyPatterns: '/load_profile/api/monthly_patterns',
+                projectedMetrics: '/load_profile/api/projected_future_metrics',
+                scenarioDetails: '/demand/api/scenario_details',
+                generateProfiles: '/load_profile/api/generate_load_profiles',
+                profileMetadata: '/load_profile/api/metadata',
+                profileData: '/load_profile/api/data'
             },
             chartDefaults: {
                 responsive: true,

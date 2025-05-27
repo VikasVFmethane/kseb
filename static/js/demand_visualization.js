@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
             params.append('compare_scenario', comparisonScenarios[sector]);
         }
 
-        fetch(`/api/download_csv/${scenario}/${sector}?${params.toString()}`)
+        fetch(`demand/api/download_csv/${scenario}/${sector}?${params.toString()}`)
             .then(response => {
                 if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                 return response.blob();
@@ -224,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadForecastData(scenario) {
         try {
-            const response = await fetch(`/api/forecast_data/${scenario}`, {
+            const response = await fetch('/demand/api/forecast_data/${scenario}', {
                 headers: { 'Accept': 'application/json' }
             });
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
@@ -257,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // New function to load comparison data
     async function loadComparisonData(scenario, sector) {
         try {
-            const response = await fetch(`/api/forecast_data/${scenario}`, {
+            const response = await fetch('/demand/api/forecast_data/${scenario}', {
                 headers: { 'Accept': 'application/json' }
             });
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
@@ -573,7 +573,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 } else {
                     // Load data from server
-                    const response = await fetch(`/api/forecast_data/${compareScenario}`, {
+                    const response = await fetch('/demand/api/forecast_data/${compareScenario}', {
                         headers: { 'Accept': 'application/json' }
                     });
                     if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
@@ -889,7 +889,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Make API request to save
-        fetch(`/api/save_consolidated_data/${scenario}?${params.toString()}`)
+        fetch(`demand/api/save_consolidated_data/${scenario}?${params.toString()}`)
             .then(response => {
                 if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                 return response.json();

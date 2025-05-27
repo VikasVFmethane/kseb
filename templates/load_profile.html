@@ -81,7 +81,7 @@
                             </div>
 
                             <!-- File Upload Form -->
-                            <form method="POST" action="{{ url_for('load_profile_creation') }}" 
+                            <form method="POST" action="{{ url_for('loadprofile.load_profile_creation_route') }}" 
                                   enctype="multipart/form-data" id="uploadForm" 
                                   aria-label="Upload load profile file">
                                 <div class="mb-3">
@@ -106,7 +106,7 @@
                                         <i class="fas fa-upload me-1"></i>Upload File
                                     </button>
                                     {% endif %}
-                                    <a href="{{ url_for('download_template', template_type='load_curve') }}" 
+                                    <a href="{{ url_for('data.download_template_route', template_type='load_curve') }}" 
                                        class="btn btn-outline-secondary">
                                         <i class="fas fa-download me-1"></i>Download Template
                                     </a>

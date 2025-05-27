@@ -8,7 +8,7 @@ import threading
 import uuid
 import time
 from io import BytesIO # For file download
-
+from io import StringIO # Add this import if not present
 # Imports from project utils
 from utils.data_loading import input_demand_data
 # from utils.helpers import handle_nan_values # Assuming handle_nan_values might be more global or in its own util
@@ -16,6 +16,9 @@ from utils.plots import generate_area_chart, generate_correlation_plot # If thes
 
 # Import for forecasting (ensure this path is correct relative to how models are structured)
 from models.forecasting import Main_forecasting_function
+
+
+
 
 
 demand_bp = Blueprint('demand', 
@@ -64,132 +67,137 @@ def get_forecast_data_for_sector(scenario_path, sector, from_year, to_year, unit
         return None
 
 # Worker function moved from app.py
-def run_multiple_forecasts_job(job_id, project_path, data_payload): # Renamed 'data' to 'data_payload'
-    current_app.logger.info(f"Starting forecast job {job_id} for project {project_path} via demand_bp")
-    job = forecast_jobs[job_id] # Use blueprint-specific job tracking
-    job['status'] = 'running'
-    
-    try:
-        scenario_name = data_payload.get('scenarioName')
-        target_year = int(data_payload.get('targetYear'))
-        exclude_covid = data_payload.get('excludeCovidYears', True)
-        sector_configs = data_payload.get('sectorConfigs', {})
-        
-        current_app.logger.info(f"Job {job_id} config: scenario={scenario_name}, target_year={target_year}, exclude_covid={exclude_covid}, sectors={list(sector_configs.keys())}")
-        job['progress'] = 5
-        
-        demand_input_file_path = f"{project_path}/inputs/input_demand_file.xlsx"
-        current_app.logger.debug(f"Loading input data from {demand_input_file_path}")
+def run_multiple_forecasts_job(app, job_id, project_path, data_payload): # Added 'app' argument
+    with app.app_context(): 
+        current_app.logger.info(f"Starting forecast job {job_id} for project {project_path} via demand_bp")
+        job = forecast_jobs.get(job_id) 
+        if not job:
+            current_app.logger.error(f"Job {job_id} not found in forecast_jobs (demand_bp). Aborting thread.")
+            return
+
+        job['status'] = 'running'
         
         try:
-            # Assuming input_demand_data is correctly imported
-            sectors, _, param_dict, sector_data_map, _ = input_demand_data(demand_input_file_path) # Renamed sector_data
-        except Exception as e:
-            current_app.logger.exception(f"Error loading input data: {e}")
-            job['status'] = 'failed'
-            job['error'] = f"Failed to load input data: {str(e)}"
-            return
-        
-        start_year = int(param_dict.get('Start_Year', 2006))
-        
-        for sector_name_key in sector_configs.keys(): # Renamed sector
-            if sector_name_key not in sector_data_map:
-                current_app.logger.warning(f"Sector {sector_name_key} not found in input data, skipping")
-                job['error'] = f"Sector {sector_name_key} not found in input data"
-                job['status'] = 'failed'
-                return
-        
-        forecast_dir = f"{project_path}/results/demand_projection/{scenario_name}"
-        os.makedirs(forecast_dir, exist_ok=True)
-        
-        # Main_forecasting_function is imported
-        
-        sectors_using_existing_data = []
-        sectors_forecasted = []
-        sectors_with_errors = []
-        total_sectors_to_process = len(sector_configs) # Renamed
-        
-        for idx, (sector_name_key, config) in enumerate(sector_configs.items()):
-            if forecast_jobs[job_id]['status'] == 'cancelled':
-                current_app.logger.info(f"Job {job_id} was cancelled, stopping processing")
-                return
+            scenario_name = data_payload.get('scenarioName')
+            target_year = int(data_payload.get('targetYear'))
+            exclude_covid = data_payload.get('excludeCovidYears', True)
+            sector_configs = data_payload.get('sectorConfigs', {})
             
-            job['currentSector'] = sector_name_key
-            job['processedSectors'] = idx
-            progress_per_sector = 90 / max(1, total_sectors_to_process)
-            current_progress = 5 + int(idx * progress_per_sector)
-            job['progress'] = current_progress
-            current_app.logger.info(f"Processing sector {sector_name_key} ({idx+1}/{total_sectors_to_process}), progress: {current_progress}%")
+            current_app.logger.info(f"Job {job_id} config: scenario={scenario_name}, target_year={target_year}, exclude_covid={exclude_covid}, sectors={list(sector_configs.keys())}")
+            job['progress'] = 5
+            
+            demand_input_file_path = f"{project_path}/inputs/input_demand_file.xlsx"
+            current_app.logger.debug(f"Loading input data from {demand_input_file_path}")
             
             try:
-                selected_models = config.get('models', ['MLR', 'SLR', 'WAM', 'TimeSeries'])
-                base_params = {'target_year': target_year, 'exclude_covid': exclude_covid}
-                model_params_config = {} # Renamed
-                if 'MLR' in selected_models:
-                    independent_vars = config.get('independentVars', [])
-                    model_params_config['MLR'] = {'independent_vars': independent_vars}
-                if 'WAM' in selected_models:
-                    window_size = int(config.get('windowSize', 10))
-                    model_params_config['WAM'] = {'window_size': window_size}
-                
+                # Assuming input_demand_data is correctly imported
+                sectors, _, param_dict, sector_data_map, _ = input_demand_data(demand_input_file_path) # Renamed sector_data
+            except Exception as e:
+                current_app.logger.exception(f"Error loading input data: {e}")
+                job['status'] = 'failed'
+                job['error'] = f"Failed to load input data: {str(e)}"
+                return
+            
+            start_year = int(param_dict.get('Start_Year', 2006))
+            
+            for sector_name_key in sector_configs.keys(): # Renamed sector
                 if sector_name_key not in sector_data_map:
-                    current_app.logger.error(f"Sector {sector_name_key} not in input data, skipping")
+                    current_app.logger.warning(f"Sector {sector_name_key} not found in input data, skipping")
+                    job['error'] = f"Sector {sector_name_key} not found in input data"
+                    job['status'] = 'failed'
+                    return
+            
+            forecast_dir = f"{project_path}/results/demand_projection/{scenario_name}"
+            os.makedirs(forecast_dir, exist_ok=True)
+            
+         
+            
+            sectors_using_existing_data = []
+            sectors_forecasted = []
+            sectors_with_errors = []
+            total_sectors_to_process = len(sector_configs) # Renamed
+            
+            for idx, (sector_name_key, config) in enumerate(sector_configs.items()):
+                if forecast_jobs[job_id]['status'] == 'cancelled':
+                    current_app.logger.info(f"Job {job_id} was cancelled, stopping processing")
+                    return
+                
+                job['currentSector'] = sector_name_key
+                job['processedSectors'] = idx
+                progress_per_sector = 90 / max(1, total_sectors_to_process)
+                current_progress = 5 + int(idx * progress_per_sector)
+                job['progress'] = current_progress
+                current_app.logger.info(f"Processing sector {sector_name_key} ({idx+1}/{total_sectors_to_process}), progress: {current_progress}%")
+                
+                try:
+                    selected_models = config.get('models', ['MLR', 'SLR', 'WAM', 'TimeSeries'])
+                    base_params = {'target_year': target_year, 'exclude_covid': exclude_covid}
+                    model_params_config = {} # Renamed
+                    if 'MLR' in selected_models:
+                        independent_vars = config.get('independentVars', [])
+                        model_params_config['MLR'] = {'independent_vars': independent_vars}
+                    if 'WAM' in selected_models:
+                        window_size = int(config.get('windowSize', 10))
+                        model_params_config['WAM'] = {'window_size': window_size}
+                    
+                    if sector_name_key not in sector_data_map:
+                        current_app.logger.error(f"Sector {sector_name_key} not in input data, skipping")
+                        sectors_with_errors.append(sector_name_key)
+                        continue
+                    
+                    result = Main_forecasting_function(
+                        sector_name_key, 
+                        forecast_dir, 
+                        sector_data_map[sector_name_key],
+                        selected_models=selected_models,
+                        model_params=model_params_config,
+                        **base_params
+                    )
+                    
+                    if result.get('used_existing_data', False):
+                        sectors_using_existing_data.append(sector_name_key)
+                    else:
+                        sectors_forecasted.append(sector_name_key)
+                except Exception as e:
+                    current_app.logger.exception(f"Error processing sector {sector_name_key}: {str(e)}")
                     sectors_with_errors.append(sector_name_key)
                     continue
                 
-                result = Main_forecasting_function(
-                    sector_name_key, 
-                    forecast_dir, 
-                    sector_data_map[sector_name_key],
-                    selected_models=selected_models,
-                    model_params=model_params_config,
-                    **base_params
-                )
-                
-                if result.get('used_existing_data', False):
-                    sectors_using_existing_data.append(sector_name_key)
-                else:
-                    sectors_forecasted.append(sector_name_key)
-            except Exception as e:
-                current_app.logger.exception(f"Error processing sector {sector_name_key}: {str(e)}")
-                sectors_with_errors.append(sector_name_key)
-                continue
+                job['progress'] = 5 + int((idx + 1) * progress_per_sector)
+                job['processedSectors'] = idx + 1
+                if forecast_jobs[job_id]['status'] == 'cancelled':
+                    current_app.logger.info(f"Job {job_id} was cancelled after processing {sector_name_key}")
+                    return
             
-            job['progress'] = 5 + int((idx + 1) * progress_per_sector)
-            job['processedSectors'] = idx + 1
-            if forecast_jobs[job_id]['status'] == 'cancelled':
-                current_app.logger.info(f"Job {job_id} was cancelled after processing {sector_name_key}")
-                return
-        
-        summary_content = { # Renamed
-            'scenario': scenario_name, 'target_year': target_year, 'start_year': start_year,
-            'sectors': list(sector_configs.keys()),
-            'sectors_with_complete_data': sectors_using_existing_data,
-            'sectors_forecasted': sectors_forecasted,
-            'sectors_with_errors': sectors_with_errors,
-            'timestamp': time.strftime('%Y-%m-%d %H:%M:%S'),
-            'exclude_covid': exclude_covid,
-            'models_used': {s_key: cfg.get('models', ['MLR', 'SLR', 'WAM', 'TimeSeries']) 
-                           for s_key, cfg in sector_configs.items()}
-        }
-        with open(f"{forecast_dir}/summary.json", 'w') as f:
-            json.dump(summary_content, f, indent=4)
-        
-        job['status'] = 'completed'
-        job['progress'] = 100
-        job['result'] = {
-            'scenarioName': scenario_name, 'targetYear': target_year,
-            'totalSectors': len(sector_configs),
-            'sectorsWithCompleteData': len(sectors_using_existing_data),
-            'sectorsForecasted': len(sectors_forecasted),
-            'sectorsWithErrors': len(sectors_with_errors),
-            'filePath': forecast_dir
-        }
-        current_app.logger.info(f"Forecast job {job_id} completed successfully via demand_bp")
-    except Exception as e:
-        current_app.logger.exception(f"Error in forecast job {job_id} (demand_bp): {str(e)}")
-        job['status'] = 'failed'
-        job['error'] = str(e)
+            summary_content = { # Renamed
+                'scenario': scenario_name, 'target_year': target_year, 'start_year': start_year,
+                'sectors': list(sector_configs.keys()),
+                'sectors_with_complete_data': sectors_using_existing_data,
+                'sectors_forecasted': sectors_forecasted,
+                'sectors_with_errors': sectors_with_errors,
+                'timestamp': time.strftime('%Y-%m-%d %H:%M:%S'),
+                'exclude_covid': exclude_covid,
+                'models_used': {s_key: cfg.get('models', ['MLR', 'SLR', 'WAM', 'TimeSeries']) 
+                            for s_key, cfg in sector_configs.items()}
+            }
+            with open(f"{forecast_dir}/summary.json", 'w') as f:
+                json.dump(summary_content, f, indent=4)
+            
+            job['status'] = 'completed'
+            job['progress'] = 100
+            job['result'] = {
+                'scenarioName': scenario_name, 'targetYear': target_year,
+                'totalSectors': len(sector_configs),
+                'sectorsWithCompleteData': len(sectors_using_existing_data),
+                'sectorsForecasted': len(sectors_forecasted),
+                'sectorsWithErrors': len(sectors_with_errors),
+                'filePath': forecast_dir
+            }
+            current_app.logger.info(f"Forecast job {job_id} completed successfully via demand_bp")
+        except Exception as e:
+            current_app.logger.exception(f"Error in forecast job {job_id} (demand_bp): {str(e)}")
+            job['status'] = 'failed'
+            job['error'] = str(e)
 
 # Routes
 @demand_bp.route('/projection') # Changed from /demand_projection
@@ -426,46 +434,81 @@ def get_chart_data_api(sector): # Renamed
 
 @demand_bp.route('/api/forecast_data/<scenario>')
 def get_forecast_data_api(scenario): # Renamed
-
     current_app.logger.info(f"Processing API request for forecast_data/{scenario} via demand_bp")
     if current_app.config.get('CURRENT_PROJECT_PATH') is None:
+        current_app.logger.warning("No project selected for get_forecast_data_api.")
         return jsonify({'status': 'error', 'message': 'No project selected'})
     try:
-        scenario_path_api = os.path.join(current_app.config['CURRENT_PROJECT_PATH'], 'results', 'demand_projection', scenario) # Renamed
+        scenario_path_api = os.path.join(current_app.config['CURRENT_PROJECT_PATH'], 'results', 'demand_projection', scenario)
+        current_app.logger.info(f"Attempting to access scenario path: {scenario_path_api}")
+
         if not os.path.exists(scenario_path_api):
+            current_app.logger.warning(f"Scenario path not found: {scenario_path_api}")
             return jsonify({'status': 'error', 'message': f'Scenario {scenario} not found'})
         
-        sector_files_api = [f for f in os.listdir(scenario_path_api) if f.endswith('.xlsx') and not f.startswith('_')] # Renamed
+        all_files_in_dir = os.listdir(scenario_path_api)
+        current_app.logger.info(f"Files found in directory {scenario_path_api}: {all_files_in_dir}")
+
+        # Filter for .xlsx files not starting with '_'
+        sector_files_api = [f for f in all_files_in_dir if f.endswith('.xlsx') and not f.startswith('_')]
+        current_app.logger.info(f"Filtered XLSX files (not starting with '_'): {sector_files_api}")
+
         if not sector_files_api:
-            return jsonify({'status': 'error', 'message': 'No sector data found for this scenario'})
+            current_app.logger.warning(f"No suitable XLSX files found in {scenario_path_api} after initial filtering. All files were: {all_files_in_dir}")
+            # Changed message to be more informative if all_files_in_dir was not empty but sector_files_api is
+            message = 'No sector data files found for this scenario.' if not all_files_in_dir else 'No processable sector data files (e.g. non-summary .xlsx) found for this scenario.'
+            return jsonify({'status': 'error', 'message': message})
         
-        sector_data_resp = {} # Renamed
-        for file_api in sector_files_api: # Renamed
-            sector_name_api = os.path.splitext(file_api)[0] # Renamed
-            if sector_name_api.lower() in ['summary', 'consolidated']: continue
-            file_path_api = os.path.join(scenario_path_api, file_api) # Renamed
+        sector_data_resp = {}
+        for file_api in sector_files_api:
+            sector_name_api = os.path.splitext(file_api)[0]
+            current_app.logger.info(f"Processing file: {file_api} (derived sector name: {sector_name_api})")
+
+            if sector_name_api.lower() in ['summary', 'consolidated']:
+                current_app.logger.info(f"Skipping file {file_api} as it is a summary or consolidated file.")
+                continue
+
+            file_path_api = os.path.join(scenario_path_api, file_api)
             try:
-                df_api = pd.read_excel(file_path_api, sheet_name='Results') # Renamed
-                if 'Year' not in df_api.columns: continue
-                years_api = df_api['Year'].dropna().apply(lambda x: int(x) if pd.api.types.is_numeric_dtype(type(x)) and not pd.isna(x) else None).filter(pd.notna).tolist() # Renamed
-                model_data_api = {} # Renamed
-                models_list_api = [col for col in df_api.columns if col != 'Year'] # Renamed
-                for col_api in models_list_api: # Renamed
+                xls = pd.ExcelFile(file_path_api)
+                if 'Results' not in xls.sheet_names:
+                    current_app.logger.warning(f"Skipping file {file_api}: 'Results' sheet not found. Available sheets: {xls.sheet_names}")
+                    xls.close()
+                    continue
+                xls.close() 
+
+                df_api = pd.read_excel(file_path_api, sheet_name='Results')
+                if 'Year' not in df_api.columns:
+                    current_app.logger.warning(f"Skipping file {file_api}: 'Results' sheet does not contain a 'Year' column. Columns found: {df_api.columns.tolist()}")
+                    continue
+                
+                current_app.logger.info(f"Successfully read 'Results' sheet with 'Year' column from {file_api}.")
+                years_api = pd.to_numeric(df_api['Year'], errors='coerce').dropna().astype(int).tolist()
+                #years_api = df_api['Year'].dropna().apply(lambda x: int(x) if pd.api.types.is_numeric_dtype(type(x)) and not pd.isna(x) else None).filter(pd.notna).tolist()
+                model_data_api = {}
+                models_list_api = [col for col in df_api.columns if col != 'Year']
+                for col_api in models_list_api:
                     model_data_api[col_api] = [None if pd.isna(v) else float(v) for v in df_api[col_api].tolist()]
+                
                 sector_data_resp[sector_name_api] = {'years': years_api, 'models': models_list_api, **model_data_api}
-            except Exception as e_file_api: # Renamed
-                current_app.logger.error(f"Error processing {file_api}: {str(e_file_api)}")
+                current_app.logger.info(f"Successfully processed and added data for sector {sector_name_api} from file {file_api}.")
+
+            except Exception as e_file_api:
+                current_app.logger.error(f"Error processing file {file_api}: {str(e_file_api)}", exc_info=True)
         
         if not sector_data_resp:
+            current_app.logger.warning(f"No sector data could be successfully processed from the files in {scenario_path_api}. Files considered after initial filter: {sector_files_api}")
             return jsonify({'status': 'error', 'message': 'Could not process any sector data'})
+        
+        current_app.logger.info(f"Successfully processed {len(sector_data_resp)} sectors for scenario {scenario}.")
         return jsonify({'status': 'success', 'data': handle_nan_values(sector_data_resp)})
     except Exception as e:
-        current_app.logger.exception(f"Error fetching forecast data for {scenario} via demand_bp: {e}")
+        current_app.logger.exception(f"General error fetching forecast data for {scenario} via demand_bp: {e}")
         return jsonify({'status': 'error', 'message': f'Error fetching forecast data: {str(e)}'})
 
 @demand_bp.route('/api/run_forecast', methods=['POST'])
 def run_forecast_api(): # Renamed
-    # ... (Logic from app.py, using current_app.logger, current_app.config, and blueprint's forecast_jobs)
+    
     current_app.logger.info("Processing API request to run_forecast via demand_bp")
     if current_app.config.get('CURRENT_PROJECT_PATH') is None:
         return jsonify({'status': 'error', 'message': 'No project selected'})
@@ -485,9 +528,9 @@ def run_forecast_api(): # Renamed
         'scenarioName': scenario_name_req, 'targetYear': data_req.get('targetYear'),
         'excludeCovidYears': data_req.get('excludeCovidYears', True),
         'start_time': time.time(), 'result': None, 'error': None}
-    
-    forecast_thread = threading.Thread(target=run_multiple_forecasts_job, 
-                                     args=(job_id_req, current_app.config['CURRENT_PROJECT_PATH'], data_req))
+    app_instance = current_app._get_current_object() # <--- Get the app instance
+    forecast_thread = threading.Thread(target=run_multiple_forecasts_job,
+                                     args=(app_instance, job_id_req, current_app.config['CURRENT_PROJECT_PATH'], data_req)) # <--- Pass app_instance
     forecast_thread.daemon = True
     forecast_thread.start()
     return jsonify({'status': 'started', 'jobId': job_id_req, 
@@ -655,3 +698,61 @@ def save_consolidated_data_api(scenario): # Renamed
     except Exception as e:
         current_app.logger.exception(f"Error saving consolidated data via demand_bp: {e}")
         return jsonify({'status': 'error', 'message': f'Error saving consolidated data: {str(e)}'})
+@demand_bp.route('/api/download_csv/<scenario>/<sector>')
+def download_csv_api(scenario, sector):
+    current_app.logger.info(f"Processing API request for download_csv for {scenario}/{sector} via demand_bp")
+    if not current_app.config.get('CURRENT_PROJECT_PATH'):
+        return jsonify({'status': 'error', 'message': 'No project selected'}), 400
+
+    try:
+        unit = request.args.get('unit', 'TWh')
+        from_year = int(request.args.get('from_year', datetime.now().year - 5))
+        to_year = int(request.args.get('to_year', datetime.now().year + 10))
+        scenario_path = os.path.join(current_app.config['CURRENT_PROJECT_PATH'], 'results', 'demand_projection', scenario)
+
+        if not os.path.exists(scenario_path):
+            return jsonify({'status': 'error', 'message': f'Scenario {scenario} not found'}), 404
+
+        df_to_download = pd.DataFrame({'Year': range(from_year, to_year + 1)})
+        unit_factors = {'TWh': 1000000000, 'GWh': 1000000, 'MWh': 1000, 'kWh': 1}
+        divisor = unit_factors.get(unit, 1000000000) # Default to TWh's divisor if unit is wrong, though JS should send correct
+
+        if sector == 'consolidated':
+            model_params = {}
+            for param_key, value in request.args.items():
+                if param_key.startswith('model_'):
+                    sector_name = param_key.replace('model_', '')
+                    model_params[sector_name] = value
+
+            for sec, model in model_params.items():
+                sector_df = get_forecast_data_for_sector(scenario_path, sec, from_year, to_year, 'kWh') # Get base unit
+                if sector_df is not None and model in sector_df.columns:
+                    sector_data = sector_df[['Year', model]].rename(columns={model: sec})
+                    sector_data[sec] = sector_data[sec] / divisor # Convert to selected unit
+                    df_to_download = df_to_download.merge(sector_data, on='Year', how='left')
+            
+            sector_cols = [col for col in df_to_download.columns if col != 'Year']
+            if sector_cols:
+                df_to_download['Total'] = df_to_download[sector_cols].sum(axis=1)
+
+        else: # Individual sector
+            sector_df = get_forecast_data_for_sector(scenario_path, sector, from_year, to_year, 'kWh') # Get base unit
+            if sector_df is not None:
+                for col in sector_df.columns:
+                    if col != 'Year':
+                        sector_df[col] = sector_df[col] / divisor # Convert all models
+                df_to_download = df_to_download.merge(sector_df, on='Year', how='left')
+            else:
+                 return jsonify({'status': 'error', 'message': f'Data for sector {sector} not found'}), 404
+
+        df_to_download = df_to_download.fillna(0)
+        output_buffer = BytesIO()
+        df_to_download.to_csv(output_buffer, index=False, encoding='utf-8')
+        output_buffer.seek(0)
+
+        download_filename = f"{scenario}_{sector}_{unit}_{from_year}-{to_year}.csv"
+        return send_file(output_buffer, mimetype='text/csv', as_attachment=True, download_name=download_filename)
+
+    except Exception as e:
+        current_app.logger.exception(f"Error creating download CSV via demand_bp: {e}")
+        return jsonify({'status': 'error', 'message': f'Error creating download: {str(e)}'}), 500

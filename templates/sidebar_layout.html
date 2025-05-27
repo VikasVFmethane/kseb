@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -28,7 +29,7 @@
                 </a>
                 <button class="sidebar-toggle-btn" id="sidebarToggle" aria-expanded="false" aria-controls="appSidebar"
                     aria-label="Toggle Sidebar">
-                    <i class="fas fa-chevron-right" aria-hidden="true"></i> {# Icon changes in JS #}
+                    <i class="fas fa-chevron-right" aria-hidden="true"></i> {# Icon changes in JS to fa-chevron-left or fa-chevron-right #}
                 </button>
             </div>
 
@@ -128,16 +129,18 @@
                                 <span class="nav-text">PyPSA Docs</span>
                             </a>
                         </li>
+                         <li class="nav-item" role="none">
+                             <a href="{{ url_for('admin.feature_management_route') }}" class="nav-link {% if request.endpoint == 'admin.feature_management_route' %}active{% endif %}"  role="menuitem" data-bs-toggle="tooltip" data-bs-placement="right" title="Feature Management">
+                                <i class="fas fa-toggle-on me-2"></i>
+                                <span class="nav-text">Feature Management</span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
-                <!-- Add to sidebar navigation -->
-                <a href="{{ url_for('admin.feature_management_route') }}" class="nav-link">
-                    <i class="fas fa-toggle-on me-2"></i>
-                    <span class="nav-text">Feature Management</span>
-                </a>
             </nav>
 
             <div class="sidebar-footer">
+                 <!-- User profile or other footer content can go here -->
             </div>
         </aside>
 
@@ -161,8 +164,7 @@
                     <button type="button" class="action-button" data-bs-toggle="modal"
                         data-bs-target="#notificationsModal" aria-label="View Notifications">
                         <i class="fas fa-bell" aria-hidden="true"></i>
-                        <span class="notification-badge" id="notificationCountBadge" style="display:none;">0</span> {#
-                        JS will update count and visibility #}
+                        <span class="notification-badge" id="notificationCountBadge" style="display:none;">0</span>
                     </button>
                     <button type="button" class="action-button" data-bs-toggle="modal"
                         data-bs-target="#helpModalUniversal" aria-label="Help">
@@ -186,6 +188,7 @@
             </header>
 
             <div class="content-area">
+                <div id="globalAlertPlaceholder"></div> {# For toast-like global alerts #}
                 {% block content %}{% endblock %}
             </div>
 
@@ -301,22 +304,24 @@
 
     <div class="modal fade" id="notificationsModal" tabindex="-1" aria-labelledby="notificationsModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-dialog-scrollable modal-lg"> {# Made modal larger for better display #}
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="notificationsModalLabel"><i class="fas fa-bell me-2"></i>Notifications
+                    <h5 class="modal-title" id="notificationsModalLabel"><i class="fas fa-bell me-2"></i>Notifications & Active Tasks
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="notifications-list" id="notificationsListContainer">
-                        <p class="text-center text-muted" id="noNotificationsText">No new notifications.</p>
+                    <div id="notificationsListContainer" class="notifications-list" style="max-height: 400px; overflow-y: auto;">
+                         {# Notifications will be dynamically inserted here by sidebar.js #}
+                        <p class="text-center text-muted p-3" id="noNotificationsText">No active tasks or new notifications.</p>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-primary btn-sm" id="markAllNotificationsReadBtn">Mark
-                        All as Read</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <div class="modal-footer d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id="markAllNotificationsReadBtn" title="Clear all non-active notifications">
+                        <i class="fas fa-check-double me-1"></i>Clear Finished
+                    </button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -331,58 +336,21 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+    
+    <script src="{{ url_for('static', filename='js/sidebar.js') }}"></script> {# sidebar.js should be loaded early #}
     <script>
-        // Simple global alert function (can be expanded)
-        function showGlobalAlert(message, type = 'info', duration = 5000) {
-            const alertPlaceholder = document.createElement('div');
-            alertPlaceholder.style.position = 'fixed';
-            alertPlaceholder.style.top = '80px';
-            alertPlaceholder.style.right = '20px';
-            alertPlaceholder.style.zIndex = '1056'; // Above most Bootstrap components
-            alertPlaceholder.style.maxWidth = '400px';
-            document.body.appendChild(alertPlaceholder);
-
-            const wrapper = document.createElement('div');
-            const iconClass = type === 'success' ? 'fa-check-circle' :
-                type === 'danger' ? 'fa-exclamation-triangle' :
-                    type === 'warning' ? 'fa-exclamation-circle' : 'fa-info-circle';
-            wrapper.innerHTML = `
-                <div class="alert alert-${type} alert-dismissible fade show d-flex align-items-start" role="alert">
-                    <i class="fas ${iconClass} alert-icon me-2"></i>
-                    <div class="alert-content">${message}</div>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>`;
-            alertPlaceholder.append(wrapper);
-            const alertElement = wrapper.firstChild;
-            const bsAlert = new bootstrap.Alert(alertElement);
-
-            if (duration) {
-                setTimeout(() => {
-                    bsAlert.close();
-                }, duration);
-            }
-        }
-
-        // Global Loading Overlay Control
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        function showLoading(show = true) {
-            if (loadingOverlay) {
-                loadingOverlay.style.display = show ? 'flex' : 'none';
-                loadingOverlay.setAttribute('aria-hidden', !show);
-            }
-        }
-
-        // Initialize Bootstrap Tooltips
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        })
+        // Global Loading Overlay Control already in sidebar.js
+        // Initialize Bootstrap Tooltips (also in sidebar.js but good to ensure it's called after DOM ready)
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        });
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-    <script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
     {% block scripts %}{% endblock %}
 </body>
 

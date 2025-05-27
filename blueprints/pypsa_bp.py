@@ -2,14 +2,14 @@ from flask import (Blueprint, render_template, request, redirect, url_for,
                    flash, jsonify, current_app, send_file, make_response)
 import os
 import pandas as pd
-import numpy as np # For handle_nan_values if included
+import numpy as np
 import json
 from datetime import datetime
 import threading
 import uuid
 import tempfile
 from pathlib import Path
-import inspect # For _api_data_wrapper
+import inspect
 
 import pypsa
 import utils.pypsa_analysis_utils as pau
@@ -29,7 +29,6 @@ pypsa_jobs = {}
 # TEMP_DIR for PyPSA related temporary files
 PYPSA_TEMP_DIR = tempfile.mkdtemp(prefix="pypsa_flask_bp_")
 
-
 # Helper function for NaN handling
 def handle_nan_values(obj):
     if isinstance(obj, float) and np.isnan(obj): return None
@@ -46,7 +45,6 @@ def get_pypsa_results_folder_bp():
     if not current_project_base_path:
         current_app.logger.error("get_pypsa_results_folder_bp: CURRENT_PROJECT_PATH not set.")
         return None
-    # Consistent path: results/Pypsa_results
     pypsa_results_relative_path = os.path.join('results', 'Pypsa_results')
     return os.path.join(current_project_base_path, pypsa_results_relative_path)
 
@@ -57,16 +55,23 @@ def _get_snapshots_for_period_bp(n: pypsa.Network,
     snapshots = pau.safe_get_snapshots(n)
     if snapshots.empty: return snapshots
     current_snapshots_slice = snapshots
+    
+    # Period filtering
     if period_name and isinstance(current_snapshots_slice, pd.MultiIndex):
         period_level_values = current_snapshots_slice.get_level_values(0)
         try:
             typed_period_name = period_level_values.dtype.type(period_name)
             period_mask = (period_level_values == typed_period_name)
-            if period_mask.any(): current_snapshots_slice = current_snapshots_slice[period_mask]
-            else: current_app.logger.warning(f"Period '{period_name}' not found in _get_snapshots_for_period_bp.")
-        except ValueError: current_app.logger.warning(f"Could not convert period name '{period_name}' in _get_snapshots_for_period_bp.")
-        except Exception as e: current_app.logger.error(f"Error period filtering in _get_snapshots_for_period_bp: {e}", exc_info=True)
+            if period_mask.any(): 
+                current_snapshots_slice = current_snapshots_slice[period_mask]
+            else: 
+                current_app.logger.warning(f"Period '{period_name}' not found in _get_snapshots_for_period_bp.")
+        except ValueError: 
+            current_app.logger.warning(f"Could not convert period name '{period_name}' in _get_snapshots_for_period_bp.")
+        except Exception as e: 
+            current_app.logger.error(f"Error period filtering in _get_snapshots_for_period_bp: {e}", exc_info=True)
     
+    # Date filtering
     if start_date_str and end_date_str:
         try:
             start_dt = pd.Timestamp(start_date_str)
@@ -79,7 +84,8 @@ def _get_snapshots_for_period_bp(n: pypsa.Network,
                     current_snapshots_slice = current_snapshots_slice[current_snapshots_slice.get_level_values(-1).isin(valid_time_indices)]
                 else:
                     current_snapshots_slice = current_snapshots_slice[date_mask]
-                if current_snapshots_slice.empty: current_app.logger.warning("Date range resulted in empty snapshots in _get_snapshots_for_period_bp.")
+                if current_snapshots_slice.empty: 
+                    current_app.logger.warning("Date range resulted in empty snapshots in _get_snapshots_for_period_bp.")
         except Exception as e:
             current_app.logger.error(f"Error applying date filter in _get_snapshots_for_period_bp: {e}", exc_info=True)
     return current_snapshots_slice
@@ -113,34 +119,34 @@ def _api_data_wrapper_bp(network_rel_path, data_extraction_func_name_in_pau: str
             empty_payload_content = {}
             if data_extraction_func_name_in_pau == "dispatch_data_payload_former": 
                 empty_payload_content = {'generation': [], 'load': [], 'storage': [], 'store': [], 'timestamps': []}
-            elif data_extraction_func_name_in_pau == "get_carrier_capacity": 
+            elif data_extraction_func_name_in_pau == "carrier_capacity_payload_former": 
                 empty_payload_content = {'by_carrier': [], 'by_region': []}
+            elif data_extraction_func_name_in_pau == "new_capacity_additions_payload_former":
+                empty_payload_content = {'new_additions': []}
             elif data_extraction_func_name_in_pau == "combined_metrics_extractor_wrapper": 
                 empty_payload_content = {'cuf': [], 'curtailment': []}
             elif data_extraction_func_name_in_pau == "extract_api_storage_data_payload_former":
-                empty_payload_content = {'charge_discharge': [], 'state_of_charge': []}
+                empty_payload_content = {'soc': [], 'stats': [], 'timestamps': [], 'storage_types': []}
             elif data_extraction_func_name_in_pau == "emissions_payload_former":
-                empty_payload_content = {'total_emissions': [], 'emissions_by_carrier': []}
+                empty_payload_content = {'total': [], 'by_carrier': []}
             elif data_extraction_func_name_in_pau == "extract_api_prices_data_payload_former":
-                 empty_payload_content = {'bus_prices': [], 'line_loading': [], 'generator_marginal_cost':[]} # Match pau
+                empty_payload_content = {'available': False, 'message': 'No data available for selected filters'}
             elif data_extraction_func_name_in_pau == "extract_api_network_flow_payload_former":
-                 empty_payload_content = {'line_flows': [], 'bus_balance': []}
+                empty_payload_content = {'losses': [], 'line_loading': []}
 
-
-            response_key_base = data_extraction_func_name_in_pau.replace("get_", "").replace("_payload", "").replace("_former","").replace("_extractor_wrapper","").replace("_extractor","")
+            response_key_base = data_extraction_func_name_in_pau.replace("_payload_former","").replace("_extractor_wrapper","").replace("extract_api_","").replace("_data","")
             return jsonify({
                 'status': 'success',
                 response_key_base + "_data": empty_payload_content,
                 'colors': pau.get_color_palette(n) if hasattr(pau, 'get_color_palette') else {},
                 'message': "No data available for the selected PyPSA filters."})
 
-        func_args = {'n': n, '_snapshots_slice': filtered_snapshots, 'snapshots_slice': filtered_snapshots,
+        func_args = {'n': n, 'snapshots_slice': filtered_snapshots,
                      'resolution': resolution_req, 'period': period_name_req, 'period_name': period_name_req}
         func_args.update(route_specific_kwargs)
         
         sig = inspect.signature(actual_data_func)
         valid_func_args = {k: v for k, v in func_args.items() if k in sig.parameters}
-        if '_n' in sig.parameters and 'n' not in valid_func_args : valid_func_args['_n'] = n
 
         raw_result_payload = actual_data_func(**valid_func_args)
         color_palette = pau.get_color_palette(n) if hasattr(pau, 'get_color_palette') else {}
@@ -154,35 +160,39 @@ def _api_data_wrapper_bp(network_rel_path, data_extraction_func_name_in_pau: str
                 
                 if is_multi:
                     for i, name in enumerate(original_index_names):
-                        if name in df_reset.columns: # If original index level name was already a column name
+                        if name in df_reset.columns:
                              df_reset.rename(columns={name: f"index_{name}"}, inplace=True)
                         df_reset.rename(columns={f"level_{i}": name}, inplace=True)
-                else: # Single index
+                else:
                     if original_index_names[0] in df_reset.columns and original_index_names[0] != 'index':
                          df_reset.rename(columns={original_index_names[0]: f"index_{original_index_names[0]}"}, inplace=True)
                     df_reset.rename(columns={'index': original_index_names[0]}, inplace=True)
 
                 for col in df_reset.columns:
-                    if pd.api.types.is_datetime64_any_dtype(df_reset[col]): df_reset[col] = df_reset[col].astype(str)
-                    elif isinstance(df_reset[col].dtype, pd.PeriodDtype): df_reset[col] = df_reset[col].astype(str)
+                    if pd.api.types.is_datetime64_any_dtype(df_reset[col]): 
+                        df_reset[col] = df_reset[col].astype(str)
+                    elif isinstance(df_reset[col].dtype, pd.PeriodDtype): 
+                        df_reset[col] = df_reset[col].astype(str)
                 return handle_nan_values(df_reset.to_dict(orient='records'))
             elif isinstance(item, pd.Series):
                 idx_name = item.index.name if item.index.name else 'index'
                 val_col_name = item.name if item.name else 'value'
                 series_reset = item.copy().reset_index(name=val_col_name)
-                if idx_name in series_reset.columns and idx_name != 'index': # if original index name was already a column name
+                if idx_name in series_reset.columns and idx_name != 'index':
                     series_reset.rename(columns={idx_name: f"index_{idx_name}"}, inplace=True)
                 series_reset.rename(columns={'index': idx_name}, inplace=True)
 
-                if pd.api.types.is_datetime64_any_dtype(series_reset[idx_name]): series_reset[idx_name] = series_reset[idx_name].astype(str)
+                if pd.api.types.is_datetime64_any_dtype(series_reset[idx_name]): 
+                    series_reset[idx_name] = series_reset[idx_name].astype(str)
                 return handle_nan_values(series_reset.to_dict(orient='records'))
             return handle_nan_values(item)
 
         serialized_payload_content = {k: serialize_item_for_json(v) for k, v in raw_result_payload.items()}
-        response_key_base = data_extraction_func_name_in_pau.replace("get_", "").replace("_payload", "").replace("_former","").replace("_extractor_wrapper","").replace("_extractor","")
+        response_key_base = data_extraction_func_name_in_pau.replace("_payload_former","").replace("_extractor_wrapper","").replace("extract_api_","").replace("_data","")
         
         response_dict = {'status': 'success', response_key_base + "_data": serialized_payload_content}
-        if color_palette: response_dict['colors'] = color_palette
+        if color_palette: 
+            response_dict['colors'] = color_palette
         return jsonify(response_dict)
 
     except FileNotFoundError:
@@ -235,7 +245,8 @@ def pypsa_results_route():
                             rel_path_to_file = os.path.relpath(full_file_path, pypsa_folder)
                             nc_files_info.append({'scenario': item, 'filename': file_item, 'path': rel_path_to_file.replace(os.sep, '/')})
     else:
-        if pypsa_folder: os.makedirs(pypsa_folder, exist_ok=True)
+        if pypsa_folder: 
+            os.makedirs(pypsa_folder, exist_ok=True)
         flash('PyPSA results folder empty or not found. Please upload .nc files or run simulations.', 'info')
 
     return render_template('pypsa_results.html',
@@ -246,7 +257,8 @@ def pypsa_results_route():
 @pypsa_bp.route('/api/scan_files', methods=['GET'])
 def api_scan_pypsa_files_api():
     pypsa_folder = get_pypsa_results_folder_bp()
-    if not pypsa_folder: return jsonify({'status': 'error', 'message': 'No project selected.'})
+    if not pypsa_folder: 
+        return jsonify({'status': 'error', 'message': 'No project selected.'})
     scenarios, nc_files_info = [], []
     if os.path.exists(pypsa_folder):
         for item in os.listdir(pypsa_folder):
@@ -258,18 +270,23 @@ def api_scan_pypsa_files_api():
                         if file_item.endswith('.nc'):
                             rel_path = os.path.relpath(os.path.join(root, file_item), pypsa_folder)
                             nc_files_info.append({'scenario': item, 'filename': file_item, 'path': rel_path.replace(os.sep, '/')})
-    else: os.makedirs(pypsa_folder, exist_ok=True)
+    else: 
+        os.makedirs(pypsa_folder, exist_ok=True)
     return jsonify({'status': 'success', 'scenarios': sorted(list(set(scenarios))), 'files': nc_files_info})
 
 @pypsa_bp.route('/api/upload_network', methods=['POST'])
 def api_upload_pypsa_network_api():
     pypsa_folder = get_pypsa_results_folder_bp()
-    if not pypsa_folder: return jsonify({'status': 'error', 'message': 'No project selected.'})
-    if 'network_file' not in request.files: return jsonify({'status': 'error', 'message': 'No file part'})
+    if not pypsa_folder: 
+        return jsonify({'status': 'error', 'message': 'No project selected.'})
+    if 'network_file' not in request.files: 
+        return jsonify({'status': 'error', 'message': 'No file part'})
     file_obj = request.files['network_file']
     scenario_name = request.form.get('scenario', 'default_uploads')
-    if file_obj.filename == '': return jsonify({'status': 'error', 'message': 'No selected file'})
-    if not file_obj.filename.endswith('.nc'): return jsonify({'status': 'error', 'message': 'Only .nc valid'})
+    if file_obj.filename == '': 
+        return jsonify({'status': 'error', 'message': 'No selected file'})
+    if not file_obj.filename.endswith('.nc'): 
+        return jsonify({'status': 'error', 'message': 'Only .nc valid'})
     try:
         scenario_path = os.path.join(pypsa_folder, scenario_name)
         os.makedirs(scenario_path, exist_ok=True)
@@ -285,7 +302,8 @@ def api_upload_pypsa_network_api():
 @pypsa_bp.route('/api/network_info/<path:network_rel_path>', methods=['GET'])
 def api_get_pypsa_network_info_api(network_rel_path):
     pypsa_folder = get_pypsa_results_folder_bp()
-    if not pypsa_folder: return jsonify({'status': 'error', 'message': 'Project context not available.'})
+    if not pypsa_folder: 
+        return jsonify({'status': 'error', 'message': 'Project context not available.'})
     full_path = os.path.normpath(os.path.join(pypsa_folder, network_rel_path))
     if not full_path.startswith(os.path.normpath(pypsa_folder)):
         return jsonify({'status': 'error', 'message': 'Invalid file path.'}), 400
@@ -312,7 +330,7 @@ def api_get_pypsa_network_info_api(network_rel_path):
                         components_info[component_name] = 0
                 except (KeyError, TypeError):
                     try:
-                        if hasattr(n, component_name): # Fallback for older PyPSA or different structure
+                        if hasattr(n, component_name):
                             component_df = getattr(n, component_name)
                             components_info[component_name] = len(component_df) if hasattr(component_df, '__len__') else 0
                         else:
@@ -330,7 +348,6 @@ def api_get_pypsa_network_info_api(network_rel_path):
             start_s = str(pau.get_time_index(pd.Index([s0_raw]))[0]) if pau.get_time_index(pd.Index([s0_raw])) is not None else str(s0_raw)
             end_s = str(pau.get_time_index(pd.Index([s_end_raw]))[0]) if pau.get_time_index(pd.Index([s_end_raw])) is not None else str(s_end_raw)
 
-
         info = {
             'name': os.path.basename(network_rel_path),
             'components': components_info,
@@ -342,11 +359,10 @@ def api_get_pypsa_network_info_api(network_rel_path):
                 'is_multi_period': is_multi
             },
             'periods': periods,
-            'optimization_status': getattr(n, 'objective_status', 'N/A') # PyPSA sometimes uses objective_status
+            'optimization_status': getattr(n, 'objective_status', 'N/A')
         }
         return jsonify({'status': 'success', 'network_info': info})
     except Exception as e:
-       
         error_payload = {'status': 'error', 'message': f"Error processing network info: {str(e)}"}
         response = make_response(jsonify(error_payload), 500)
         response.mimetype = "application/json"
@@ -355,7 +371,8 @@ def api_get_pypsa_network_info_api(network_rel_path):
 @pypsa_bp.route('/api/extract_period/<path:network_rel_path>/<period_name_req>', methods=['GET'])
 def api_extract_period_network_api(network_rel_path, period_name_req):
     pypsa_folder = get_pypsa_results_folder_bp()
-    if not pypsa_folder: return jsonify({'status': 'error', 'message': 'No project selected.'})
+    if not pypsa_folder: 
+        return jsonify({'status': 'error', 'message': 'No project selected.'})
 
     original_full_path = os.path.normpath(os.path.join(pypsa_folder, network_rel_path))
     if not original_full_path.startswith(os.path.normpath(pypsa_folder)):
@@ -382,28 +399,59 @@ def api_extract_period_network_api(network_rel_path, period_name_req):
         # Create a new network for the specific period
         n_period = pypsa.Network()
         
-        # Copy components that are not time-dependent
+        # Copy static components
         for component_name in n_orig.components:
-            if component_name not in n_orig.component_attrs or not n_orig.component_attrs[component_name].get("type", "").endswith("_t"):
-                n_period.madd(component_name, n_orig.df(component_name).index, **n_orig.df(component_name))
+            component_list_name = n_orig.components[component_name]["list_name"]
+            if hasattr(n_orig, component_list_name):
+                component_df = getattr(n_orig, component_list_name)
+                if not component_df.empty:
+                    # Copy all static data for this component
+                    for idx, row in component_df.iterrows():
+                        try:
+                            n_period.add(component_name, idx, **row.to_dict())
+                        except Exception as add_error:
+                            current_app.logger.warning(f"Could not add {component_name} {idx}: {add_error}")
         
-        # Copy time-dependent components, filtering by the period's snapshots
+        # Copy carriers and other global data
+        if hasattr(n_orig, 'carriers') and not n_orig.carriers.empty:
+            for idx, row in n_orig.carriers.iterrows():
+                try:
+                    n_period.add("Carrier", idx, **row.to_dict())
+                except Exception as add_error:
+                    current_app.logger.warning(f"Could not add carrier {idx}: {add_error}")
+
+        # Set snapshots for the period (use time level only)
+        time_snapshots = period_snapshots.get_level_values(1)
+        n_period.set_snapshots(time_snapshots)
+        
+        # Copy time-dependent data
         for component_name in n_orig.components:
-            if n_orig.component_attrs[component_name].get("type", "").endswith("_t"):
-                df_t_orig = n_orig.pnl(component_name)
-                if not df_t_orig.empty:
-                    # Filter by the snapshots of the selected period
-                    df_t_period = df_t_orig.loc[period_snapshots]
-                    if not df_t_period.empty:
-                        # Ensure the component itself exists in n_period before adding time series data
-                        for item_name in df_t_period.columns.get_level_values(0).unique():
-                             if item_name not in n_period.df(component_name).index and item_name in n_orig.df(component_name).index:
-                                n_period.add(component_name, item_name, **n_orig.df(component_name).loc[item_name])
-                        n_period.import_series_from_dataframe(df_t_period, component_name)
+            component_list_name = n_orig.components[component_name]["list_name"]
+            component_t_name = f"{component_list_name}_t"
+            
+            if hasattr(n_orig, component_t_name):
+                orig_pnl = getattr(n_orig, component_t_name)
+                period_pnl = {}
+                
+                for attr_name, df_t in orig_pnl.items():
+                    if not df_t.empty and df_t.index.equals(n_orig.snapshots):
+                        # Filter for this period's snapshots
+                        period_data = df_t.loc[period_snapshots]
+                        # Reset index to just the time part
+                        period_data.index = time_snapshots
+                        period_pnl[attr_name] = period_data
+                
+                if period_pnl:
+                    setattr(n_period, component_t_name, period_pnl)
 
-        n_period.set_snapshots(period_snapshots.get_level_values(1)) # Use the time part of the multi-index
+        # Copy snapshot weightings if they exist
+        if hasattr(n_orig, 'snapshot_weightings') and not n_orig.snapshot_weightings.empty:
+            if isinstance(n_orig.snapshot_weightings.index, pd.MultiIndex):
+                period_weights = n_orig.snapshot_weightings.loc[period_snapshots]
+                period_weights.index = time_snapshots
+                n_period.snapshot_weightings = period_weights
 
-        # Save the new network to a temporary file
+        # Save the new network
         temp_dir_path = Path(PYPSA_TEMP_DIR)
         temp_dir_path.mkdir(parents=True, exist_ok=True)
         
@@ -413,30 +461,35 @@ def api_extract_period_network_api(network_rel_path, period_name_req):
         
         n_period.export_to_netcdf(str(temp_file_path))
         
-        # Determine scenario name from original path for saving
-        scenario_name_from_path = Path(network_rel_path).parts[0] if len(Path(network_rel_path).parts) > 1 else "extracted_periods"
+        # Determine scenario from original path
+        scenario_name = Path(network_rel_path).parts[0] if len(Path(network_rel_path).parts) > 1 else "extracted_periods"
         
-        # Save to the project's PyPSA results folder
-        target_scenario_folder = Path(pypsa_folder) / scenario_name_from_path
+        # Save to project's PyPSA results folder
+        target_scenario_folder = Path(pypsa_folder) / scenario_name
         target_scenario_folder.mkdir(parents=True, exist_ok=True)
         final_save_path = target_scenario_folder / new_filename
         
-        os.replace(str(temp_file_path), str(final_save_path)) # Move from temp to final location
+        os.replace(str(temp_file_path), str(final_save_path))
         
         new_rel_path = os.path.relpath(str(final_save_path), pypsa_folder).replace(os.sep, '/')
 
         return jsonify({
             'status': 'success', 
             'message': f'Network for period {period_name_req} extracted and saved.',
-            'new_network_path': new_rel_path,
-            'new_filename': new_filename,
-            'scenario': scenario_name_from_path
+            'file_info': {
+                'path': new_rel_path,
+                'filename': new_filename,
+                'scenario': scenario_name
+            }
         })
 
     except Exception as e:
         current_app.logger.error(f"Error extracting period network for {network_rel_path}, period {period_name_req}: {e}", exc_info=True)
         return make_response(jsonify({'status': 'error', 'message': f"Error extracting period network: {str(e)}"}), 500)
 
+# ==========================================
+# ENHANCED DATA API ENDPOINTS
+# ==========================================
 
 @pypsa_bp.route('/api/dispatch_data/<path:network_rel_path>', methods=['GET'])
 def api_get_dispatch_data_api(network_rel_path):
@@ -445,8 +498,12 @@ def api_get_dispatch_data_api(network_rel_path):
 @pypsa_bp.route('/api/capacity_data/<path:network_rel_path>', methods=['GET'])
 def api_get_capacity_data_api(network_rel_path):
     attribute = request.args.get('attribute', 'p_nom_opt')
-    return _api_data_wrapper_bp(network_rel_path, "get_carrier_capacity", attribute=attribute)
+    return _api_data_wrapper_bp(network_rel_path, "carrier_capacity_payload_former", attribute=attribute)
 
+@pypsa_bp.route('/api/new_capacity_additions/<path:network_rel_path>', methods=['GET'])
+def api_get_new_capacity_additions_api(network_rel_path):
+    method = request.args.get('method', 'optimization_diff')
+    return _api_data_wrapper_bp(network_rel_path, "new_capacity_additions_payload_former", method=method)
 
 @pypsa_bp.route('/api/metrics_data/<path:network_rel_path>', methods=['GET'])
 def api_get_metrics_data_api(network_rel_path):
@@ -471,12 +528,19 @@ def api_get_network_flow_data_api(network_rel_path):
 @pypsa_bp.route('/api/compare_networks', methods=['POST'])
 def api_compare_networks_api():
     pypsa_folder = get_pypsa_results_folder_bp()
-    if not pypsa_folder: return jsonify({'status': 'error', 'message': 'No project selected.'})
+    if not pypsa_folder: 
+        return jsonify({'status': 'error', 'message': 'No project selected.'})
+    
     try:
         req_data = request.get_json()
         file_paths_rel = req_data.get('file_paths', [])
-        if len(file_paths_rel) < 2:
-            return jsonify({'status': 'error', 'message': 'At least two network files are required for comparison.'}), 400
+        labels = req_data.get('labels', {})
+        comparison_type = req_data.get('comparison_type', 'capacity')
+        attribute = req_data.get('attribute', 'p_nom_opt')
+        new_capacity_method = req_data.get('new_capacity_method', 'optimization_diff')
+        
+        if len(file_paths_rel) < 1:
+            return jsonify({'status': 'error', 'message': 'At least one network file is required for comparison.'}), 400
 
         networks_to_compare = {}
         for rel_path in file_paths_rel:
@@ -484,30 +548,28 @@ def api_compare_networks_api():
             if not full_path.startswith(os.path.normpath(pypsa_folder)) or not os.path.exists(full_path):
                 return jsonify({'status': 'error', 'message': f'Invalid or non-existent file path: {rel_path}'}), 400
             try:
-                # Use filename as key, or a more unique identifier if needed
-                network_key = os.path.basename(rel_path) 
+                # Use provided label or filename as key
+                network_key = labels.get(rel_path, os.path.basename(rel_path))
                 networks_to_compare[network_key] = pypsa.Network(full_path)
             except Exception as e:
                  return jsonify({'status': 'error', 'message': f"Error loading network {rel_path}: {str(e)}"}), 500
         
-        comparison_results = pau.compare_networks_results(networks_to_compare)
+        # Call comparison function with appropriate parameters
+        kwargs = {'attribute': attribute}
+        if comparison_type == 'new_capacity_additions':
+            kwargs['new_capacity_method'] = new_capacity_method
+            
+        comparison_results = pau.compare_networks_results(networks_to_compare, comparison_type=comparison_type, **kwargs)
         
-        # Serialize comparison_results (assuming it's a dict of DataFrames/Series)
-        serialized_results = {}
-        for key, value in comparison_results.items():
-            if isinstance(value, pd.DataFrame):
-                serialized_results[key] = handle_nan_values(value.reset_index().to_dict(orient='records'))
-            elif isinstance(value, pd.Series):
-                 serialized_results[key] = handle_nan_values(value.reset_index().to_dict(orient='records'))
-            else: # Handle other types like dicts of numbers/strings
-                serialized_results[key] = handle_nan_values(value)
-
-        return jsonify({'status': 'success', 'comparison_data': serialized_results})
+        return jsonify({'status': 'success', 'comparison_data': comparison_results})
 
     except Exception as e:
         current_app.logger.error(f"PyPSA Compare error: {e}", exc_info=True)
         return jsonify({'status': 'error', 'message': f'Error during network comparison: {str(e)}'}), 500
 
+# ==========================================
+# EXISTING PYPSA MODELING ROUTES
+# ==========================================
 
 @pypsa_bp.route('/api/get_settings_from_excel', methods=['GET'])
 def api_get_pypsa_settings_from_excel_api():
@@ -529,8 +591,10 @@ def api_get_pypsa_settings_from_excel_api():
         for _, row in main_settings_table.iterrows():
             if pd.notna(row.get('Setting')) and pd.notna(row.get('Option')):
                 val = row['Option']
-                try: settings_dict[row['Setting']] = int(val) if isinstance(val, (int, float)) and float(val).is_integer() else float(val)
-                except ValueError: settings_dict[row['Setting']] = str(val)
+                try: 
+                    settings_dict[row['Setting']] = int(val) if isinstance(val, (int, float)) and float(val).is_integer() else float(val)
+                except ValueError: 
+                    settings_dict[row['Setting']] = str(val)
         ui_settings = {
             'Run Pypsa Model on': settings_dict.get('Run Pypsa Model on', 'All Snapshots'),
             'Weightings': int(settings_dict.get('Weightings', 1)),
@@ -577,12 +641,15 @@ def api_run_pypsa_model_api():
 def api_get_pypsa_model_status_api(job_id):
     current_app.logger.info(f"Processing API request for pypsa_model_status/{job_id} via pypsa_bp")
     job = pypsa_jobs.get(job_id)
-    if not job: return jsonify({'status': 'error', 'message': 'Job not found'}), 404
+    if not job: 
+        return jsonify({'status': 'error', 'message': 'Job not found'}), 404
     
     if job['status'] == 'Completed' and job.get('result_files') is None:
         scenario_results_dir = Path(job['project_path']) / "results" / "Pypsa_results" / job['scenario_name']
-        if scenario_results_dir.exists(): job['result_files'] = [f.name for f in scenario_results_dir.iterdir() if f.is_file()]
-        else: job['result_files'] = []
+        if scenario_results_dir.exists(): 
+            job['result_files'] = [f.name for f in scenario_results_dir.iterdir() if f.is_file()]
+        else: 
+            job['result_files'] = []
     return jsonify(job)
 
 @pypsa_bp.route('/api/scenarios', methods=['GET'])
@@ -624,4 +691,5 @@ def download_pypsa_result_file_api(scenario_name, filename):
         return send_file(str(file_to_download_path.resolve()), as_attachment=True)
     else:
         flash(f"File not found or access denied: {filename}", "danger")
-        return redirect(url_for('pypsa.pypsa_results_route')) 
+        return redirect(url_for('pypsa.pypsa_results_route'))
+ 

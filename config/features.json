@@ -1,18 +1,26 @@
 {
-  "features": {
-    "demand-projection": {
-      "enabled": true,
-      "description": "Demand projections"
+    "feature_groups": {
+        "core": "Core Modelling Features",
+        "experimental": "Experimental Features"
     },
-    "load-curve": {
-      "enabled": true,
-      "description": "Load curve creation"
+    "features": {
+        "demand-projection": {
+            "name": "Demand Projection",
+            "description": "Forecast future energy demand based on various models.",
+            "group": "core",
+            "default_enabled": true
+        },
+        "load-curve": {
+            "name": "Load Curve Analysis",
+            "description": "Analyze and generate typical load curves from historical data.",
+            "group": "core",
+            "default_enabled": true
+        },
+        "pypsa-integration": {
+            "name": "PyPSA Integration",
+            "description": "Integrate with PyPSA for power system analysis.",
+            "group": "experimental",
+            "default_enabled": false
+        }
     }
-  },
-  "feature_groups": {
-    "basic": [
-      "demand-projection",
-      "load-curve"
-    ]
-  }
 }

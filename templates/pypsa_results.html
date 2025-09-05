@@ -1,3 +1,5 @@
+
+
 {% extends "sidebar_layout.html" %}
 
 {% block title %}PyPSA Results - Energy Demand Platform{% endblock %}
@@ -55,28 +57,7 @@
 
                 <!-- Network Information Display -->
                 <div class="network-info-container mt-3" id="networkInfoContainer" style="display: none;">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Network Information</h5>
-                            <button type="button" class="btn btn-sm btn-primary" id="loadNetworkBtn">
-                                <i class="fas fa-chart-line me-1"></i> Load Network for Analysis
-                            </button>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <p><strong>Name:</strong> <span id="networkName"></span></p>
-                                    <p><strong>Components:</strong> <span id="networkComponents"></span></p>
-                                    <p><strong>Carriers:</strong> <span id="networkCarriers"></span></p>
-                                </div>
-                                <div class="col-md-6">
-                                    <p><strong>Snapshots:</strong> <span id="networkSnapshots"></span></p>
-                                    <p><strong>Period Type:</strong> <span id="networkPeriodType"></span></p>
-                                    <p><strong>Optimization Status:</strong> <span id="networkOptStatus"></span></p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Content dynamically loaded by JS -->
                 </div>
 
                 <!-- File Upload Section -->
@@ -88,7 +69,7 @@
                                 <label for="uploadScenarioName" class="form-label">Scenario Name</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-folder"></i></span>
-                                    <input type="text" class="form-control" id="uploadScenarioName" name="scenario" placeholder="Enter scenario name" required>
+                                    <input type="text" class="form-control" id="uploadScenarioName" name="scenario" placeholder="Enter scenario name (e.g., Base, HighRE)" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -149,7 +130,7 @@
                         </div>
                         <div class="col-md-auto">
                             <label for="resolutionSelect" class="form-label">Resolution:</label>
-                            <select class="form-control form-control-sm" id="resolutionSelect">
+                            <select class="form-select form-select-sm" id="resolutionSelect">
                                 <option value="1H">Hourly (1H)</option>
                                 <option value="3H">3-Hourly (3H)</option>
                                 <option value="6H">6-Hourly (6H)</option>
@@ -160,7 +141,7 @@
                         </div>
                         <div class="col-md-auto d-flex align-items-end">
                             <button class="btn btn-sm btn-primary" id="applyFilterBtn">
-                                <i class="fas fa-filter me-1"></i> Apply Filter
+                                <i class="fas fa-filter me-1"></i> Apply Filters
                             </button>
                         </div>
                     </div>
@@ -331,7 +312,7 @@
                         <div class="row mb-3">
                             <div class="col-12">
                                 <div class="d-flex align-items-center">
-                                    <label for="capacityAttributeSelect" class="form-label me-2 mb-0">Capacity Attribute:</label>
+                                    <label for="capacityAttributeSelect" class="form-label me-2 mb-0">Total Capacity Attribute:</label>
                                     <select class="form-select form-select-sm" id="capacityAttributeSelect" style="width: auto;">
                                         <option value="p_nom_opt">p_nom_opt (Optimized MW)</option>
                                         <option value="p_nom">p_nom (Initial MW)</option>
@@ -365,8 +346,13 @@
                         </div>
                         
                         <div class="card mb-4">
-                            <div class="card-header">
+                            <div class="card-header d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0">Capacity by Region</h5>
+                                 <div class="chart-controls">
+                                    <button class="btn btn-sm btn-outline-secondary download-btn" data-chart="capacityByRegion">
+                                        <i class="fas fa-download me-1"></i> Download
+                                    </button>
+                                </div>
                             </div>
                             <div class="card-body">
                                 <div class="plot-container" id="capacityByRegionPlot">
@@ -379,7 +365,7 @@
                         
                         <div class="card mb-4">
                             <div class="card-header">
-                                <h5 class="mb-0">Capacity Data Table</h5>
+                                <h5 class="mb-0">Total Capacity Data Table</h5>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
@@ -398,6 +384,64 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- NEW: New Capacity Additions Section -->
+                        <hr class="my-4">
+                        <h4>New Capacity Additions</h4>
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <div class="d-flex align-items-center">
+                                    <label for="newCapacityMethodSelect" class="form-label me-2 mb-0">Calculation Method:</label>
+                                    <select class="form-select form-select-sm" id="newCapacityMethodSelect" style="width: auto;">
+                                        <option value="optimization_diff">Optimized - Initial</option>
+                                        <option value="build_year">By Build Year (for current period)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card mb-4">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">New Capacity Additions by Carrier</h5>
+                                        <div class="chart-controls">
+                                            <button class="btn btn-sm btn-outline-secondary download-btn" data-chart="newCapacityAdditions">
+                                                <i class="fas fa-download me-1"></i> Download
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="plot-container" id="newCapacityAdditionsPlot">
+                                            <div class="loading-indicator">
+                                                <i class="fas fa-spinner fa-spin"></i> Loading new capacity data...
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">New Capacity Additions Table</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-hover" id="newCapacityAdditionsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Carrier</th>
+                                                <th>New Capacity</th>
+                                                <th>Unit</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- END: New Capacity Additions Section -->
                     </div>
 
                     <!-- 3. Metrics Tab -->
@@ -500,8 +544,13 @@
                         </div>
                         
                         <div class="card mb-4">
-                            <div class="card-header">
+                            <div class="card-header d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0">Storage Utilization</h5>
+                                 <div class="chart-controls">
+                                    <button class="btn btn-sm btn-outline-secondary download-btn" data-chart="storageUtilizationPlot">
+                                        <i class="fas fa-download me-1"></i> Download
+                                    </button>
+                                </div>
                             </div>
                             <div class="card-body">
                                 <div class="row">
@@ -775,8 +824,9 @@
                         <div class="d-flex align-items-center mb-3">
                             <label for="comparisonTypeSelect" class="form-label me-2 mb-0">Comparison Type:</label>
                             <select class="form-select form-select-sm" id="comparisonTypeSelect" style="width: auto;">
-                                <option value="capacity">Capacity</option>
-                                <option value="generation">Generation</option>
+                                <option value="capacity">Total Capacity</option>
+                                <option value="new_capacity_additions">New Capacity Additions</option>
+                                <option value="generation">Total Generation</option>
                                 <option value="metrics">Metrics (CUF & Curtailment)</option>
                                 <option value="emissions">Emissions</option>
                             </select>
@@ -790,8 +840,16 @@
                 
                 <div class="comparison-results" id="comparisonResults" style="display: none;">
                     <div class="card">
-                        <div class="card-header">
+                        <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="mb-0" id="comparisonResultsTitle">Comparison Results</h5>
+                             <div class="chart-controls">
+                                <button class="btn btn-sm btn-outline-secondary download-btn" data-chart="comparisonMain">
+                                    <i class="fas fa-download me-1"></i> Download Main
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary download-btn ms-2" data-chart="comparisonSecondary" id="downloadComparisonSecondaryBtn" style="display:none;">
+                                    <i class="fas fa-download me-1"></i> Download Secondary
+                                </button>
+                            </div>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -848,6 +906,6 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="https://cdn.plot.ly/plotly-2.20.0.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script> <!-- Updated Plotly version -->
     <script src="{{ url_for('static', filename='js/pypsa_results.js') }}"></script>
 {% endblock %}

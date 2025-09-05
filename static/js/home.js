@@ -1,7 +1,4 @@
-/**
- * Energy Demand Forecasting Platform - Main JavaScript
- * Handles all interactive functionality across the platform
- */
+
 
 document.addEventListener('DOMContentLoaded', function () {
     // ========== Project Mode Selection ==========
@@ -868,5 +865,3 @@ document.querySelectorAll('.feature-link').forEach(link => {
         }
     });
 });
-
-// Add to Jinja2 template - Create is_used function

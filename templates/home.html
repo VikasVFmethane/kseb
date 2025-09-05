@@ -168,11 +168,11 @@
                 </div>
                 {% endmacro %}
 
-                {{ feature_card("demand-projection", "fa-chart-line", "Demand Projection", "Generate sector-wise electricity demand projections.", "demand_projection", "demandProjectionHelpModal") }}
-                {{ feature_card("demand-visualization", "fa-chart-bar", "Demand Visualization", "Visualize and analyze forecast results interactively.", "demand_visualization", "demandVisualizationHelpModal") }}
-                {{ feature_card("load-curve", "fa-wave-square", "Load Curve Creation", "Generate temporal load profiles for different scenarios.", "load_profile_creation", "loadCurveHelpModal") }}
-                {{ feature_card("pypsa-modeling", "fa-cogs", "PyPSA Modeling", "Model energy systems using the PyPSA framework.", "pypsa_modeling", "pypsaModelingHelpModal") }}
-                {{ feature_card("results-analysis", "fa-poll-h", "Results Analysis", "Analyze modeling outputs and generate reports.", "pypsa_results", "resultsHelpModal") }}
+                {{ feature_card("demand-projection", "fa-chart-line", "Demand Projection", "Generate sector-wise electricity demand projections.", "demand.demand_projection_route", "demandProjectionHelpModal") }}
+                {{ feature_card("demand-visualization", "fa-chart-bar", "Demand Visualization", "Visualize and analyze forecast results interactively.", "demand.demand_visualization_route", "demandVisualizationHelpModal") }}
+                {{ feature_card("load-curve", "fa-wave-square", "Load Curve Creation", "Generate temporal load profiles for different scenarios.", "loadprofile.load_profile_creation_route", "loadCurveHelpModal") }}
+                {{ feature_card("pypsa-modeling", "fa-cogs", "PyPSA Modeling", "Model energy systems using the PyPSA framework.", "pypsa.pypsa_modeling_route", "pypsaModelingHelpModal") }}
+                {{ feature_card("results-analysis", "fa-poll-h", "Results Analysis", "Analyze modeling outputs and generate reports.", "pypsa.pypsa_results_route", "resultsHelpModal") }}
             </div>
         </div>
     </section>
@@ -199,12 +199,12 @@
             </div>
             {% endmacro %}
 
-            {{ resource_card("fa-file-excel", "Data Input Template", "Excel template for sector-wise energy demand data.", url_for('download_template', template_type='data_input')) }}
-            {{ resource_card("fa-file-excel", "Load Curve Template", "Excel template for load curve creation parameters.", url_for('download_template', template_type='load_curve')) }}
-            {{ resource_card("fa-file-excel", "PyPSA Input Template", "Excel template for PyPSA modeling inputs.", url_for('download_template', template_type='pypsa_input')) }}
-            {{ resource_card("fa-file-pdf", "User Guide", "Comprehensive guide for using all platform features.", url_for('download_user_guide'), download_label="View Guide", external=true) }}
-            {{ resource_card("fa-file-alt", "Methodology Document", "Detailed explanation of forecasting and modeling methods.", url_for('download_methodology'), download_label="View Document", external=true) }}
-            {{ resource_card("fa-video", "Tutorial Videos", "Step-by-step video guides for key platform functionalities.", url_for('tutorials'), download_label="View Tutorials", external=true) }}
+            {{ resource_card("fa-file-excel", "Data Input Template", "Excel template for sector-wise energy demand data.", url_for('data.download_template_route', template_type='data_input')) }}
+            {{ resource_card("fa-file-excel", "Load Curve Template", "Excel template for load curve creation parameters.", url_for('data.download_template_route', template_type='load_curve')) }}
+            {{ resource_card("fa-file-excel", "PyPSA Input Template", "Excel template for PyPSA modeling inputs.", url_for('data.download_template_route', template_type='pypsa_input')) }}
+            {{ resource_card("fa-file-pdf", "User Guide", "Comprehensive guide for using all platform features.", url_for('core.user_guide'), download_label="View Guide", external=true) }}
+            {{ resource_card("fa-file-alt", "Methodology Document", "Detailed explanation of forecasting and modeling methods.", url_for('data.download_methodology_route'), download_label="View Document", external=true) }}
+            {{ resource_card("fa-video", "Tutorial Videos", "Step-by-step video guides for key platform functionalities.", url_for('core.tutorials'), download_label="View tutorials", external=true) }}
         </div>
     </section>
 

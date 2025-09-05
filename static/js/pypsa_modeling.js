@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
         showLoading(true);
-        fetch('/api/get_pypsa_settings_from_excel')
+        fetch('/pypsa/api/get_pypsa_settings_from_excel')
             .then(response => response.json())
             .then(data => {
                 showLoading(false);
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function () {
             logOutputDiv.innerHTML = ''; // Clear previous logs
             lastLogLength = 0;
 
-            fetch('/api/run_pypsa_model', {
+            fetch('pypsa/api/run_pypsa_model', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ scenarioName: scenarioName, settings: settingsOverrides })
@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function fetchPypsaStatus() {
         if (!currentJobId) return;
 
-        fetch(`/api/pypsa_model_status/${currentJobId}`)
+        fetch(`/pypsa/api/pypsa_model_status/${currentJobId}`)
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'error' && data.message === 'Job not found') {
@@ -294,7 +294,7 @@ document.addEventListener('DOMContentLoaded', function () {
             cancelPypsaBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Cancelling...';
 
             // Assuming backend has a similar cancel endpoint for PyPSA jobs
-            fetch(`/api/cancel_forecast/${currentJobId}`, { method: 'POST' })
+            fetch(`/pypsa/api/cancel_forecast/${currentJobId}`, { method: 'POST' })
                 .then(response => response.json())
                 .then(data => {
                     showLoading(false);
@@ -327,7 +327,7 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>`;
         if (noScenariosMessageDiv) noScenariosMessageDiv.style.display = 'none';
 
-        fetch('/api/pypsa_scenarios')
+        fetch('/pypsa/api/pypsa_scenarios')
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success' && data.scenarios.length > 0) {
@@ -421,7 +421,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const fileLink = document.createElement('a');
                 // Ensure full path is sent if it's nested
                 const filePathForApi = file;
-                fileLink.href = `/api/download_pypsa_result/${encodeURIComponent(scenarioName)}/${encodeURIComponent(filePathForApi)}`;
+                fileLink.href = `/pypsa/api/download_pypsa_result/${encodeURIComponent(scenarioName)}/${encodeURIComponent(filePathForApi)}`;
 
                 let iconClass = 'fa-file-alt';
                 if (displayFileName.endsWith('.nc')) iconClass = 'fa-database';

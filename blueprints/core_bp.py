@@ -11,7 +11,7 @@ def get_recent_activities():
             'icon': 'fas fa-chart-line',
             'title': 'Created forecast for "Energy Scenario 2025"',
             'time': '2 hours ago',
-            'link': url_for('demand_visualization') # This will eventually be demand_bp.demand_visualization
+            'link': url_for('demand.demand_visualization_route') # This will eventually be demand_bp.demand.demand_visualization_route
         },
         {
             'icon': 'fas fa-upload',
@@ -23,7 +23,7 @@ def get_recent_activities():
             'icon': 'fas fa-cogs',
             'title': 'Ran PyPSA model for "Renewable Integration"',
             'time': '3 days ago',
-            'link': url_for('pypsa_results') # This will eventually be pypsa_bp.pypsa_results
+            'link': url_for('pypsa.pypsa_results_route') # This will eventually be pypsa_bp.pypsa.pypsa_results_route
         }
     ]
     return activities

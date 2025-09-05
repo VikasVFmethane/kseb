@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function () {
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating...';
 
             // Submit form data using fetch API
-            fetch('/create_project', {
+            fetch('/project/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -413,7 +413,7 @@ document.addEventListener('DOMContentLoaded', function () {
         validationStatus.innerHTML = '<div class="alert alert-info"><i class="fas fa-spinner fa-spin me-2"></i>Validating project structure...</div>';
 
         // Make a real server-side call to validate the folder structure
-        fetch('/validate_project', {
+        fetch('/project/validate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -523,7 +523,7 @@ document.addEventListener('DOMContentLoaded', function () {
         loadProjectBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Loading...';
 
         // Make actual server request to load the project
-        fetch('/load_project', {
+        fetch('/project/load', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',

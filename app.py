@@ -19,9 +19,10 @@ from utils.create_load_curve import (
     check_total_demand_data, create_load_curve, load_scenario_data, 
     extract_monthly_patterns_from_excel, get_future_annual_demand
 )
-import utils.pypsa_analysis_utils as pau 
+import utils.pypsa_analysis_utils as pau
 from utils.pypsa_analysis_utils import *
 import pypsa
+from utils import app_helpers
 # Set up logging configuration
 log_dir = 'logs'
 os.makedirs(log_dir, exist_ok=True)
